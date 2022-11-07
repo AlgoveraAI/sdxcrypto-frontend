@@ -1,29 +1,26 @@
 import Image from "next/image";
 
 import {
-  CursorArrowRaysIcon,
-  ShieldCheckIcon,
-  CurrencyDollarIcon,
+  PaintBrushIcon,
+  BriefcaseIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
 const features = [
   {
-    name: "Deploy models with just a few clicks",
-    description:
-      "Turn your models into production-ready APIs, without having to deal with infrastructure or MLOps.",
-    icon: CursorArrowRaysIcon,
+    name: "Create art",
+    description: "Get creative and produce your own artworks.",
+    icon: PaintBrushIcon,
   },
   {
-    name: "Keep your production costs down",
-    description:
-      "Leverage a fully-managed production solution for inference and pay as you go for the raw compute you use.",
-    icon: CurrencyDollarIcon,
+    name: "Design Logos",
+    description: "Make a logo for your new business or product.",
+    icon: BriefcaseIcon,
   },
   {
-    name: "Enterprise Securiy",
-    description:
-      "Deploy models into secure offline endpoints only accessible via direction connection to your Virtual Private Cloud (VPC).",
-    icon: ShieldCheckIcon,
+    name: "Make a profile picture",
+    description: "Build your online identity with a custom profile-picture.",
+    icon: UserCircleIcon,
   },
 ];
 export default function Hero() {
@@ -35,14 +32,13 @@ export default function Hero() {
             <div className="px-4 sm:px-8 lg:w-1/2 xl:pr-16">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
                 <span className="block xl:inline">
-                  Transformers in production:
+                  State-of-the-art AI Image Generation
                 </span>{" "}
-                <span className="italic block xl:inline">solved</span>
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-                With 🤗 Inference Endpoints, you can easily deploy your models
-                on dedicated, fully managed infrastructure. Keep your costs low
-                with our secure, compliant and flexible production solution.
+                Pay with Crypto or Credit Card to use our custom Stable
+                Diffusion pipeline. If you love your output, mint it directly as
+                an NFT that you own and can trade or sell.
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
@@ -50,15 +46,7 @@ export default function Hero() {
                     href="#"
                     className="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-4 md:px-10 md:text-lg"
                   >
-                    Deploy your first model
-                  </a>
-                </div>
-                <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                  <a
-                    href="#"
-                    className="flex w-full items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-primary hover:bg-gray-50 md:py-4 md:px-10 md:text-lg"
-                  >
-                    Or read the docs
+                    Start Generating
                   </a>
                 </div>
               </div>
@@ -67,7 +55,7 @@ export default function Hero() {
           <div className="relative h-64 w-full sm:h-72 md:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-1/2">
             <Image
               className="absolute inset-0 h-full w-full object-cover"
-              src="https://images.unsplash.com/photo-1636955840493-f43a02bfa064?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+              src="https://images.unsplash.com/photo-1617396900799-f4ec2b43c7ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
               alt=""
               width={1000}
               height={1000}
@@ -78,12 +66,12 @@ export default function Hero() {
       <div className="relative bg-white py-16 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Production Inference Made Easy
+            What can you do with Stable Diffusion?
           </p>
-          <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
+          {/* <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
             Deploy models on dedicated and secure infrastructure without dealing
             with containers and GPUs
-          </p>
+          </p> */}
           <div className="mt-12">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-1 lg:grid-cols-3">
               {features.map((feature) => (
