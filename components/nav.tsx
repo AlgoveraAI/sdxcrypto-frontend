@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import {
@@ -13,19 +14,19 @@ const resources = [
   {
     name: "Images",
     description: "Generate images using our custom Stable Diffusion pipeline.",
-    href: "#",
+    href: "/generate",
     icon: PaintBrushIcon,
   },
   {
     name: "Text",
     description: "Use GPT-3 to generate text from any prompt.",
-    href: "#",
+    href: "/generate",
     icon: DocumentTextIcon,
   },
   {
     name: "Audio",
     description: "Create original audio using the XYZ algorithm.",
-    href: "#",
+    href: "/generate",
     icon: MusicalNoteIcon,
   },
 ];
@@ -36,11 +37,11 @@ function classNames(...classes: string[]) {
 
 export default function Nav() {
   return (
-    <Popover className="relative">
+    <Popover className="relative bg-black/[0.3]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:justify-start md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
-            <a href="#">
+            <Link href="/">
               <span className="sr-only">Algovera</span>
               <Image
                 // className="h-8 w-auto sm:h-10"
@@ -49,7 +50,7 @@ export default function Nav() {
                 width={200}
                 height={100}
               />
-            </a>
+            </Link>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
             <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:text-gray-400 focus:outline-none">
@@ -103,7 +104,7 @@ export default function Nav() {
                       <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                         <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
                           {resources.map((item) => (
-                            <a
+                            <Link
                               key={item.name}
                               href={item.href}
                               className="-m-3 flex items-start rounded-lg p-3 hover:bg-gray-800"
@@ -120,7 +121,7 @@ export default function Nav() {
                                   {item.description}
                                 </p>
                               </div>
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       </div>

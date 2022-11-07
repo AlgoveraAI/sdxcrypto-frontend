@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import {
   PaintBrushIcon,
@@ -42,12 +43,12 @@ export default function Hero() {
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
-                  <a
-                    href="#"
+                  <Link
+                    href="/generate"
                     className="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-4 md:px-10 md:text-lg"
                   >
                     Start Generating
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

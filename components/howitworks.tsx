@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HowItWorks() {
   return (
@@ -92,6 +93,9 @@ export default function HowItWorks() {
       <div className="w-full text-center mt-24">
         <button
           type="button"
+          onClick={() => {
+            window.location.href = "/generate";
+          }}
           className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-3 md:px-8 md:text-lg"
         >
           Test the models
