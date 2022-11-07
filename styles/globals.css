@@ -28,3 +28,12 @@ a {
     background-color: #0f172a;
   }
 }
+
+.ReactModal__Overlay {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.ReactModal__Content {
+  border: none;
+  outline: none;
+}

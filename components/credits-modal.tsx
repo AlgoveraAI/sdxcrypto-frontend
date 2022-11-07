@@ -6,6 +6,8 @@ type Props = {
   trigger: boolean;
 };
 
+ReactModal.setAppElement("#__next");
+
 export default function CreditsModal({ nCredits, trigger }: Props) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [prevTrigger, setPrevTrigger] = useState(false);
@@ -29,18 +31,18 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
 
   return (
     <ReactModal
-      className="text-center text-black px-12 py-24 rounded-lg bg-white mx-24 mt-24 border border-primary focus:outline-none"
+      className="text-center text-gray-300 px-12 lg:px-36 py-24 rounded-lg bg-background mx-24 mt-24 border focus:outline-none"
       isOpen={modalIsOpen}
       onRequestClose={closeModal}
     >
-      <div className="text-primary text-3xl">{nCredits} Credits Remaining</div>
+      <div className="text-white text-3xl">{nCredits} Credits Remaining</div>
       <br />
       <div className="font-bold">How does the credit system work?</div>
       <div>
-        You can use credits to create a new project. Each project costs 1
-        credit. You can also use credits to create a new project. Each project
-        costs 1 credit.
+        Use credits to generate and mint your own NFTs. Credits can be purchased
+        via CoinBase Pay.
       </div>
+      <div>1 credit = 1 generation.</div>
       <div className="w-full text-center mt-12">
         <button
           type="button"
