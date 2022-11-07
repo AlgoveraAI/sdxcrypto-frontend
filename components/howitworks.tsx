@@ -1,9 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function HowItWorks() {
+type Props = {
+  howitworksRef: React.RefObject<HTMLDivElement>;
+};
+
+export default function HowItWorks({ howitworksRef }: Props) {
   return (
-    <div className="relative overflow-hidden bg-white pb-32">
+    <div
+      className="relative overflow-hidden bg-white pb-32"
+      ref={howitworksRef}
+    >
       <div className="relative">
         <p className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl w-full text-center">
           How It Works

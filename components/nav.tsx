@@ -1,3 +1,4 @@
+import React, { useEffect, FC } from "react";
 import Link from "next/link";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
@@ -9,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
+import PropTypes from "prop-types";
 
 const resources = [
   {
@@ -35,7 +37,11 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Nav() {
+type NavProps = {
+  howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
+};
+
+export default function Nav({ howitworksRef }: NavProps) {
   return (
     <Popover className="relative bg-black/[0.3]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -65,12 +71,14 @@ export default function Nav() {
             >
               About Us
             </a>
-            <a
-              href="#"
-              className="text-base font-medium text-gray-300 hover:text-gray-400 focus:outline-none"
+            <span
+              onClick={() =>
+                howitworksRef?.current?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="text-base font-medium text-gray-300 hover:text-gray-400 focus:outline-none cursor-pointer"
             >
               How it Works
-            </a>
+            </span>
 
             <Popover className="relative">
               {({ open }) => (
@@ -197,3 +205,5 @@ export default function Nav() {
     </Popover>
   );
 }
+
+// export default Nav;
