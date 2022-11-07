@@ -10,7 +10,7 @@ export default function HowItWorks() {
         <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8 ">
           <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0">
             <div>
-              <div className="mt-12">
+              <div className="mt-24">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900">
                   1. Select your model
                 </h2>
@@ -89,7 +89,7 @@ export default function HowItWorks() {
         </div>
       </div>
 
-      <div className="w-full text-center mt-12">
+      <div className="w-full text-center mt-24">
         <button
           type="button"
           className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-3 md:px-8 md:text-lg"
