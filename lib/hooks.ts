@@ -10,7 +10,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 export const useMoralisAuth = () => {
   const [user] = useAuthState(auth);
   const [moralisAuth, setMoralisAuth] = useState<MoralisAuth | null>(null);
-
   useEffect(() => {
     setMoralisAuth(getMoralisAuth(firebaseApp));
   }, []);

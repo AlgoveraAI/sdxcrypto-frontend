@@ -47,6 +47,7 @@ export default function Nav({ howitworksRef }: NavProps) {
   const moralisAuth = useMoralisAuth();
 
   const handleConnect = async () => {
+    // todo: handle signature rejection
     if (moralisAuth) {
       await signInWithMoralis(moralisAuth);
     }
