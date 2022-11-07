@@ -1,9 +1,14 @@
 import ReactModal from "react-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function CreditsModal() {
+type Props = {
+  nCredits: number;
+  trigger: boolean;
+};
+
+export default function CreditsModal({ nCredits, trigger }: Props) {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [nCredits, setNCredits] = useState(0);
+  const [prevTrigger, setPrevTrigger] = useState(false);
 
   function openModal() {
     setIsOpen(true);
@@ -12,6 +17,16 @@ export default function CreditsModal() {
   function closeModal() {
     setIsOpen(false);
   }
+
+  // if the trigger prop changes, open the modal
+  useEffect(() => {
+    if (prevTrigger !== trigger) {
+      console.log("triggering credits modal");
+      openModal();
+    }
+    setPrevTrigger(trigger);
+  }, [trigger]);
+
   return (
     <ReactModal
       className="text-center text-black px-12 py-24 rounded-lg bg-white mx-24 mt-24 border border-primary focus:outline-none"

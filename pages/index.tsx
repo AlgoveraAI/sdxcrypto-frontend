@@ -4,7 +4,6 @@ import Nav from "../components/nav";
 import Hero from "../components/hero";
 import HowItWorks from "../components/howitworks";
 import Pricing from "../components/pricing";
-import CreditsModal from "../components/credits-modal";
 
 const Home: NextPage = () => {
   const howitworksRef = useRef<HTMLDivElement>(null);
@@ -20,7 +19,6 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      <CreditsModal />
       <Nav howitworksRef={howitworksRef} />
       <Hero />
       <HowItWorks howitworksRef={howitworksRef} />
