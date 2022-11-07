@@ -52,7 +52,7 @@ export default function Nav() {
             </a>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
-            <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:text-gray-500 focus:outline-none">
+            <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:text-gray-400 focus:outline-none">
               <span className="sr-only">Open menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </Popover.Button>
@@ -134,7 +134,7 @@ export default function Nav() {
           <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
             <a
               href="#"
-              className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-indigo-500 px-4 py-2 text-base font-medium text-indigo-500 shadow-sm hover:text-indigo-700"
+              className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500"
             >
               Connect Wallet
             </a>
@@ -184,7 +184,7 @@ export default function Nav() {
               <div>
                 <a
                   href="#"
-                  className="flex w-full items-center justify-center rounded-md border border-solid border-indigo-500 px-4 py-2 text-base font-medium text-indigo-500 shadow-sm hover:text-indigo-700"
+                  className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
                 >
                   Connect Wallet
                 </a>
