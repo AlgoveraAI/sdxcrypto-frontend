@@ -2,6 +2,7 @@ import Nav from "../components/nav";
 import Select from "../components/generate/select";
 import Generate from "../components/generate/generate";
 import Mint from "../components/generate/mint";
+import type { NextPage } from "next";
 
 import { useState } from "react";
 
@@ -11,7 +12,7 @@ const STAGES = {
   3: "Mint",
 };
 
-export default function Pipeline() {
+const Pipeline: NextPage = () => {
   const [stage, setStage] = useState(1);
 
   return (
@@ -57,4 +58,6 @@ export default function Pipeline() {
       </div>
     </div>
   );
-}
+};
+
+export default Pipeline;

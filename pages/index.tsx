@@ -1,13 +1,22 @@
 import { useRef } from "react";
-
+import type { NextPage } from "next";
 import Nav from "../components/nav";
 import Hero from "../components/hero";
 import HowItWorks from "../components/howitworks";
 import Pricing from "../components/pricing";
 import CreditsModal from "../components/credits-modal";
 
-export default function Home() {
+const Home: NextPage = () => {
   const howitworksRef = useRef<HTMLDivElement>(null);
+
+  const handlePay = async () => {
+    const res = await fetch(
+      "https://us-central1-next-moralis.cloudfunctions.net/createCharge"
+    );
+    const data = await res.json();
+
+    window.open(data.hosted_url, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div>
@@ -18,4 +27,6 @@ export default function Home() {
       <Pricing />
     </div>
   );
-}
+};
+
+export default Home;

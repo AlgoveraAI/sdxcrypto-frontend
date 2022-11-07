@@ -10,7 +10,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
-import PropTypes from "prop-types";
+import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
+import { useMoralisAuth } from "../lib/hooks";
+import { auth } from "../lib/firebase";
 
 const resources = [
   {
@@ -42,6 +44,18 @@ type NavProps = {
 };
 
 export default function Nav({ howitworksRef }: NavProps) {
+  const moralisAuth = useMoralisAuth();
+
+  const handleConnect = async () => {
+    if (moralisAuth) {
+      await signInWithMoralis(moralisAuth);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    await auth.signOut();
+  };
+
   return (
     <Popover className="relative bg-black/[0.3]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -141,12 +155,21 @@ export default function Nav({ howitworksRef }: NavProps) {
           </Popover.Group>
 
           <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-            <a
-              href="#"
-              className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500"
-            >
-              Connect Wallet
-            </a>
+            {moralisAuth?.auth?.currentUser ? (
+              <span
+                onClick={handleDisconnect}
+                className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
+              >
+                Disconnect Wallet
+              </span>
+            ) : (
+              <span
+                onClick={handleConnect}
+                className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
+              >
+                Connect Wallet
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -191,12 +214,21 @@ export default function Nav({ howitworksRef }: NavProps) {
                 ))}
               </div>
               <div>
-                <a
-                  href="#"
-                  className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
-                >
-                  Connect Wallet
-                </a>
+                {moralisAuth?.auth?.currentUser ? (
+                  <span
+                    onClick={handleDisconnect}
+                    className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
+                  >
+                    Disconnect Wallet
+                  </span>
+                ) : (
+                  <span
+                    onClick={handleConnect}
+                    className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
+                  >
+                    Connect Wallet
+                  </span>
+                )}
               </div>
             </div>
           </div>
