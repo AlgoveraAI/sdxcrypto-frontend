@@ -15,18 +15,14 @@ export default function HowItWorks({ howitworksRef }: Props) {
         <p className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl w-full text-center">
           How It Works
         </p>
-        <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8 ">
-          <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0">
-            <div>
-              <div className="mt-24">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                  1. Select your model
-                </h2>
-                <p className="mt-4 text-lg text-gray-500">
-                  Choose from state-of-the-art generative AI models
-                </p>
-              </div>
-            </div>
+        <div className="mt-24 lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8 ">
+          <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:px-0  flex flex-col justify-center ">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+              1. Select your model
+            </h2>
+            <p className="mt-4 text-lg text-gray-500">
+              Choose from state-of-the-art generative AI models
+            </p>
           </div>
           <div className="mt-12 sm:mt-12 lg:mt-0 ">
             <div className="px-14 lg:relative lg:m-0 lg:h-full lg:px-0">
@@ -43,17 +39,13 @@ export default function HowItWorks({ howitworksRef }: Props) {
       </div>
       <div className="mt-12">
         <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8">
-          <div className="mx-auto max-w-xl px-4 sm:px-6 lg:col-start-2 lg:mx-0 lg:max-w-none lg:py-32 lg:px-0">
-            <div>
-              <div className="mt-0">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                  2. Generate outputs
-                </h2>
-                <p className="mt-4 text-lg text-gray-500">
-                  Type in your prompt, adjust the settings, and generate.
-                </p>
-              </div>
-            </div>
+          <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:px-0 flex flex-col justify-center ">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+              2. Generate outputs
+            </h2>
+            <p className="mt-4 text-lg text-gray-500">
+              Type in your prompt, adjust the settings, and generate.
+            </p>
           </div>
           <div className="mt-12 sm:mt-12 lg:col-start-1 lg:mt-0">
             <div className="px-14 lg:relative lg:m-0 lg:h-full lg:px-0">
@@ -68,31 +60,26 @@ export default function HowItWorks({ howitworksRef }: Props) {
           </div>
         </div>
       </div>
-      <div className="relative mt-12">
-        <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8">
-          <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0">
-            <div>
-              <div className="mt-0">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                  3. Mint (optional)
-                </h2>
-                <p className="mt-4 text-lg text-gray-500">
-                  If you like what you see, mint the image as an NFT for free on
-                  the Ethereum blockchain.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="mt-12 sm:mt-12 lg:mt-0">
-            <div className="px-14 lg:relative lg:m-0 lg:h-full lg:px-0">
-              <Image
-                className=" w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:left-0 lg:w-100 lg:max-w-none lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2"
-                src={require("../assets/howitworks/3.png")}
-                alt="Inbox user interface"
-                width={999}
-                height={517}
-              />
-            </div>
+
+      <div className="mt-24 lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8 ">
+        <div className="mx-auto max-w-xl px-4 sm:px-6 lg:mx-0 lg:max-w-none lg:px-0 flex flex-col justify-center ">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+            3. Mint (optional)
+          </h2>
+          <p className="mt-4 text-lg text-gray-500">
+            If you like what you see, mint the image as an NFT for free on the
+            Ethereum blockchain.
+          </p>
+        </div>
+        <div className="mt-12 sm:mt-12 lg:mt-0 ">
+          <div className="px-14 lg:relative lg:m-0 lg:h-full lg:px-0">
+            <Image
+              className="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2 lg:max-w-none "
+              src={require("../assets/howitworks/3.png")}
+              alt="Inbox user interface"
+              width={490}
+              height={600}
+            />
           </div>
         </div>
       </div>
