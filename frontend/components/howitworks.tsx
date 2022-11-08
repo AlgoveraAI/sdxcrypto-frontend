@@ -92,7 +92,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
           }}
           className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-3 md:px-8 md:text-lg"
         >
-          Test the models
+          Try it now!
         </button>
       </div>
     </div>
