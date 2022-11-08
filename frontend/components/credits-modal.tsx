@@ -20,6 +20,17 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
     setIsOpen(false);
   }
 
+  async function buyCredits() {
+    // make call to next api
+    const chargeRes = await fetch(
+      "https://us-central1-next-moralis.cloudfunctions.net/createCharge"
+    );
+    const data = await chargeRes.json();
+
+    window.open(data.hosted_url, "_blank", "noopener,noreferrer");
+    // console.log(res);
+  }
+
   // if the trigger prop changes, open the modal
   useEffect(() => {
     if (prevTrigger !== trigger) {
@@ -47,6 +58,7 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
         <button
           type="button"
           className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-3 md:px-8 md:text-lg"
+          onClick={buyCredits}
         >
           Buy Credits
         </button>

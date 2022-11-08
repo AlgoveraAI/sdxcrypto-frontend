@@ -8,15 +8,6 @@ import Pricing from "../components/pricing";
 const Home: NextPage = () => {
   const howitworksRef = useRef<HTMLDivElement>(null);
 
-  const handlePay = async () => {
-    const res = await fetch(
-      "https://us-central1-next-moralis.cloudfunctions.net/createCharge"
-    );
-    const data = await res.json();
-
-    window.open(data.hosted_url, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <div>
       <Nav howitworksRef={howitworksRef} />
