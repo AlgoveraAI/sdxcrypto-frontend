@@ -38,6 +38,7 @@ export default function Nav({ howitworksRef }: NavProps) {
     // todo: handle signature rejection
     if (moralisAuth) {
       await signInWithMoralis(moralisAuth);
+      console.log("connected user:", moralisAuth.auth.currentUser);
     }
   };
 

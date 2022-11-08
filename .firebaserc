@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "sdxcrypto-4ac0c"
+  },
+  "targets": {},
+  "etags": {
+    "sdxcrypto-4ac0c": {
+      "extensionInstances": {
+        "moralis-auth": "beedab47a5969cafa6c526682a025cc9fed4851e4de21c8e8487922125b75155"
+      }
+    }
+  }
+}
