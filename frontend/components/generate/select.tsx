@@ -22,7 +22,6 @@ const models = [
 
 type Props = {
   selectedModal: string;
-  // function to set state
   setSelectedModal: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -39,9 +38,7 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
         {models.map((model) => (
           <div
             key={model.name}
-            className={`relative flex items-center space-x-3 rounded-lg px-6 py-5 shadow-sm bg-white ${
-              selectedModal === model.name ? "border-4 border-primary" : ""
-            } `}
+            className={`relative flex items-center space-x-3 rounded-lg px-6 py-5 shadow-sm bg-white`}
           >
             <div className="flex-shrink-0">
               <Image

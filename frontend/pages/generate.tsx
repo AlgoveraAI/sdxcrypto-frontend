@@ -7,15 +7,19 @@ import type { NextPage } from "next";
 
 import { useState } from "react";
 
-const STAGES = {
-  1: "Select",
-  2: "Generate",
-  3: "Mint",
-};
-
 const Pipeline: NextPage = () => {
   const [stage, setStage] = useState(1);
   const [selectedModal, setSelectedModal] = useState("");
+  const [imgUrl, setImgUrl] = useState(
+    "https://images.unsplash.com/photo-1617396900799-f4ec2b43c7ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+  );
+
+  // on setSelectedModal, switch stage to Generate
+  useEffect(() => {
+    if (selectedModal) {
+      setStage(2);
+    }
+  }, [selectedModal]);
 
   return (
     <div>
@@ -62,7 +66,11 @@ const Pipeline: NextPage = () => {
             setSelectedModal={setSelectedModal}
           />
         ) : stage === 2 ? (
-          <Generate />
+          <Generate
+            selectedModal={selectedModal}
+            imgUrl={imgUrl}
+            setImgUrl={setImgUrl}
+          />
         ) : (
           <Mint />
         )}
