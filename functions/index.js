@@ -1,35 +1,43 @@
 const functions = require("firebase-functions");
-
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
-const admin = require("firebase-admin");
-admin.initializeApp();
-
-const firestore = admin.firestore();
-
-Client.init("a08072f1-a418-4a25-a021-6cd8bb4e6849");
-
 const { Charge } = resources;
 
+// setup cors
 const cors = require("cors")({ origin: "*" });
+
+// prepare app
+const admin = require("firebase-admin");
+admin.initializeApp();
+const firestore = admin.firestore();
+
+// get env variables
+require("dotenv").config();
+const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
+const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
+
+Client.init(cbApiKey);
 
 exports.createCharge = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
+    console.log("creating charge", request.body);
+    const data = JSON.parse(request.body);
+    const { uid, nCredits } = data;
+    const amount = String(nCredits * 0.01);
     const chargeData = {
       name: "AI credits",
-      description: "350 AI credits",
+      description: `Purchase request: ${nCredits} AI credits`,
       local_price: {
-        amount: "0.35",
+        amount: amount,
         currency: "USD",
       },
       pricing_type: "fixed_price",
       metadata: {
-        uid: "0x275e16deffbf14283fa8dc0b3fd268734811764ca8b090debf3c722d6284b1a5",
+        uid: uid,
       },
     };
 
     const charge = await Charge.create(chargeData);
     console.log(charge);
-
     response.send(charge);
   });
 });
@@ -38,10 +46,13 @@ exports.webhookHandler = functions.https.onRequest(
   async (request, response) => {
     const rawBody = request.rawBody;
     const signature = request.headers["x-cc-webhook-signature"];
-    const webhookSecret = "ffc33b40-0b70-4bc7-b227-29c4edde6798";
 
     try {
-      const event = Webhook.verifyEventBody(rawBody, signature, webhookSecret);
+      const event = Webhook.verifyEventBody(
+        rawBody,
+        signature,
+        cbWebhookSecret
+      );
       console.log({
         id: event.data.id,
         status: event.type,
