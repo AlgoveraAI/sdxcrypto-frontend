@@ -7,17 +7,19 @@ import {
 import { getAuth, GoogleAuthProvider } from "@firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB_Q89_1FImvL5B4225qZQEnjwiY1886pM",
+  apiKey: "AIzaSyCOKMLbEL3dhbGUWMcghznnInY7yjpge-s",
 
-  authDomain: "sdxcrypto-4ac0c.firebaseapp.com",
+  authDomain: "sdxcrypto-algovera.firebaseapp.com",
 
-  projectId: "sdxcrypto-4ac0c",
+  projectId: "sdxcrypto-algovera",
 
-  storageBucket: "sdxcrypto-4ac0c.appspot.com",
+  storageBucket: "sdxcrypto-algovera.appspot.com",
 
-  messagingSenderId: "287297395976",
+  messagingSenderId: "620009842012",
 
-  appId: "1:287297395976:web:9a75e62a009b7aa03360bd",
+  appId: "1:620009842012:web:fe419cfeca2434e16a0d99",
+
+  measurementId: "G-BEQNC17HKX",
 };
 
 function createFirebaseApp(config: FirebaseOptions): FirebaseApp {

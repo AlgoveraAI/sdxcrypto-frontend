@@ -1,12 +1,13 @@
 {
   "projects": {
-    "default": "sdxcrypto-4ac0c"
+    "default": "sdxcrypto-algovera"
   },
   "targets": {},
   "etags": {
-    "sdxcrypto-4ac0c": {
+    "sdxcrypto-algovera": {
       "extensionInstances": {
-        "moralis-auth": "beedab47a5969cafa6c526682a025cc9fed4851e4de21c8e8487922125b75155"
+        "moralis-auth-m2ll": "829dff064be3baa98b92e6833650bc395ce6065ac4faff35f8882cc056d4b7f8",
+        "moralis-auth": "dcc7280f508f67cf375f9d278191ae2bbb9b3a46185efeeb0c2aa01efdc82521"
       }
     }
   }

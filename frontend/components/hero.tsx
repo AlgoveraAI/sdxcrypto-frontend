@@ -67,7 +67,7 @@ export default function Hero() {
       <div className="relative bg-white py-16 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            What can you do with Stable Diffusion?
+            Create Stunning Images in Seconds
           </p>
           {/* <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
             Deploy models on dedicated and secure infrastructure without dealing
