@@ -26,7 +26,7 @@ const Pipeline: NextPage = () => {
       <Nav />
 
       {/* <h2 className="mt-12 text-3xl font-bold text-center">Generate</h2> */}
-      <div className="mt-24 columns-3 w-full text-center">
+      <div className="mt-12 columns-3 w-full text-center">
         <div
           onClick={() => setStage(1)}
           className={`text-xl ${
@@ -35,7 +35,7 @@ const Pipeline: NextPage = () => {
               : "text-gray-500 hover:cursor-pointer hover:underline"
           }`}
         >
-          1. Select
+          1. Setup
         </div>
         <div
           onClick={() => setStage(2)}
@@ -72,7 +72,7 @@ const Pipeline: NextPage = () => {
             setImgUrl={setImgUrl}
           />
         ) : (
-          <Mint />
+          <Mint selectedModal={selectedModal} imgUrl={imgUrl} />
         )}
       </div>
     </div>
