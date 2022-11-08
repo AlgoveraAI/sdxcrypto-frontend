@@ -5,14 +5,22 @@ import Spinner from "../spinner";
 type Props = {
   selectedModal: string;
   imgUrl: string;
+  prompt: string;
 };
 
-export default function Generate({ selectedModal, imgUrl }: Props) {
+export default function Generate({ selectedModal, imgUrl, prompt }: Props) {
   const [loading, setLoading] = useState(false);
 
   const mint = async () => {
     setLoading(true);
+    // check params
     const name = document.getElementById("name") as HTMLInputElement;
+    if (imgUrl === "") {
+      alert("Generate an image before minting");
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
     if (name.value === "") {
       alert("Please enter a name");
       setLoading(false);
@@ -26,7 +34,9 @@ export default function Generate({ selectedModal, imgUrl }: Props) {
       setLoading(false);
       return;
     }
-    setLoading(false);
+
+    // todo add prompt as an attribute
+    // todo add selected modal as an attribute
   };
 
   return (
@@ -40,8 +50,7 @@ export default function Generate({ selectedModal, imgUrl }: Props) {
               id="name"
               defaultValue=""
               data-lpignore="true"
-              disabled={selectedModal === "" || imgUrl === "" ? true : false}
-              className="block p-2 w-full shadow-sm disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500 sm:text-sm outline-none bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
               placeholder="AI Art #1"
             />
           </div>
@@ -57,8 +66,7 @@ export default function Generate({ selectedModal, imgUrl }: Props) {
               id="description"
               defaultValue=""
               data-lpignore="true"
-              disabled={selectedModal === "" || imgUrl === "" ? true : false}
-              className="block p-2 w-full shadow-sm disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-500 sm:text-sm bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm  sm:text-sm bg-black/[0.3] border-none"
               placeholder="An AI generated artwork"
             />
           </div>
@@ -68,7 +76,6 @@ export default function Generate({ selectedModal, imgUrl }: Props) {
         <button
           onClick={mint}
           type="button"
-          disabled={selectedModal === "" || imgUrl === "" ? true : false}
           className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-1 text-base font-medium text-white hover:bg-primary-darker md:text-lg"
         >
           {loading ? <Spinner /> : "Mint"}

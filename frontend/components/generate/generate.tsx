@@ -6,15 +6,27 @@ type Props = {
   selectedModal: string;
   imgUrl: string;
   setImgUrl: React.Dispatch<React.SetStateAction<string>>;
+  prompt: string;
+  setPrompt: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export default function Generate({ selectedModal, imgUrl, setImgUrl }: Props) {
+export default function Generate({
+  selectedModal,
+  imgUrl,
+  setImgUrl,
+  prompt,
+  setPrompt,
+}: Props) {
   const [loading, setLoading] = useState(false);
 
   const generateImg = async () => {
     setLoading(true);
-    const prompt = document.getElementById("prompt") as HTMLInputElement;
-    if (prompt.value === "") {
+    if (selectedModal === "") {
+      alert("Please select a model");
+      setLoading(false);
+      return;
+    }
+    if (prompt === "") {
       alert("Please enter a prompt");
       setLoading(false);
       return;
@@ -22,7 +34,7 @@ export default function Generate({ selectedModal, imgUrl, setImgUrl }: Props) {
     const res = await fetch("/api/generate", {
       method: "POST",
       body: JSON.stringify({
-        prompt: prompt.value,
+        prompt: prompt,
         selectedModal: selectedModal,
       }),
     });
@@ -37,7 +49,7 @@ export default function Generate({ selectedModal, imgUrl, setImgUrl }: Props) {
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-center">
-        {selectedModal ? selectedModal : "Please select a model"}
+        {selectedModal ? selectedModal : "No model selected"}
       </h2>
       <div>
         <label className="block text-sm font-medium text-gray-500">
@@ -47,17 +59,16 @@ export default function Generate({ selectedModal, imgUrl, setImgUrl }: Props) {
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <input
               id="prompt"
-              defaultValue=""
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
               data-lpignore="true"
-              disabled={selectedModal === "" ? true : false}
-              className="block p-2 w-full shadow-sm disabled:cursor-not-allowed disabled:border-gray-200  disabled:text-gray-500 sm:text-sm outline-none bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
               placeholder="Abstract 3D octane render, trending on artstation..."
             />
           </div>
           <button
             onClick={generateImg}
             type="button"
-            disabled={selectedModal === "" ? true : false}
             className="relative -ml-px inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
           >
             {/* keep text here when loading to maintain same width */}
