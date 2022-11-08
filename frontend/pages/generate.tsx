@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Nav from "../components/nav";
 import Select from "../components/generate/select";
 import Generate from "../components/generate/generate";
@@ -14,12 +15,13 @@ const STAGES = {
 
 const Pipeline: NextPage = () => {
   const [stage, setStage] = useState(1);
+  const [selectedModal, setSelectedModal] = useState("");
 
   return (
     <div>
       <Nav />
 
-      <h2 className="mt-12 text-3xl font-bold text-center">Generate</h2>
+      {/* <h2 className="mt-12 text-3xl font-bold text-center">Generate</h2> */}
       <div className="mt-24 columns-3 w-full text-center">
         <div
           onClick={() => setStage(1)}
@@ -53,8 +55,17 @@ const Pipeline: NextPage = () => {
         </div>
       </div>
 
-      <div className="mt-12 mx-36 p-4 bg-black/[0.3]">
-        {stage === 1 ? <Select /> : stage === 2 ? <Generate /> : <Mint />}
+      <div className="mt-12 mx-24 p-4">
+        {stage === 1 ? (
+          <Select
+            selectedModal={selectedModal}
+            setSelectedModal={setSelectedModal}
+          />
+        ) : stage === 2 ? (
+          <Generate />
+        ) : (
+          <Mint />
+        )}
       </div>
     </div>
   );
