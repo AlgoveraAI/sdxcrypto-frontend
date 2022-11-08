@@ -67,3 +67,5 @@ node_modules/
 
 # ignore extensions/moralis-auth.env and others
 *.env
+
+*.vscode
