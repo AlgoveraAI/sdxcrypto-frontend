@@ -26,9 +26,6 @@ type Props = {
 };
 
 export default function Select({ selectedModal, setSelectedModal }: Props) {
-  // log props on every render
-  console.log("selectedModal: ", selectedModal);
-
   return (
     <>
       <h2 className="mb-6 text-3xl font-bold text-center">Select a Model</h2>
