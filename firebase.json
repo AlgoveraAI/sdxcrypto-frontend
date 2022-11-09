@@ -3,7 +3,7 @@
     "source": "functions"
   },
   "hosting": {
-    "public": "frontend/.next",
+    "source": "frontend",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -11,7 +11,6 @@
     ]
   },
   "extensions": {
-    "moralis-auth": "moralis/moralis-auth@0.1.4",
-    "moralis-auth-m2ll": "moralis/moralis-auth@0.1.4"
+    "moralis-auth": "moralis/moralis-auth@0.1.4"
   }
 }
