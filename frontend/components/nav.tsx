@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import CreditsModal from "../components/credits-modal";
 import Link from "next/link";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
@@ -9,26 +8,27 @@ import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 import { useMoralisAuth } from "../lib/hooks";
 import { auth } from "../lib/firebase";
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
+// function classNames(...classes: string[]) {
+//   return classes.filter(Boolean).join(" ");
+// }
 
 type NavProps = {
-  uid: string;
+  // uid: string;
+  credits: number;
   setUid: React.Dispatch<React.SetStateAction<string>>;
-  howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
+  // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
+  // creditsModalTrigger: boolean;
+  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
+export default function Nav({
+  credits,
+  setUid,
+  setCreditsModalTrigger,
+}: NavProps) {
   const [onHome, setOnHome] = React.useState(true);
-  const [creditsModalTrigger, setCreditsModalTrigger] = React.useState(false);
-  const [credits, setCredits] = useState(0);
 
   const moralisAuth = useMoralisAuth();
-
-  const openCreditsModal = () => {
-    setCreditsModalTrigger(!creditsModalTrigger);
-  };
 
   useEffect(() => {
     console.log("checking auth");
@@ -62,7 +62,6 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
 
   return (
     <div>
-      <CreditsModal credits={credits} trigger={creditsModalTrigger} uid={uid} />
       <Popover className="relative bg-black/[0.3]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between border-gray-100 py-6 md:justify-start md:space-x-10">
@@ -84,7 +83,7 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </Popover.Button>
             </div>
-            <Popover.Group as="nav" className="hidden space-x-10 md:flex">
+            {/* <Popover.Group as="nav" className="hidden space-x-10 md:flex">
               <a
                 href="#"
                 className="text-base font-medium text-gray-300 hover:text-gray-400 focus:outline-none"
@@ -123,9 +122,9 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
                   </>
                 )}
               </Popover>
-            </Popover.Group>
+            </Popover.Group> */}
 
-            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 text-white ">
+            <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
               {moralisAuth?.auth?.currentUser && (
                 <span
                   className={`cursor-pointer ${
@@ -133,7 +132,9 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
                       ? "text-red-500 hover:text-red-600 "
                       : "text-green-500 hover:text-green-600 "
                   }`}
-                  onClick={openCreditsModal}
+                  onClick={() => {
+                    setCreditsModalTrigger(true);
+                  }}
                 >
                   {credits === 0
                     ? "Out of Credits"
@@ -142,9 +143,6 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
                     : `${credits} Credits`}
                 </span>
               )}
-            </div>
-
-            <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
               {moralisAuth?.auth?.currentUser ? (
                 <span
                   onClick={handleDisconnect}
@@ -177,9 +175,9 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
             focus
             className="absolute inset-x-0 top-0 origin-top-right transform p-2 transition md:hidden"
           >
-            <div className="divide-y-2 divide-gray-50 rounded-lg bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
-              <div className="space-y-6 py-6 px-5">
-                <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+            <div className="divide-y-2 divide-gray-50 rounded-lg bg-gray-800 shadow-lg">
+              <div className="space-y-3 py-6 px-5">
+                {/* <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                   <a
                     href="#"
                     className="text-base font-medium text-gray-300 hover:text-gray-400"
@@ -198,19 +196,39 @@ export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
                   >
                     Generate
                   </a>
+                </div> */}
+                <div className="flex w-full items-center justify-center px-4 py-2  bg-black/[0.3]">
+                  {moralisAuth?.auth?.currentUser && (
+                    <span
+                      className={`cursor-pointer ${
+                        !credits
+                          ? "text-red-500 hover:text-red-600 "
+                          : "text-green-500 hover:text-green-600 "
+                      }`}
+                      onClick={() => {
+                        setCreditsModalTrigger(true);
+                      }}
+                    >
+                      {credits === 0
+                        ? "Out of Credits"
+                        : credits === 1
+                        ? "1 Credit"
+                        : `${credits} Credits`}
+                    </span>
+                  )}
                 </div>
                 <div>
                   {moralisAuth?.auth?.currentUser ? (
                     <span
                       onClick={handleDisconnect}
-                      className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
+                      className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
                     >
                       Disconnect Wallet
                     </span>
                   ) : (
                     <span
                       onClick={handleConnect}
-                      className="flex w-full items-center justify-center rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400"
+                      className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
                     >
                       Connect Wallet
                     </span>

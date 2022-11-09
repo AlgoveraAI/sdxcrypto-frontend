@@ -18,6 +18,8 @@ export default function Generate({
   images,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [width, setWidth] = useState(512);
+  const [height, setHeight] = useState(512);
 
   console.log("rendering images", images);
 
@@ -57,21 +59,21 @@ export default function Generate({
         <label className="block text-sm font-medium text-gray-500">
           Prompt
         </label>
-        <div className="mt-1 flex shadow-sm ">
+        <div className="mt-1 md:flex shadow-sm ">
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <input
               id="prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               data-lpignore="true"
-              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm text-sm outline-none bg-black/[0.3] border-none"
               placeholder="Abstract 3D octane render, trending on artstation..."
             />
           </div>
           <button
             onClick={generateImg}
             type="button"
-            className="relative -ml-px inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
+            className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
           >
             {/* keep text here when loading to maintain same width */}
             <span className={loading ? "text-transparent" : ""}>Generate</span>
@@ -84,11 +86,11 @@ export default function Generate({
       {/* TODO display all images */}
       {images.length ? (
         <Image
-          className="mt-6 w-full"
+          className="mt-6 max-w-full h-auto mx-auto"
           src={images[0]}
           alt="Generated Image"
-          width={400}
-          height={400}
+          width={width}
+          height={height}
         />
       ) : null}
     </div>

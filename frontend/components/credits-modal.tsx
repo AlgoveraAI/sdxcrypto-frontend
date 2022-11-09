@@ -4,15 +4,20 @@ import Spinner from "./spinner";
 
 type Props = {
   credits: number;
-  trigger: boolean;
+  creditsModalTrigger: boolean;
+  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   uid: string;
 };
 
 ReactModal.setAppElement("#__next");
 
-export default function CreditsModal({ credits, trigger, uid }: Props) {
+export default function CreditsModal({
+  credits,
+  creditsModalTrigger,
+  setCreditsModalTrigger,
+  uid,
+}: Props) {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [prevTrigger, setPrevTrigger] = useState(false);
   const [loading, setLoading] = useState(false);
   const [desiredNumCredits, setDesiredNumCredits] = useState(1);
 
@@ -22,6 +27,7 @@ export default function CreditsModal({ credits, trigger, uid }: Props) {
 
   function closeModal() {
     setIsOpen(false);
+    setCreditsModalTrigger(false);
   }
 
   async function testChargeEvent() {
@@ -76,11 +82,11 @@ export default function CreditsModal({ credits, trigger, uid }: Props) {
 
   // if the trigger prop changes, open the modal
   useEffect(() => {
-    if (prevTrigger !== trigger) {
+    console.log("credits modal triggered");
+    if (creditsModalTrigger) {
       openModal();
     }
-    setPrevTrigger(trigger);
-  }, [prevTrigger, trigger]);
+  }, [creditsModalTrigger]);
 
   return (
     <ReactModal

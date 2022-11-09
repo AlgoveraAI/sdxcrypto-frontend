@@ -4,21 +4,37 @@ import Nav from "../components/nav";
 import Hero from "../components/hero";
 import HowItWorks from "../components/howitworks";
 import Pricing from "../components/pricing";
+import CreditsModal from "../components/credits-modal";
+import { PageProps } from "./types";
 
-type PageProps = {
-  uid: string;
-  setUid: React.Dispatch<React.SetStateAction<string>>;
-};
-
-const Home: NextPage<PageProps> = ({ uid, setUid }) => {
+const Home: NextPage<PageProps> = ({
+  uid,
+  setUid,
+  credits,
+  creditsModalTrigger,
+  setCreditsModalTrigger,
+}) => {
   const howitworksRef = useRef<HTMLDivElement>(null);
 
   return (
     <div>
-      <Nav uid={uid} setUid={setUid} howitworksRef={howitworksRef} />
+      <CreditsModal
+        credits={credits}
+        creditsModalTrigger={creditsModalTrigger}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+        uid={uid}
+      />
+      <Nav
+        credits={credits}
+        setUid={setUid}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+      />
       <Hero />
       <HowItWorks howitworksRef={howitworksRef} />
-      <Pricing />
+      <Pricing
+        creditsModalTrigger={creditsModalTrigger}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+      />
     </div>
   );
 };

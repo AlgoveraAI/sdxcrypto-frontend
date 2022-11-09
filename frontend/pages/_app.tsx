@@ -4,5 +4,18 @@ import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [uid, setUid] = useState("");
-  return <Component {...pageProps} uid={uid} setUid={setUid} />;
+  const [credits, setCredits] = useState(0);
+  const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
+
+  return (
+    <Component
+      {...pageProps}
+      uid={uid}
+      setUid={setUid}
+      credits={credits}
+      setCredits={setCredits}
+      creditsModalTrigger={creditsModalTrigger}
+      setCreditsModalTrigger={setCreditsModalTrigger}
+    />
+  );
 }

@@ -7,6 +7,8 @@ import type { NextPage } from "next";
 import { useState } from "react";
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { firebaseApp, auth } from "../lib/firebase";
+import CreditsModal from "../components/credits-modal";
+import { PageProps } from "./types";
 
 const steps = [
   { id: "1", name: "Setup", href: "#" },
@@ -14,12 +16,13 @@ const steps = [
   { id: "3", name: "Mint", href: "#" },
 ];
 
-type PageProps = {
-  uid: string;
-  setUid: React.Dispatch<React.SetStateAction<string>>;
-};
-
-const GeneratePage: NextPage<PageProps> = ({ uid, setUid }) => {
+const GeneratePage: NextPage<PageProps> = ({
+  uid,
+  setUid,
+  credits,
+  creditsModalTrigger,
+  setCreditsModalTrigger,
+}) => {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
   // store params and details for each step here
@@ -64,13 +67,23 @@ const GeneratePage: NextPage<PageProps> = ({ uid, setUid }) => {
 
   return (
     <div>
-      <Nav uid={uid} setUid={setUid} />
+      <CreditsModal
+        credits={credits}
+        creditsModalTrigger={creditsModalTrigger}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+        uid={uid}
+      />
+      <Nav
+        setUid={setUid}
+        credits={credits}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+      />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto md:px-24 px-6">
         <nav aria-label="Progress">
           <ol
             role="list"
-            className="bg-black/[0.3] mt-12 mx-24 divide-y rounded-md md:flex md:divide-y-0"
+            className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
           >
             {steps.map((step, stepIdx) => (
               <li
@@ -129,7 +142,7 @@ const GeneratePage: NextPage<PageProps> = ({ uid, setUid }) => {
           </ol>
         </nav>
 
-        <div className="mt-12 mx-24 p-4">
+        <div className="mt-12">
           {currentStepIdx === 0 ? (
             <Select
               selectedModal={selectedModal}
