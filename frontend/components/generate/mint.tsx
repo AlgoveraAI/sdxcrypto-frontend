@@ -49,7 +49,7 @@ export default function Generate({
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-center">Mint Your NFT</h2>
-      <div className="w-1/2 mx-auto">
+      <div className="mx-auto">
         <label className="block text-sm font-medium text-gray-500">Name</label>
         <div className="mt-1 flex shadow-sm ">
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
@@ -57,13 +57,13 @@ export default function Generate({
               id="name"
               defaultValue=""
               data-lpignore="true"
-              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none text-sm"
               placeholder="AI Art #1"
             />
           </div>
         </div>
       </div>
-      <div className="mt-2  w-1/2 mx-auto">
+      <div className="mt-2 mx-auto">
         <label className="block text-sm font-medium text-gray-500">
           Description
         </label>
@@ -73,7 +73,7 @@ export default function Generate({
               id="description"
               defaultValue=""
               data-lpignore="true"
-              className="block p-2 w-full shadow-sm  sm:text-sm bg-black/[0.3] border-none"
+              className="block p-2 w-full shadow-sm outline-none sm:text-sm bg-black/[0.3] border-none text-sm"
               placeholder="An AI generated artwork"
             />
           </div>
@@ -83,7 +83,7 @@ export default function Generate({
         <button
           onClick={mint}
           type="button"
-          className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-1 text-base font-medium text-white hover:bg-primary-darker md:text-lg"
+          className="w-full md:w-1/2 text-center rounded-md border border-transparent bg-primary px-8 py-1 text-base font-medium text-white hover:bg-primary-darker md:text-lg"
         >
           {loading ? <Spinner /> : "Mint"}
         </button>
