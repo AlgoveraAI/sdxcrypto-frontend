@@ -21,11 +21,11 @@ exports.createCharge = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
     console.log("creating charge", request.body);
     const data = JSON.parse(request.body);
-    const { uid, nCredits } = data;
-    const amount = String(nCredits * 0.01);
+    const { uid, credits } = data;
+    const amount = String(credits * 0.01);
     const chargeData = {
-      name: "AI credits",
-      description: `Purchase request: ${nCredits} AI credits`,
+      name: "Algovera AI Credits",
+      description: `Purchase request: ${credits} AI credits`,
       local_price: {
         amount: amount,
         currency: "USD",
@@ -33,12 +33,107 @@ exports.createCharge = functions.https.onRequest((request, response) => {
       pricing_type: "fixed_price",
       metadata: {
         uid: uid,
+        credits: credits,
       },
     };
 
     const charge = await Charge.create(chargeData);
     console.log(charge);
     response.send(charge);
+  });
+});
+
+async function handleChargeEvent(event) {
+  console.log("charge event:", {
+    id: event.data.id,
+    status: event.type,
+    code: event.data.code,
+    uid: event.data.metadata.uid,
+    created_at: event.data.created_at,
+  });
+
+  if (event.type === "charge:pending") {
+    console.log("Charge pending");
+  }
+
+  if (event.type === "charge:confirmed") {
+    console.log("Charge confirmed!!!!");
+
+    let { uid, credits } = event.data.metadata;
+    credits = parseInt(credits);
+
+    // prepare a batch update
+    let batch = firestore.batch();
+
+    // check if the user has a doc in the users collection
+    console.log("Checking user doc");
+    const userRef = firestore.collection("users").doc(uid);
+    const userDoc = await userRef.get();
+    console.log("Got user doc. exists =", userDoc.exists);
+    if (userDoc.exists) {
+      // update the user's credits
+      console.log("Updating user's credits");
+      batch.update(firestore.collection("users").doc(uid), {
+        credits: admin.firestore.FieldValue.increment(credits),
+      });
+    } else {
+      console.log("Creating user's doc");
+      batch.set(firestore.collection("users").doc(uid), {
+        // create the user doc with the credits
+        credits: credits,
+      });
+    }
+
+    // get a ref to the charge
+    console.log("Checking charge doc");
+    const chargeRef = firestore
+      .collection("users")
+      .doc(uid)
+      .collection("charges")
+      .doc(event.data.id);
+
+    // check if this charge has already been processed
+    const chargeDoc = await chargeRef.get();
+    if (chargeDoc.exists) {
+      console.log("Charge already exists");
+    } else {
+      // store the charge as a doc within the charges subcollection
+      console.log("Storing charge");
+      batch.set(
+        firestore
+          .collection("users")
+          .doc(uid)
+          .collection("charges")
+          .doc(event.data.id),
+        {
+          credits: credits,
+          order: event.data.code,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        }
+      );
+    }
+
+    // commit the batch
+    console.log("Committing batch");
+    return batch.commit().then(function () {
+      console.log("Firestore updated");
+    });
+  }
+
+  if (event.type === "charge:failed") {
+    console.log("Charge failed");
+  }
+}
+
+exports.testChargeEvent = functions.https.onRequest((request, response) => {
+  cors(request, response, async () => {
+    console.log("testing charge event", request.body);
+    const data = JSON.parse(request.body);
+    const event = data.event;
+    await handleChargeEvent(event);
+    response.send({
+      status: "ok",
+    });
   });
 });
 
@@ -53,57 +148,7 @@ exports.webhookHandler = functions.https.onRequest(
         signature,
         cbWebhookSecret
       );
-      console.log({
-        id: event.data.id,
-        status: event.type,
-        code: event.data.code,
-        uid: event.data.metadata.uid,
-        created_at: event.data.created_at,
-      });
-
-      if (event.type === "charge:pending") {
-        console.log("Charge pending");
-      }
-
-      if (event.type === "charge:confirmed") {
-        console.log("Charge confirmed!!!!");
-
-        const docRef = firestore
-          .collection("users")
-          .doc(event.data.metadata.uid)
-          .collection("credits")
-          .doc(event.data.id);
-
-        docRef.get().then((doc) => {
-          if (doc.exists) {
-            console.log("Charge already exists");
-          } else {
-            let batch = firestore.batch();
-
-            batch.set(docRef, {
-              credit: 350,
-              order: event.data.code,
-              timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            console.log("batch set");
-            batch.update(
-              firestore.collection("users").doc(event.data.metadata.uid),
-              {
-                count: admin.firestore.FieldValue.increment(350),
-              }
-            );
-            console.log("batch update");
-
-            batch.commit().then(() => {
-              console.log("batch commit");
-            });
-          }
-        });
-      }
-
-      if (event.type === "charge:failed") {
-        console.log("Charge failed");
-      }
+      await handleChargeEvent(event);
 
       return response.status(200).send("Webhook received");
     } catch (error) {

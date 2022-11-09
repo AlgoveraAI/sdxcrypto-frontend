@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { NextPage } from "next";
 import Nav from "../components/nav";
 import Hero from "../components/hero";

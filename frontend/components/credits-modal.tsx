@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import Spinner from "./spinner";
 
 type Props = {
-  nCredits: number;
+  credits: number;
   trigger: boolean;
+  uid: string;
 };
 
 ReactModal.setAppElement("#__next");
 
-export default function CreditsModal({ nCredits, trigger }: Props) {
+export default function CreditsModal({ credits, trigger, uid }: Props) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [prevTrigger, setPrevTrigger] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,16 +24,45 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
     setIsOpen(false);
   }
 
-  async function buyCredits() {
-    // make call to next api
-    // setLoading(true);
-    const chargeRes = await fetch(
-      "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
+  async function testChargeEvent() {
+    setLoading(true);
+    const res = await fetch(
+      "http://localhost:5001/sdxcrypto-algovera/us-central1/testChargeEvent",
       {
         method: "POST",
         body: JSON.stringify({
-          uid: "test",
-          nCredits: desiredNumCredits,
+          event: {
+            type: "charge:confirmed",
+            data: {
+              id: "test_id",
+              code: "test_code",
+              created_at: "test_created_at",
+              metadata: {
+                uid: uid,
+                credits: desiredNumCredits,
+              },
+            },
+          },
+        }),
+      }
+    );
+    const data = await res.json();
+    console.log("testChargeEvent result:", data);
+    setLoading(false);
+  }
+
+  async function buyCredits() {
+    // make call to next api
+    setLoading(true);
+    console.log("buying credits", uid, desiredNumCredits);
+    const chargeRes = await fetch(
+      // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uid: uid,
+          credits: desiredNumCredits,
         }),
       }
     );
@@ -44,11 +74,10 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
   // if the trigger prop changes, open the modal
   useEffect(() => {
     if (prevTrigger !== trigger) {
-      console.log("triggering credits modal");
       openModal();
     }
     setPrevTrigger(trigger);
-  }, [trigger]);
+  }, [prevTrigger, trigger]);
 
   return (
     <ReactModal
@@ -56,7 +85,9 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
       isOpen={modalIsOpen}
       onRequestClose={closeModal}
     >
-      <div className="text-white text-3xl">{nCredits} Credits Remaining</div>
+      <div className="text-white text-3xl">
+        You have {credits} {credits === 1 ? "credit" : "credits"} remaining
+      </div>
       <div className="mt-6">Use credits to generate images.</div>
       <div>{"100 credits = 100 generations = $1"}</div>
       <div className="mt-6 shadow-sm w-1/2 mx-auto">
@@ -78,7 +109,8 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
             />
           </div>
           <button
-            onClick={buyCredits}
+            // onClick={buyCredits}
+            onClick={testChargeEvent}
             type="button"
             className="relative -ml-px inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
           >
@@ -91,7 +123,15 @@ export default function CreditsModal({ nCredits, trigger }: Props) {
         </div>
       </div>
       <div className="text-center italic text-gray-500 mt-6">
-        Powered by Coinbase Commerce
+        Powered by{" "}
+        <a
+          className="underline"
+          href="https://commerce.coinbase.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Coinbase Commerce
+        </a>
       </div>
     </ReactModal>
   );

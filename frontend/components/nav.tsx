@@ -1,15 +1,9 @@
-import React, { useEffect, FC } from "react";
+import React, { useEffect, useState } from "react";
 import CreditsModal from "../components/credits-modal";
 import Link from "next/link";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import {
-  Bars3Icon,
-  MusicalNoteIcon,
-  DocumentTextIcon,
-  PaintBrushIcon,
-} from "@heroicons/react/24/outline";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 import { useMoralisAuth } from "../lib/hooks";
@@ -25,8 +19,9 @@ type NavProps = {
 
 export default function Nav({ howitworksRef }: NavProps) {
   const [onHome, setOnHome] = React.useState(true);
-  const [nCredits, setNCredits] = React.useState(0);
   const [creditsModalTrigger, setCreditsModalTrigger] = React.useState(false);
+  const [uid, setUid] = useState("");
+  const [credits, setCredits] = useState(0);
 
   const moralisAuth = useMoralisAuth();
 
@@ -34,11 +29,24 @@ export default function Nav({ howitworksRef }: NavProps) {
     setCreditsModalTrigger(!creditsModalTrigger);
   };
 
+  useEffect(() => {
+    console.log("checking auth");
+    if (moralisAuth) {
+      console.log("connected user:", moralisAuth.auth.currentUser);
+      if (moralisAuth.auth.currentUser) {
+        setUid(moralisAuth.auth.currentUser.uid);
+        // const userDoc = await moralisAuth.auth.currentUser.getIdTokenResult();
+        // console.log("userDoc:", userDoc);
+        // setCredits(userDoc.claims.credits);
+        // todo poll this
+      }
+    }
+  }, [moralisAuth, moralisAuth?.auth.currentUser]);
+
   const handleConnect = async () => {
     // todo: handle signature rejection
     if (moralisAuth) {
       await signInWithMoralis(moralisAuth);
-      console.log("connected user:", moralisAuth.auth.currentUser);
     }
   };
 
@@ -53,7 +61,7 @@ export default function Nav({ howitworksRef }: NavProps) {
 
   return (
     <div>
-      <CreditsModal nCredits={nCredits} trigger={creditsModalTrigger} />
+      <CreditsModal credits={credits} trigger={creditsModalTrigger} uid={uid} />
       <Popover className="relative bg-black/[0.3]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center justify-between border-gray-100 py-6 md:justify-start md:space-x-10">
@@ -119,16 +127,18 @@ export default function Nav({ howitworksRef }: NavProps) {
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 text-white ">
               {moralisAuth?.auth?.currentUser && (
                 <span
-                  className={`cursor-pointer hover:text-red-600 ${
-                    !nCredits ? "text-red-500" : ""
+                  className={`cursor-pointer ${
+                    !credits
+                      ? "text-red-500 hover:text-red-600 "
+                      : "text-green-500 hover:text-green-600 "
                   }`}
                   onClick={openCreditsModal}
                 >
-                  {nCredits === 0
+                  {credits === 0
                     ? "Out of Credits"
-                    : nCredits === 1
+                    : credits === 1
                     ? "1 Credit"
-                    : `${nCredits} Credits`}
+                    : `${credits} Credits`}
                 </span>
               )}
             </div>
