@@ -3,14 +3,16 @@ import { useState, useEffect } from "react";
 import Spinner from "../spinner";
 
 type Props = {
+  uid: string;
   selectedModal: string;
-  setJobId: React.Dispatch<React.SetStateAction<string>>;
+  setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
 };
 
 export default function Generate({
+  uid,
   selectedModal,
   setJobId,
   prompt,
@@ -20,8 +22,6 @@ export default function Generate({
   const [loading, setLoading] = useState(false);
   const [width, setWidth] = useState(512);
   const [height, setHeight] = useState(512);
-
-  console.log("rendering images", images);
 
   const generateImg = async () => {
     setLoading(true);
@@ -35,19 +35,24 @@ export default function Generate({
       setLoading(false);
       return;
     }
-    const res = await fetch("/api/generate", {
+    const res = await fetch("/api/txt2img", {
       method: "POST",
       body: JSON.stringify({
+        uid: uid,
         prompt: prompt,
-        selectedModal: selectedModal,
+        // selectedModal: selectedModal,
       }),
     });
     // todo handle out of credits error
     // todo handle unknown api error
-    const data = await res.json();
-    console.log("job result:", data);
-    setJobId(data.jobId);
-    setLoading(false);
+    console.log("res", res);
+    if (res.status === 200) {
+      const data = await res.json();
+      console.log("job result:", data);
+      setJobId(data.jobId);
+    } else {
+      alert("Error generating image");
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import Spinner from "../spinner";
 
 type Props = {
   selectedModal: string;
-  jobId: string;
+  jobId: string | null;
   prompt: string;
   images: string[];
 };

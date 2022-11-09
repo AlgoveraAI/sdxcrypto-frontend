@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Nav from "../components/nav";
 import Select from "../components/generate/select";
@@ -30,34 +30,80 @@ const GeneratePage: NextPage<PageProps> = ({
   // so that we can pass them to the next step and store them
   const [selectedModal, setSelectedModal] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [jobId, setJobId] = useState("test_jobid");
+  const [jobId, setJobId] = useState<string | null>(
+    "56c7fbff7d0d49f68d91d765f23f6ed7"
+  );
   const [images, setImages] = useState<string[]>([]);
+  const [jobStatus, setJobStatus] = useState("");
+  const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
+
+  const checkJobStatus = async (jobId: string) => {
+    // check the status of a job
+    console.log("fetching status", uid, jobId);
+    const res = await fetch("/api/status", {
+      method: "POST",
+      body: JSON.stringify({
+        jobId: jobId,
+      }),
+    });
+    // parse the json
+    const data = await res.json();
+    console.log("job status:", data);
+    if (res.status === 200) {
+      // set job status
+      setJobStatus(data.jobStatus);
+      if (data.jobStatus === "done") {
+        // make call to firebase storage to get all images under job
+        console.log("getting images for jobId", jobId);
+        const storage = getStorage(firebaseApp);
+        const storageRef = ref(storage, `${uid}/images/${jobId}`);
+        listAll(storageRef)
+          .then((res) => {
+            // get img urls
+            const imgUrls = res.items.map((itemRef) => {
+              // get public url
+              return getDownloadURL(itemRef);
+            });
+            // await requests
+            Promise.all(imgUrls).then((urls) => {
+              console.log("got img urls", urls);
+              setImages(urls);
+            });
+          })
+          .catch((err) => {
+            // firebase error
+            console.log("error getting images", err);
+          });
+      }
+    } else {
+      // log the error and set job status to error
+      // to clear the interval
+      console.error("error getting job status");
+      setJobStatus("error");
+    }
+  };
 
   useEffect(() => {
-    // if jobid and uid are set, can read from storage
-    // (if user is not connected, we can't read from storage)
     if (jobId && uid) {
-      console.log("getting images for jobId", jobId);
-      // make call to firebase storage
-      const storage = getStorage(firebaseApp);
-      const storageRef = ref(storage, `${uid}/images/${jobId}`);
-      listAll(storageRef)
-        .then((res) => {
-          // get img urls
-          const imgUrls = res.items.map((itemRef) => {
-            // get public url
-            return getDownloadURL(itemRef);
-          });
-          Promise.all(imgUrls).then((urls) => {
-            console.log("urls", urls);
-            setImages(urls);
-          });
-        })
-        .catch((err) => {
-          console.log("error getting images", err);
-        });
+      // check job status on interval
+      console.log("setting jobStatus interval");
+      // reset state here in case it's already done or error
+      // so that the clear interval effect triggers
+      setJobStatus("pending");
+      const interval = setInterval(() => {
+        checkJobStatus(jobId);
+      }, 1000);
+      setJobStatusInterval(interval);
     }
   }, [jobId, uid]);
+
+  useEffect(() => {
+    // if job is done, clear interval
+    if (jobStatus === "done" || jobStatus === "error") {
+      console.log("clearing jobStatus interval", jobStatus);
+      clearInterval(jobStatusInterval);
+    }
+  }, [jobStatus]);
 
   useEffect(() => {
     // switch to step 2 (Generate) when a model is selected
@@ -153,6 +199,7 @@ const GeneratePage: NextPage<PageProps> = ({
             />
           ) : currentStepIdx === 1 ? (
             <Generate
+              uid={uid}
               selectedModal={selectedModal}
               setJobId={setJobId}
               prompt={prompt}
