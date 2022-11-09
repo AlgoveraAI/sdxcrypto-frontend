@@ -53,17 +53,19 @@ export default function Nav({
 
   useEffect(() => {
     // poll credits every 10 seconds
-    if (pollCredits && moralisAuth?.auth?.currentUser?.uid) {
+    if (pollCredits) {
       const interval = setInterval(async () => {
-        const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
-        getDoc(docRef).then((docSnap) => {
-          if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
-            setCredits(docSnap.data().credits);
-          } else {
-            console.log("User not in firestore db");
-          }
-        });
+        if (moralisAuth?.auth.currentUser) {
+          const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
+          getDoc(docRef).then((docSnap) => {
+            if (docSnap.exists()) {
+              console.log("Document data:", docSnap.data());
+              setCredits(docSnap.data().credits);
+            } else {
+              console.log("User not in firestore db");
+            }
+          });
+        }
       }, 10000);
       return () => clearInterval(interval);
     }

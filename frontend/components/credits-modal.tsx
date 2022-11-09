@@ -15,7 +15,7 @@ export default function CreditsModal({
   setCreditsModalTrigger,
   uid,
 }: Props) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [desiredNumCredits, setDesiredNumCredits] = useState(100);
 

@@ -79,6 +79,15 @@ export default function Generate({
           </div>
         </div>
       </div>
+      {jobId && images.length ? (
+        <Image
+          className="mt-6 max-w-full h-auto mx-auto"
+          src={images[selectedIdx]}
+          alt="Generated Image"
+          width={512}
+          height={512}
+        />
+      ) : null}
       <div className="w-full text-center mt-6">
         <button
           onClick={mint}
@@ -88,15 +97,6 @@ export default function Generate({
           {loading ? <Spinner /> : "Mint"}
         </button>
       </div>
-      {jobId && images.length ? (
-        <Image
-          className="mt-6 w-full"
-          src={images[selectedIdx]}
-          alt="Generated Image"
-          width={400}
-          height={400}
-        />
-      ) : null}
     </div>
   );
 }

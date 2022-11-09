@@ -5,7 +5,7 @@ import Hero from "../components/hero";
 import HowItWorks from "../components/howitworks";
 import Pricing from "../components/pricing";
 import CreditsModal from "../components/credits-modal";
-import { PageProps } from "./types";
+import { PageProps } from "../lib/types";
 
 const Home: NextPage<PageProps> = ({
   uid,
