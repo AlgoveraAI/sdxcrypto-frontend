@@ -4,23 +4,30 @@ import Spinner from "../spinner";
 
 type Props = {
   selectedModal: string;
-  imgUrl: string;
+  jobId: string;
   prompt: string;
+  images: string[];
 };
 
-export default function Generate({ selectedModal, imgUrl, prompt }: Props) {
+export default function Generate({
+  selectedModal,
+  jobId,
+  prompt,
+  images,
+}: Props) {
   const [loading, setLoading] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState(0);
 
   const mint = async () => {
     setLoading(true);
     // check params
     const name = document.getElementById("name") as HTMLInputElement;
-    if (imgUrl === "") {
-      alert("Generate an image before minting");
+
+    if (!jobId) {
+      alert("You haven't generated an image to mint!");
       setLoading(false);
       return;
     }
-    setLoading(false);
     if (name.value === "") {
       alert("Please enter a name");
       setLoading(false);
@@ -81,10 +88,10 @@ export default function Generate({ selectedModal, imgUrl, prompt }: Props) {
           {loading ? <Spinner /> : "Mint"}
         </button>
       </div>
-      {imgUrl ? (
+      {jobId && images.length ? (
         <Image
           className="mt-6 w-full"
-          src={imgUrl}
+          src={images[selectedIdx]}
           alt="Generated Image"
           width={400}
           height={400}

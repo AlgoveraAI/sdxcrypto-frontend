@@ -14,13 +14,14 @@ function classNames(...classes: string[]) {
 }
 
 type NavProps = {
+  uid: string;
+  setUid: React.Dispatch<React.SetStateAction<string>>;
   howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
 };
 
-export default function Nav({ howitworksRef }: NavProps) {
+export default function Nav({ uid, setUid, howitworksRef }: NavProps) {
   const [onHome, setOnHome] = React.useState(true);
   const [creditsModalTrigger, setCreditsModalTrigger] = React.useState(false);
-  const [uid, setUid] = useState("");
   const [credits, setCredits] = useState(0);
 
   const moralisAuth = useMoralisAuth();

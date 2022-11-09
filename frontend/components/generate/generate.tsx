@@ -1,23 +1,25 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Spinner from "../spinner";
 
 type Props = {
   selectedModal: string;
-  imgUrl: string;
-  setImgUrl: React.Dispatch<React.SetStateAction<string>>;
+  setJobId: React.Dispatch<React.SetStateAction<string>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
+  images: string[];
 };
 
 export default function Generate({
   selectedModal,
-  imgUrl,
-  setImgUrl,
+  setJobId,
   prompt,
   setPrompt,
+  images,
 }: Props) {
   const [loading, setLoading] = useState(false);
+
+  console.log("rendering images", images);
 
   const generateImg = async () => {
     setLoading(true);
@@ -41,8 +43,8 @@ export default function Generate({
     // todo handle out of credits error
     // todo handle unknown api error
     const data = await res.json();
-    console.log("/api/generate result:", data);
-    setImgUrl(data.imgUrl);
+    console.log("job result:", data);
+    setJobId(data.jobId);
     setLoading(false);
   };
 
@@ -79,10 +81,11 @@ export default function Generate({
           </button>
         </div>
       </div>
-      {imgUrl ? (
+      {/* TODO display all images */}
+      {images.length ? (
         <Image
           className="mt-6 w-full"
-          src={imgUrl}
+          src={images[0]}
           alt="Generated Image"
           width={400}
           height={400}
