@@ -7,7 +7,7 @@ import Image from "next/image";
 import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 import { useMoralisAuth } from "../lib/hooks";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db, auth } from "../lib/firebase";
 
 // function classNames(...classes: string[]) {
 //   return classes.filter(Boolean).join(" ");
@@ -49,11 +49,11 @@ export default function Nav({
         setPollCredits(true);
       }
     }
-  }, [moralisAuth, moralisAuth?.auth.currentUser]);
+  }, [moralisAuth, moralisAuth?.auth.currentUser, setUid]);
 
   useEffect(() => {
     // poll credits every 10 seconds
-    if (pollCredits && moralisAuth?.auth.currentUser) {
+    if (pollCredits && moralisAuth?.auth?.currentUser?.uid) {
       const interval = setInterval(async () => {
         const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
         getDoc(docRef).then((docSnap) => {
@@ -67,7 +67,7 @@ export default function Nav({
       }, 10000);
       return () => clearInterval(interval);
     }
-  }, [pollCredits]);
+  }, [pollCredits, moralisAuth, setCredits]);
 
   const handleConnect = async () => {
     // todo: handle signature rejection
