@@ -25,6 +25,9 @@ export default function CreditsModal({ credits, trigger, uid }: Props) {
   }
 
   async function testChargeEvent() {
+    // use this instead of buyCredits to locally test the handleChargeEvent firebase function
+    // (it mimics the event that Coinbase sends once a txn is executed)
+    // (run firebase serve in the functions folder to activate the endpoint)
     setLoading(true);
     const res = await fetch(
       "http://localhost:5001/sdxcrypto-algovera/us-central1/testChargeEvent",
@@ -109,8 +112,8 @@ export default function CreditsModal({ credits, trigger, uid }: Props) {
             />
           </div>
           <button
-            // onClick={buyCredits}
-            onClick={testChargeEvent}
+            onClick={buyCredits}
+            // onClick={testChargeEvent}
             type="button"
             className="relative -ml-px inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
           >
