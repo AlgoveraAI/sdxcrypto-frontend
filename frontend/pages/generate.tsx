@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { NextPage } from "next";
 import Nav from "../components/nav";
 import Select from "../components/generate/select";
 import Generate from "../components/generate/generate";
 import Mint from "../components/generate/mint";
-import type { NextPage } from "next";
-import { useState } from "react";
-import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
-import { firebaseApp, auth } from "../lib/firebase";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "./types";
+
+import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
+import { firebaseApp, auth } from "../lib/firebase";
 
 const steps = [
   { id: "1", name: "Setup", href: "#" },
@@ -20,6 +20,7 @@ const GeneratePage: NextPage<PageProps> = ({
   uid,
   setUid,
   credits,
+  setCredits,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -74,8 +75,10 @@ const GeneratePage: NextPage<PageProps> = ({
         uid={uid}
       />
       <Nav
+        uid={uid}
         setUid={setUid}
         credits={credits}
+        setCredits={setCredits}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
 

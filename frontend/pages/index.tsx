@@ -11,6 +11,7 @@ const Home: NextPage<PageProps> = ({
   uid,
   setUid,
   credits,
+  setCredits,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -25,8 +26,10 @@ const Home: NextPage<PageProps> = ({
         uid={uid}
       />
       <Nav
-        credits={credits}
+        uid={uid}
         setUid={setUid}
+        credits={credits}
+        setCredits={setCredits}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
       <Hero />

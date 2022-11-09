@@ -1,9 +1,5 @@
-import {
-  initializeApp,
-  getApp,
-  FirebaseOptions,
-  FirebaseApp,
-} from "@firebase/app";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "@firebase/auth";
 
 const firebaseConfig = {
@@ -16,14 +12,7 @@ const firebaseConfig = {
   measurementId: "G-BEQNC17HKX",
 };
 
-function createFirebaseApp(config: FirebaseOptions): FirebaseApp {
-  try {
-    return getApp();
-  } catch (error) {
-    return initializeApp(config);
-  }
-}
-
-export const firebaseApp = createFirebaseApp(firebaseConfig);
+export const firebaseApp = initializeApp(firebaseConfig);
+export const db = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const googleProvider = new GoogleAuthProvider();

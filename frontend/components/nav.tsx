@@ -6,15 +6,17 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 import { useMoralisAuth } from "../lib/hooks";
-import { auth } from "../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 // function classNames(...classes: string[]) {
 //   return classes.filter(Boolean).join(" ");
 // }
 
 type NavProps = {
-  // uid: string;
+  uid: string;
   credits: number;
+  setCredits: React.Dispatch<React.SetStateAction<number>>;
   setUid: React.Dispatch<React.SetStateAction<string>>;
   // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
   // creditsModalTrigger: boolean;
@@ -22,27 +24,50 @@ type NavProps = {
 };
 
 export default function Nav({
-  credits,
+  uid,
   setUid,
+  credits,
+  setCredits,
   setCreditsModalTrigger,
 }: NavProps) {
-  const [onHome, setOnHome] = React.useState(true);
+  // store which page we're on to manage nav behaviour
+  // (scrolling to howitworks section on index.tsx)
+  // const [onHome, setOnHome] = React.useState(true);
+
+  // set app to poll database to update credits once signed in
+  const [pollCredits, setPollCredits] = useState(false);
 
   const moralisAuth = useMoralisAuth();
 
   useEffect(() => {
+    // triggers when user logs in or out
     console.log("checking auth");
     if (moralisAuth) {
       console.log("connected user:", moralisAuth.auth.currentUser);
       if (moralisAuth.auth.currentUser) {
         setUid(moralisAuth.auth.currentUser.uid);
-        // const userDoc = await moralisAuth.auth.currentUser.getIdTokenResult();
-        // console.log("userDoc:", userDoc);
-        // setCredits(userDoc.claims.credits);
-        // todo poll this
+        setPollCredits(true);
       }
     }
   }, [moralisAuth, moralisAuth?.auth.currentUser]);
+
+  useEffect(() => {
+    // poll credits every 10 seconds
+    if (pollCredits && moralisAuth?.auth.currentUser) {
+      const interval = setInterval(async () => {
+        const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
+        getDoc(docRef).then((docSnap) => {
+          if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            setCredits(docSnap.data().credits);
+          } else {
+            console.log("User not in firestore db");
+          }
+        });
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [pollCredits]);
 
   const handleConnect = async () => {
     // todo: handle signature rejection
@@ -55,10 +80,10 @@ export default function Nav({
     await auth.signOut();
   };
 
-  useEffect(() => {
-    console.log("loading page", window.location.pathname);
-    setOnHome(window.location.pathname == "/" ? true : false);
-  }, []);
+  // useEffect(() => {
+  //   console.log("loading page", window.location.pathname);
+  //   setOnHome(window.location.pathname == "/" ? true : false);
+  // }, []);
 
   return (
     <div>
