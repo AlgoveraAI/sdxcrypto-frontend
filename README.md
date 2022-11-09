@@ -20,26 +20,39 @@ It uses a Moralis extension to authenticate users with Firebase, Coinbase Commer
 
 Images are retrieved from a Firebase Cloud Storage bucket.
 
-## Install
-`npm i`
+## Commands
 
-## Run app
+### Install
+```
+cd frontend
+npm i
+```
+
+### Run app
 ```
 cd frontend
 npm run dev
 ```
 
-## Coinbase Setup
+### Coinbase Setup
 Add the Coinbase Commerce api key and webhook secret to `functions/.env` as per `/functions/.env.example`.
 
-## Run firebase functions locally
-`firebase serve`
+### Run firebase functions locally
+```
+firebase serve
+```
 
-## Deploy app
-`firebase deploy`
+### Deploy app
+```
+firebase deploy
+```
 
-## Deploy functions
-`firebase deploy --only functions`
+### Deploy functions
+```
+firebase deploy --only functions
+```
 
-## Deploy extensions
-`firebase deploy --only extensions`
+### Deploy extensions
+```
+firebase deploy --only extensions
+```
