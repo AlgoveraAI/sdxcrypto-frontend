@@ -3,8 +3,7 @@
     "source": "functions"
   },
   "hosting": {
-    "source": "frontend",
-    "public": "public",
+    "public": "frontend",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   },
   "extensions": {
