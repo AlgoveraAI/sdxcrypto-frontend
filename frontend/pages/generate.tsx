@@ -30,9 +30,7 @@ const GeneratePage: NextPage<PageProps> = ({
   // so that we can pass them to the next step and store them
   const [selectedModal, setSelectedModal] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [jobId, setJobId] = useState<string | null>(
-    "1ca72412ab7146b6a490904fe049a1f2"
-  );
+  const [jobId, setJobId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [jobStatus, setJobStatus] = useState("");
   const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
