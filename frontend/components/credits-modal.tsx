@@ -3,10 +3,10 @@ import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
 
 type Props = {
-  credits: number;
+  uid: string;
+  credits: number | null;
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  uid: string;
 };
 
 export default function CreditsModal({
@@ -19,8 +19,19 @@ export default function CreditsModal({
   const [loading, setLoading] = useState(false);
   const [desiredNumCredits, setDesiredNumCredits] = useState(100);
 
+  // if the trigger prop changes, open the modal
+  useEffect(() => {
+    if (creditsModalTrigger) {
+      openModal();
+    }
+  }, [creditsModalTrigger]);
+
   function openModal() {
-    setOpen(true);
+    if (uid) {
+      setOpen(true);
+    } else {
+      alert("Please connect wallet to purchase credits");
+    }
   }
 
   function closeModal() {
@@ -77,14 +88,6 @@ export default function CreditsModal({
     window.open(data.hosted_url, "_blank", "noopener,noreferrer");
     setLoading(false);
   }
-
-  // if the trigger prop changes, open the modal
-  useEffect(() => {
-    console.log("credits modal triggered");
-    if (creditsModalTrigger) {
-      openModal();
-    }
-  }, [creditsModalTrigger]);
 
   return (
     <Transition.Root show={open} as={Fragment}>

@@ -28,7 +28,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
             <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
               <Image
                 className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2 lg:max-w-none "
-                src={require("../assets/howitworks/1.png")}
+                src={require("../../assets/howitworks/1.png")}
                 alt="Inbox user interface"
                 width={512}
                 height={512}
@@ -51,7 +51,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
             <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
               <Image
                 className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2"
-                src={require("../assets/howitworks/2.png")}
+                src={require("../../assets/howitworks/2.png")}
                 alt="Customer profile user interface"
                 width={512}
                 height={512}
@@ -75,7 +75,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
           <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
             <Image
               className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2 lg:max-w-none "
-              src={require("../assets/howitworks/3.png")}
+              src={require("../../assets/howitworks/3.png")}
               alt="Inbox user interface"
               width={512}
               height={512}

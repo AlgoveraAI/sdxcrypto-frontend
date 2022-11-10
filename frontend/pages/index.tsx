@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import type { NextPage } from "next";
 import Nav from "../components/nav";
-import Hero from "../components/hero";
-import HowItWorks from "../components/howitworks";
-import Pricing from "../components/pricing";
+import Hero from "../components/index/hero";
+import HowItWorks from "../components/index/howitworks";
+import Pricing from "../components/index/pricing";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 
@@ -11,7 +11,7 @@ const Home: NextPage<PageProps> = ({
   uid,
   setUid,
   credits,
-  setCredits,
+  moralisAuth,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -29,7 +29,7 @@ const Home: NextPage<PageProps> = ({
         uid={uid}
         setUid={setUid}
         credits={credits}
-        setCredits={setCredits}
+        moralisAuth={moralisAuth}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
       <Hero />

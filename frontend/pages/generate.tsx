@@ -20,7 +20,7 @@ const GeneratePage: NextPage<PageProps> = ({
   uid,
   setUid,
   credits,
-  setCredits,
+  moralisAuth,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -113,17 +113,19 @@ const GeneratePage: NextPage<PageProps> = ({
 
   return (
     <div>
-      <CreditsModal
-        credits={credits}
-        creditsModalTrigger={creditsModalTrigger}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-        uid={uid}
-      />
+      {credits !== null ? (
+        <CreditsModal
+          credits={credits}
+          creditsModalTrigger={creditsModalTrigger}
+          setCreditsModalTrigger={setCreditsModalTrigger}
+          uid={uid}
+        />
+      ) : null}
       <Nav
         uid={uid}
         setUid={setUid}
         credits={credits}
-        setCredits={setCredits}
+        moralisAuth={moralisAuth}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
 

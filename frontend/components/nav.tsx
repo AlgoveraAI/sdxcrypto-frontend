@@ -5,9 +5,8 @@ import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
-import { useMoralisAuth } from "../lib/hooks";
-import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
+import { auth } from "../lib/firebase";
+import { HookCallbacks } from "async_hooks";
 
 // function classNames(...classes: string[]) {
 //   return classes.filter(Boolean).join(" ");
@@ -15,60 +14,21 @@ import { db, auth } from "../lib/firebase";
 
 type NavProps = {
   uid: string;
-  credits: number;
-  setCredits: React.Dispatch<React.SetStateAction<number>>;
+  credits: number | null;
   setUid: React.Dispatch<React.SetStateAction<string>>;
   // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
-  // creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  moralisAuth: any; // todo: get type
 };
 
 export default function Nav({
-  uid,
-  setUid,
+  moralisAuth,
   credits,
-  setCredits,
   setCreditsModalTrigger,
 }: NavProps) {
   // store which page we're on to manage nav behaviour
   // (scrolling to howitworks section on index.tsx)
   // const [onHome, setOnHome] = React.useState(true);
-
-  // set app to poll database to update credits once signed in
-  const [pollCredits, setPollCredits] = useState(false);
-
-  const moralisAuth = useMoralisAuth();
-
-  useEffect(() => {
-    // triggers when user logs in or out
-    console.log("checking auth");
-    if (moralisAuth) {
-      console.log("connected user:", moralisAuth.auth.currentUser);
-      if (moralisAuth.auth.currentUser) {
-        setUid(moralisAuth.auth.currentUser.uid);
-        setPollCredits(true);
-      }
-    }
-  }, [moralisAuth, moralisAuth?.auth.currentUser, setUid]);
-
-  useEffect(() => {
-    // poll credits every 10 seconds
-    if (pollCredits) {
-      const interval = setInterval(async () => {
-        if (moralisAuth?.auth.currentUser) {
-          const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
-          getDoc(docRef).then((docSnap) => {
-            if (docSnap.exists()) {
-              setCredits(docSnap.data().credits);
-            } else {
-              console.log("User not in firestore db");
-            }
-          });
-        }
-      }, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [pollCredits, moralisAuth, setCredits]);
 
   const handleConnect = async () => {
     // todo: handle signature rejection
@@ -151,24 +111,25 @@ export default function Nav({
             </Popover.Group> */}
 
             <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-              {moralisAuth?.auth?.currentUser && (
-                <span
-                  className={`cursor-pointer ${
-                    !credits
-                      ? "text-red-500 hover:text-red-600 "
-                      : "text-green-500 hover:text-green-600 "
-                  }`}
-                  onClick={() => {
-                    setCreditsModalTrigger(true);
-                  }}
-                >
-                  {credits === 0
-                    ? "Out of Credits"
-                    : credits === 1
-                    ? "1 Credit"
-                    : `${credits} Credits`}
-                </span>
-              )}
+              {moralisAuth?.auth?.currentUser &&
+                (credits !== null ? (
+                  <span
+                    className={`cursor-pointer ${
+                      credits === 0
+                        ? "text-red-500 hover:text-red-600 "
+                        : "text-green-500 hover:text-green-600 "
+                    }`}
+                    onClick={() => {
+                      setCreditsModalTrigger(true);
+                    }}
+                  >
+                    {credits === 0
+                      ? "Out of Credits"
+                      : credits === 1
+                      ? "1 Credit"
+                      : `${credits} Credits`}
+                  </span>
+                ) : null)}
               {moralisAuth?.auth?.currentUser ? (
                 <span
                   onClick={handleDisconnect}
