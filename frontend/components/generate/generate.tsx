@@ -23,6 +23,13 @@ export default function Generate({
   const [width, setWidth] = useState(512);
   const [height, setHeight] = useState(512);
 
+  // once images are received, turn off loading
+  useEffect(() => {
+    if (images.length > 0) {
+      setLoading(false);
+    }
+  }, [images]);
+
   const generateImg = async () => {
     setLoading(true);
     if (selectedModal === "") {

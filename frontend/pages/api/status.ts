@@ -6,22 +6,20 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const base_url = "http://3.250.11.166:8501/job/status";
+    const baseUrl = "http://3.250.11.166:8501/job/status";
     const headers = { "Content-Type": "application/json" };
-    const url = new URL(base_url);
+    const paramUrl = new URL(baseUrl);
     const reqBody = JSON.parse(req.body);
     for (const key in reqBody) {
-      url.searchParams.append(key, reqBody[key]);
+      paramUrl.searchParams.append(key, reqBody[key]);
     }
-    const response = await fetch(url, {
+    const response = await fetch(paramUrl, {
       method: "GET",
       headers: headers,
+      // body: req.body,
     });
     const data = await response.json();
-    res.status(200).json({
-      jobId: data.job_uuid,
-      jobStatus: data.job_status,
-    });
+    res.status(200).json(data);
   } catch (error: any) {
     try {
       res.status(500).json({ error: error.message });

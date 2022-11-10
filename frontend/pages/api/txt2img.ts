@@ -6,9 +6,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const base_url = "http://3.250.11.166:8501/job/create/txt2img";
+    const baseUrl = "http://3.250.11.166:8501/job/create/txt2img";
     const headers = { "Content-Type": "application/json" };
-    const response = await fetch(base_url, {
+    const response = await fetch(baseUrl, {
       method: "POST",
       headers: headers,
       body: req.body,

@@ -59,7 +59,6 @@ export default function Nav({
           const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
           getDoc(docRef).then((docSnap) => {
             if (docSnap.exists()) {
-              console.log("Document data:", docSnap.data());
               setCredits(docSnap.data().credits);
             } else {
               console.log("User not in firestore db");

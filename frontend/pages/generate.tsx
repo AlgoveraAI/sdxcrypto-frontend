@@ -30,9 +30,7 @@ const GeneratePage: NextPage<PageProps> = ({
   // so that we can pass them to the next step and store them
   const [selectedModal, setSelectedModal] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [jobId, setJobId] = useState<string | null>(
-    "56c7fbff7d0d49f68d91d765f23f6ed7"
-  );
+  const [jobId, setJobId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [jobStatus, setJobStatus] = useState("");
   const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
@@ -43,16 +41,16 @@ const GeneratePage: NextPage<PageProps> = ({
     const res = await fetch("/api/status", {
       method: "POST",
       body: JSON.stringify({
-        jobId: jobId,
+        job_uuid: jobId,
       }),
     });
     // parse the json
     const data = await res.json();
     console.log("job status:", data);
-    if (res.status === 200) {
+    if (res.status === 200 && data.job_status) {
       // set job status
-      setJobStatus(data.jobStatus);
-      if (data.jobStatus === "done") {
+      setJobStatus(data.job_status);
+      if (data.job_status === "done") {
         // make call to firebase storage to get all images under job
         console.log("getting images for jobId", jobId);
         const storage = getStorage(firebaseApp);
@@ -78,7 +76,7 @@ const GeneratePage: NextPage<PageProps> = ({
     } else {
       // log the error and set job status to error
       // to clear the interval
-      console.error("error getting job status");
+      console.error("error getting job status", res);
       setJobStatus("error");
     }
   };
@@ -90,9 +88,10 @@ const GeneratePage: NextPage<PageProps> = ({
       // reset state here in case it's already done or error
       // so that the clear interval effect triggers
       setJobStatus("pending");
+      // checkJobStatus(jobId);
       const interval = setInterval(() => {
         checkJobStatus(jobId);
-      }, 1000);
+      }, 2000);
       setJobStatusInterval(interval);
     }
   }, [jobId, uid]);
@@ -100,7 +99,7 @@ const GeneratePage: NextPage<PageProps> = ({
   useEffect(() => {
     // if job is done, clear interval
     if (jobStatus === "done" || jobStatus === "error") {
-      console.log("clearing jobStatus interval", jobStatus);
+      console.log("clearing jobStatus interval:", jobStatus);
       clearInterval(jobStatusInterval);
     }
   }, [jobStatus]);
