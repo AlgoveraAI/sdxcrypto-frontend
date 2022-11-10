@@ -37,9 +37,9 @@ export default function Hero() {
                 </span>{" "}
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-                Pay with Crypto or Credit Card to use our custom Stable
-                Diffusion pipeline. If you love your output, mint it directly as
-                an NFT that you own and can trade or sell.
+                Pay with crypto to use our custom generative AI pipeline. If you
+                love your output, mint it directly as an NFT that you own and
+                can trade or sell.
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">

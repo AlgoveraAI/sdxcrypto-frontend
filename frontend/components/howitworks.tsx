@@ -21,7 +21,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
               1. Select your model
             </h2>
             <p className="mt-4 text-lg text-gray-500">
-              Choose from state-of-the-art generative AI models
+              Choose from state-of-the-art generative AI models.
             </p>
           </div>
           <div className="mt-12 sm:mt-12 lg:mt-0 ">
