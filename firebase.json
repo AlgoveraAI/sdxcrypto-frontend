@@ -3,8 +3,15 @@
     "source": "functions"
   },
   "hosting": {
-    "public": "frontend",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "source": "frontend",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "redirects": [
+      {
+        "source": "/frontend",
+        "destination": "/index.html",
+        "type": 301
+      }
+    ]
   },
   "extensions": {
     "moralis-auth": "moralis/moralis-auth@0.1.4"
