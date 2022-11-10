@@ -47,7 +47,7 @@ export default function Generate({
       body: JSON.stringify({
         uid: uid,
         prompt: prompt,
-        // selectedModal: selectedModal,
+        base_model: "midjourney-v4",
       }),
     });
     // todo handle out of credits error
