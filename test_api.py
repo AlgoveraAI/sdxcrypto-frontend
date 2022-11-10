@@ -13,12 +13,7 @@ print(response.text)
 job_uuid = response.json()["job_uuid"]
 job_uuid = "56c7fbff7d0d49f68d91d765f23f6ed7"
 
-base_url = "http://3.250.11.166:8501/job/status"
-body = {
-    "job_uuid": job_uuid
-}
-
-response = requests.get(base_url, headers=headers, json=body)
+base_url = "http://3.250.11.166:8501/job/status?job_uuid=" + job_uuid
+response = requests.get(base_url, headers=headers)
 
 print(response.text)
-
