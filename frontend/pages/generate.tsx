@@ -28,7 +28,7 @@ const GeneratePage: NextPage<PageProps> = ({
 
   // store params and details for each step here
   // so that we can pass them to the next step and store them
-  const [selectedModal, setSelectedModal] = useState("");
+  const [selectedModal, setSelectedModal] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const [jobId, setJobId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);

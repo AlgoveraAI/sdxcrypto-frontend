@@ -3,7 +3,7 @@ import { useState } from "react";
 import Spinner from "../spinner";
 
 type Props = {
-  selectedModal: string;
+  selectedModal: string | null;
   jobId: string | null;
   prompt: string;
   images: string[];

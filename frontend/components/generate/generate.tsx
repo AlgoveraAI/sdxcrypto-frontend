@@ -4,7 +4,7 @@ import Spinner from "../spinner";
 
 type Props = {
   uid: string;
-  selectedModal: string;
+  selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
@@ -32,7 +32,7 @@ export default function Generate({
 
   const generateImg = async () => {
     setLoading(true);
-    if (selectedModal === "") {
+    if (!selectedModal) {
       alert("Please select a model");
       setLoading(false);
       return;
@@ -42,12 +42,19 @@ export default function Generate({
       setLoading(false);
       return;
     }
+    let baseModel;
+    if (selectedModal === "SDxMJ") {
+      baseModel = "midjourney-v4";
+    } else {
+      baseModel = "stable-diffusion-v1-5";
+    }
+
     const res = await fetch("/api/txt2img", {
       method: "POST",
       body: JSON.stringify({
         uid: uid,
         prompt: prompt,
-        base_model: "midjourney-v4",
+        base_model: baseModel,
       }),
     });
     // todo handle out of credits error

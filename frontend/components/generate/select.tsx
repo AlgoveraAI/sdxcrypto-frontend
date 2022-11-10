@@ -3,7 +3,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 const models = [
   {
-    name: "Stable Diffusion (1.5)",
+    name: "Stable Diffusion (v1.5)",
     description:
       "A latent text-to-image diffusion model capable of generating photo-realistic images given any text input, cultivates autonomous freedom to produce incredible imagery, empowers billions of people to create stunning art within seconds.",
     website: "https://github.com/CompVis/stable-diffusion",
@@ -12,7 +12,8 @@ const models = [
   },
   {
     name: "SDxMJ",
-    description: "Stable Diffusion 1.5 fine-tuned on Midjourney outputs.",
+    description:
+      "Stable Diffusion (v1.5) fine-tuned on Midjourney (v4) outputs.",
     website: "https://huggingface.co/prompthero/midjourney-v4-diffusion",
     imageUrl:
       "https://pbs.twimg.com/profile_images/1348748676282388482/nr8ZuLBE_400x400.jpg",
@@ -20,8 +21,8 @@ const models = [
 ];
 
 type Props = {
-  selectedModal: string;
-  setSelectedModal: React.Dispatch<React.SetStateAction<string>>;
+  selectedModal: string | null;
+  setSelectedModal: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export default function Select({ selectedModal, setSelectedModal }: Props) {
