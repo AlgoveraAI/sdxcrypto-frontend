@@ -98,7 +98,7 @@ export default function Generate({
       {/* TODO display all images */}
       {images.length ? (
         <Image
-          className="mt-6 max-w-full h-auto mx-auto"
+          className="mt-6 md:mt-12 max-w-full h-auto mx-auto"
           src={images[0]}
           alt="Generated Image"
           width={width}
