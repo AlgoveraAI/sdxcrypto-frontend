@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "source": "functions"
+  },
+  "hosting": {
+    "source": "frontend",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "/index.html",
+        "type": 301
+      }
+    ]
+  },
+  "extensions": {
+    "moralis-auth": "moralis/moralis-auth@0.1.4"
+  }
+}
