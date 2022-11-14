@@ -5,6 +5,9 @@ import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { MoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
 const { ethers } = require("ethers");
+import { Contract } from "@ethersproject/contracts";
+import { BaseProvider } from "@ethersproject/providers";
+import { Signer } from "@ethersproject/abstract-signer";
 
 type Props = {
   selectedModal: string | null;
@@ -24,11 +27,11 @@ export default function Mint({
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [networkName, setNetworkName] = useState(null);
-  const [contract, setContract] = useState(null);
+  const [contract, setContract] = useState<Contract | null>(null);
   const [mintPrice, setMintPrice] = useState(null);
   const [account, setAccount] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [signer, setSigner] = useState(null);
+  const [provider, setProvider] = useState<BaseProvider | null>(null);
+  const [signer, setSigner] = useState<Signer | null>(null);
   const [etherscanTxnUrl, setEtherscanTxnUrl] = useState(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState(null);
 
@@ -85,13 +88,16 @@ export default function Mint({
       setLoading(false);
       return;
     }
-    if (networkName === null) {
+    if (networkName === null || provider === null || signer === null) {
       alert("Please connect your wallet");
       setLoading(false);
       return;
     }
-    if (contract === null) {
-      alert("No contract found for the connected network: " + networkName);
+    if (contract === null || mintPrice === null) {
+      alert(
+        "Could not get contract details for the connected network: " +
+          networkName
+      );
       setLoading(false);
       return;
     }
@@ -125,7 +131,7 @@ export default function Mint({
       data: methodSignature,
       from: account,
     };
-    const gasEstimate = await provider.estimateGas(txnParams);
+    const gasEstimate = await signer.estimateGas(txnParams);
     console.log("Gas estimate:", gasEstimate.toString());
 
     // send transaction
@@ -144,8 +150,8 @@ export default function Mint({
       const tokenId = receipt.events[0].args[2].toString();
       console.log("Token ID:", tokenId);
       await setLoading(false);
-    } catch (error) {
-      if (error.message.includes("user rejected transaction")) {
+    } catch (error: any) {
+      if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
       } else {
         console.error(error);
