@@ -22,7 +22,11 @@ export default function App({ Component, pageProps }: AppProps) {
     console.log("checking auth");
     if (moralisAuth) {
       if (moralisAuth.auth.currentUser) {
-        console.log("connected user:", moralisAuth.auth.currentUser);
+        console.log("connected user uid:", moralisAuth.auth.currentUser.uid);
+        console.log(
+          "connected user wallet:",
+          moralisAuth.auth.currentUser.displayName
+        );
         setUid(moralisAuth.auth.currentUser.uid);
         setPollCredits(true);
       } else {
@@ -55,7 +59,7 @@ export default function App({ Component, pageProps }: AppProps) {
         if (docSnap.exists()) {
           setCredits(docSnap.data().credits);
         } else {
-          console.log("User not in firestore db");
+          console.log("User not in firestore db", moralisAuth.auth.currentUser);
         }
       });
     }

@@ -7,6 +7,7 @@ import Image from "next/image";
 import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 import { auth } from "../lib/firebase";
 import { HookCallbacks } from "async_hooks";
+import { MoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
 
 // function classNames(...classes: string[]) {
 //   return classes.filter(Boolean).join(" ");
@@ -18,7 +19,7 @@ type NavProps = {
   setUid: React.Dispatch<React.SetStateAction<string>>;
   // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  moralisAuth: any; // todo: get type
+  moralisAuth: MoralisAuth;
 };
 
 export default function Nav({
@@ -33,7 +34,8 @@ export default function Nav({
   const handleConnect = async () => {
     // todo: handle signature rejection
     if (moralisAuth) {
-      await signInWithMoralis(moralisAuth);
+      const signInResponse = await signInWithMoralis(moralisAuth);
+      console.log("Signed in", signInResponse);
     }
   };
 

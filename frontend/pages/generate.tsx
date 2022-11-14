@@ -209,6 +209,7 @@ const GeneratePage: NextPage<PageProps> = ({
             />
           ) : (
             <Mint
+              moralisAuth={moralisAuth}
               selectedModal={selectedModal}
               jobId={jobId}
               prompt={prompt}
