@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Spinner from "../spinner";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
@@ -23,8 +23,8 @@ export default function Mint({
   images,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
-  const [networkName, setNetworkName] = useState(null);
   const [contract, setContract] = useState<Contract | null>(null);
   const [mintPrice, setMintPrice] = useState(null);
   const [etherscanTxnUrl, setEtherscanTxnUrl] = useState(null);
@@ -32,16 +32,15 @@ export default function Mint({
 
   const getContract = async () => {
     // get contract address from firebase
-    if (networkName) {
-      const docRef = doc(db, "contracts", networkName);
+    if (user.provider && user.networkName) {
+      const docRef = doc(db, "contracts", user.networkName);
       if (docRef) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data) {
-            let { address, abi } = data.deployment;
+            let { address, abi } = JSON.parse(data.deployment);
             console.log("Connecting to contract:", address);
-            abi = JSON.parse(abi).abi;
             console.log("ABI:", abi);
             const contract = new ethers.Contract(address, abi, user.provider);
             setContract(contract);
@@ -52,7 +51,8 @@ export default function Mint({
         }
       } else {
         alert(
-          "No contract address found for the connected network: " + networkName
+          "No contract address found for the connected network: " +
+            user.networkName
         );
       }
     } else {
@@ -61,9 +61,15 @@ export default function Mint({
   };
 
   const mint = async () => {
-    const { signer, provider, account } = user;
+    const { signer, provider, account, networkName } = user;
+
+    if (status === "Mint successful!") {
+      alert("You already minted this image!");
+      return;
+    }
 
     setLoading(true);
+    setStatus("Preparing transaction");
     // check we have everything needed to mint
     if (!selectedModal) {
       alert("Please select a model and generate an image first");
@@ -111,10 +117,7 @@ export default function Mint({
     }
 
     // estimate gas
-    const methodSignature = await contract.interface.encodeFunctionData(
-      "mint",
-      [1]
-    );
+    const methodSignature = await contract.interface.encodeFunctionData("mint");
     const txnParams = {
       to: contract.address,
       value: mintPrice,
@@ -126,6 +129,7 @@ export default function Mint({
 
     // send transaction
     try {
+      setStatus("Awaiting signature");
       const txn = await signer.sendTransaction({
         to: contract.address,
         value: mintPrice,
@@ -134,23 +138,43 @@ export default function Mint({
       });
       console.log("Transaction:", txn);
       // wait for transaction to be mined
+      setStatus("Transaction executing");
       const receipt = await txn.wait();
       console.log("Receipt:", receipt);
-      // get the token id
-      const tokenId = receipt.events[0].args[2].toString();
-      console.log("Token ID:", tokenId);
+      setStatus("Mint successful!");
+      // get the token id from the emitted event
+      const tokenId = parseInt(receipt.logs[0].topics[3], 16);
+      const metadata = {
+        name: name.value,
+        description: description.value,
+        image: images[selectedIdx],
+        attributes: {
+          prompt: prompt,
+          model: selectedModal,
+        },
+      };
+      // upload metadata to firebase
+      // add field to nft_metadata/address document
+      const docRef = doc(db, "nft_metadata", contract.address);
+      const docSnap = await getDoc(docRef);
 
-      // upload the img url (which points at firebase storage)
-      // to the nft_images firestore, so that the api can serve it
-      // for tokenuri requests
-      await setDoc(doc(db, "nft_images", `contract_${tokenId}`), {
-        url: images[selectedIdx],
-      });
+      if (!docSnap.exists()) {
+        // create doc if it doesn't exist
+        await setDoc(docRef, {
+          [tokenId]: metadata,
+        });
+      } else {
+        // update doc if it does exist
+        await updateDoc(docRef, {
+          [tokenId]: metadata,
+        });
+      }
 
       await setLoading(false);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
+        setStatus(null);
       } else {
         console.error(error);
       }
@@ -163,7 +187,7 @@ export default function Mint({
     if (user.provider) {
       getContract();
     }
-  }, [user?.provider]);
+  }, [user.provider]);
 
   return (
     <div>
@@ -207,18 +231,23 @@ export default function Mint({
           height={512}
         />
       ) : null}
-      <div className="w-full text-center mt-6">
-        <button
-          onClick={mint}
-          type="button"
-          className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
-        >
-          <span className={loading ? "text-transparent" : ""}>Mint</span>
-          <span className={loading ? "" : "hidden"}>
-            <Spinner />
-          </span>
-        </button>
-      </div>
+      {contract ? (
+        <div className="w-full text-center mt-6">
+          <button
+            onClick={mint}
+            type="button"
+            className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
+          >
+            <span className={loading ? "text-transparent" : ""}>Mint</span>
+            <span className={loading ? "" : "hidden"}>
+              <Spinner />
+            </span>
+          </button>
+          {status ? (
+            <p className="mt-2 text-sm text-gray-500">{status}</p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.0.13",
     "@moralisweb3/client-firebase-auth-utils": "^2.7.1",
     "@moralisweb3/client-firebase-evm-auth": "^2.7.1",
+    "cors": "^2.8.5",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.1",
     "firebase": "^9.13.0",
@@ -23,6 +24,7 @@
     "react-firebase-hooks": "^5.0.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "^18.0.8",

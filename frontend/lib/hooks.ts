@@ -75,6 +75,8 @@ export const useUser = () => {
   };
 
   const signIn = async () => {
+    // use this to request a signature from metamask
+    // and get the users uid from firebase
     if (moralisAuth) {
       console.log("signing in");
       await signInWithMoralis(moralisAuth);
@@ -82,6 +84,7 @@ export const useUser = () => {
   };
 
   const signOut = async () => {
+    // use this when the user wants to disconnect their wallet
     if (uid && moralisAuth) {
       console.log("signing out");
       await auth.signOut();
