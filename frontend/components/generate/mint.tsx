@@ -27,8 +27,8 @@ export default function Mint({
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [contract, setContract] = useState<Contract | null>(null);
   const [mintPrice, setMintPrice] = useState(null);
-  const [etherscanTxnUrl, setEtherscanTxnUrl] = useState(null);
-  const [openseaAssetUrl, setOpenseaAssetUrl] = useState(null);
+  const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
+  const [etherscanTxnUrl, setEtherscanTxnUrl] = useState<string | null>(null);
 
   const getContract = async () => {
     // get contract address from firebase
@@ -170,6 +170,17 @@ export default function Mint({
         });
       }
 
+      // get opensea url
+      let openseaUrl = "";
+      if (networkName === "mainnet") {
+        openseaUrl = "https://opensea.io/assets/";
+      } else {
+        openseaUrl = "https://testnets.opensea.io/assets/";
+      }
+      setOpenseaAssetUrl(
+        openseaUrl + contract.address + "/" + tokenId.toString()
+      );
+
       await setLoading(false);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
@@ -245,6 +256,18 @@ export default function Mint({
           </button>
           {status ? (
             <p className="mt-2 text-sm text-gray-500">{status}</p>
+          ) : null}
+          {openseaAssetUrl ? (
+            <p className="mt-0 text-sm text-gray-500">
+              <a
+                className="underline"
+                href={openseaAssetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on OpenSea
+              </a>
+            </p>
           ) : null}
         </div>
       ) : null}

@@ -12,6 +12,8 @@ const { ethers } = require("ethers");
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
+declare var window: any; // to avoid typescript error on window.ethereum
+
 export const useMoralisAuth = () => {
   const [user] = useAuthState(auth);
   const [moralisAuth, setMoralisAuth] = useState<MoralisAuth | null>(null);

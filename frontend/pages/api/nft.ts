@@ -4,7 +4,7 @@ import { db, auth } from "../../lib/firebase";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 // example local call:
-// http://localhost:3000/api/nft?address=0xbcc440970714a82192a7d3b37b080c4d8dcadf7f&tokenId=0
+// http://localhost:3000/api/nft?address=0xbcc440970714a82192a7d3b37B080c4d8dcAdf7F&tokenId=0
 
 // setup cors as per https://github.com/vercel/next.js/blob/canary/examples/api-routes-cors/pages/api/cors.ts
 const cors = Cors({
