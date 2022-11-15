@@ -1,10 +1,7 @@
-import { MoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
+import { User } from "./hooks";
 
 export type PageProps = {
-  uid: string;
-  setUid: React.Dispatch<React.SetStateAction<string>>;
-  credits: number | null;
-  moralisAuth: MoralisAuth;
+  user: User;
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };

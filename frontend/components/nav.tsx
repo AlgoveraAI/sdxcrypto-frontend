@@ -4,44 +4,21 @@ import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
-import { auth } from "../lib/firebase";
-import { HookCallbacks } from "async_hooks";
-import { MoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
-
+import { User } from "../lib/hooks";
 // function classNames(...classes: string[]) {
 //   return classes.filter(Boolean).join(" ");
 // }
 
 type NavProps = {
-  uid: string;
-  credits: number | null;
-  setUid: React.Dispatch<React.SetStateAction<string>>;
+  user: User;
   // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  moralisAuth: MoralisAuth;
 };
 
-export default function Nav({
-  moralisAuth,
-  credits,
-  setCreditsModalTrigger,
-}: NavProps) {
+export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
   // store which page we're on to manage nav behaviour
   // (scrolling to howitworks section on index.tsx)
   // const [onHome, setOnHome] = React.useState(true);
-
-  const handleConnect = async () => {
-    // todo: handle signature rejection
-    if (moralisAuth) {
-      const signInResponse = await signInWithMoralis(moralisAuth);
-      console.log("Signed in", signInResponse);
-    }
-  };
-
-  const handleDisconnect = async () => {
-    await auth.signOut();
-  };
 
   // useEffect(() => {
   //   console.log("loading page", window.location.pathname);
@@ -113,11 +90,11 @@ export default function Nav({
             </Popover.Group> */}
 
             <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-              {moralisAuth?.auth?.currentUser &&
-                (credits !== null ? (
+              {user.uid &&
+                (user.credits !== null ? (
                   <span
                     className={`cursor-pointer ${
-                      credits === 0
+                      user.credits === 0
                         ? "text-red-500 hover:text-red-600 "
                         : "text-green-500 hover:text-green-600 "
                     }`}
@@ -125,23 +102,23 @@ export default function Nav({
                       setCreditsModalTrigger(true);
                     }}
                   >
-                    {credits === 0
+                    {user.credits === 0
                       ? "Out of Credits"
-                      : credits === 1
+                      : user.credits === 1
                       ? "1 Credit"
-                      : `${credits} Credits`}
+                      : `${user.credits} Credits`}
                   </span>
                 ) : null)}
-              {moralisAuth?.auth?.currentUser ? (
+              {user.uid ? (
                 <span
-                  onClick={handleDisconnect}
+                  onClick={user.signOut}
                   className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
                 >
                   Disconnect Wallet
                 </span>
               ) : (
                 <span
-                  onClick={handleConnect}
+                  onClick={user.signIn}
                   className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
                 >
                   Connect Wallet
@@ -187,10 +164,10 @@ export default function Nav({
                   </a>
                 </div> */}
                 <div className="flex w-full items-center justify-center px-4 py-2  bg-black/[0.3]">
-                  {moralisAuth?.auth?.currentUser && (
+                  {user.uid && (
                     <span
                       className={`cursor-pointer ${
-                        !credits
+                        !user.credits
                           ? "text-red-500 hover:text-red-600 "
                           : "text-green-500 hover:text-green-600 "
                       }`}
@@ -198,25 +175,25 @@ export default function Nav({
                         setCreditsModalTrigger(true);
                       }}
                     >
-                      {credits === 0
+                      {user.credits === 0
                         ? "Out of Credits"
-                        : credits === 1
+                        : user.credits === 1
                         ? "1 Credit"
-                        : `${credits} Credits`}
+                        : `${user.credits} Credits`}
                     </span>
                   )}
                 </div>
                 <div>
-                  {moralisAuth?.auth?.currentUser ? (
+                  {user.uid ? (
                     <span
-                      onClick={handleDisconnect}
+                      onClick={user.signOut}
                       className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
                     >
                       Disconnect Wallet
                     </span>
                   ) : (
                     <span
-                      onClick={handleConnect}
+                      onClick={user.signIn}
                       className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
                     >
                       Connect Wallet

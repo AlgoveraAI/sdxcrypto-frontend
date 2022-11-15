@@ -17,10 +17,7 @@ const steps = [
 ];
 
 const GeneratePage: NextPage<PageProps> = ({
-  uid,
-  setUid,
-  credits,
-  moralisAuth,
+  user,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -37,7 +34,7 @@ const GeneratePage: NextPage<PageProps> = ({
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
-    console.log("fetching status", uid, jobId);
+    console.log("fetching status", user.uid, jobId);
     const res = await fetch("/api/status", {
       method: "POST",
       body: JSON.stringify({
@@ -54,7 +51,7 @@ const GeneratePage: NextPage<PageProps> = ({
         // make call to firebase storage to get all images under job
         console.log("getting images for jobId", jobId);
         const storage = getStorage(firebaseApp);
-        const storageRef = ref(storage, `${uid}/images/${jobId}`);
+        const storageRef = ref(storage, `${user.uid}/images/${jobId}`);
         listAll(storageRef)
           .then((res) => {
             // get img urls
@@ -82,7 +79,7 @@ const GeneratePage: NextPage<PageProps> = ({
   };
 
   useEffect(() => {
-    if (jobId && uid) {
+    if (jobId && user.uid) {
       // check job status on interval
       console.log("setting jobStatus interval");
       // reset state here in case it's already done or error
@@ -94,7 +91,7 @@ const GeneratePage: NextPage<PageProps> = ({
       }, 2000);
       setJobStatusInterval(interval);
     }
-  }, [jobId, uid]);
+  }, [jobId, user.uid]);
 
   useEffect(() => {
     // if job is done, clear interval
@@ -113,21 +110,14 @@ const GeneratePage: NextPage<PageProps> = ({
 
   return (
     <div>
-      {credits !== null ? (
+      {user.credits !== null ? (
         <CreditsModal
-          credits={credits}
           creditsModalTrigger={creditsModalTrigger}
           setCreditsModalTrigger={setCreditsModalTrigger}
-          uid={uid}
+          user={user}
         />
       ) : null}
-      <Nav
-        uid={uid}
-        setUid={setUid}
-        credits={credits}
-        moralisAuth={moralisAuth}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-      />
+      <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
 
       <div className="max-w-7xl mx-auto md:px-24 px-6">
         <nav aria-label="Progress">
@@ -200,7 +190,7 @@ const GeneratePage: NextPage<PageProps> = ({
             />
           ) : currentStepIdx === 1 ? (
             <Generate
-              uid={uid}
+              user={user}
               selectedModal={selectedModal}
               setJobId={setJobId}
               prompt={prompt}
@@ -209,7 +199,7 @@ const GeneratePage: NextPage<PageProps> = ({
             />
           ) : (
             <Mint
-              moralisAuth={moralisAuth}
+              user={user}
               selectedModal={selectedModal}
               jobId={jobId}
               prompt={prompt}

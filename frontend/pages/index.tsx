@@ -8,10 +8,7 @@ import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 
 const Home: NextPage<PageProps> = ({
-  uid,
-  setUid,
-  credits,
-  moralisAuth,
+  user,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
@@ -20,18 +17,11 @@ const Home: NextPage<PageProps> = ({
   return (
     <div>
       <CreditsModal
-        credits={credits}
+        user={user}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
-        uid={uid}
       />
-      <Nav
-        uid={uid}
-        setUid={setUid}
-        credits={credits}
-        moralisAuth={moralisAuth}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-      />
+      <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
       <Hero />
       <HowItWorks howitworksRef={howitworksRef} />
       <Pricing

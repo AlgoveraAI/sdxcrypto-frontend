@@ -1,19 +1,17 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Spinner from "../spinner";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
-import { MoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
-import { BaseProvider } from "@ethersproject/providers";
-import { Signer } from "@ethersproject/abstract-signer";
+import { User } from "../../lib/hooks";
 
 type Props = {
   selectedModal: string | null;
   jobId: string | null;
   prompt: string;
-  moralisAuth: MoralisAuth;
+  user: User;
   images: string[];
 };
 
@@ -21,7 +19,7 @@ export default function Mint({
   selectedModal,
   jobId,
   prompt,
-  moralisAuth,
+  user,
   images,
 }: Props) {
   const [loading, setLoading] = useState(false);
@@ -29,37 +27,23 @@ export default function Mint({
   const [networkName, setNetworkName] = useState(null);
   const [contract, setContract] = useState<Contract | null>(null);
   const [mintPrice, setMintPrice] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [provider, setProvider] = useState<BaseProvider | null>(null);
-  const [signer, setSigner] = useState<Signer | null>(null);
   const [etherscanTxnUrl, setEtherscanTxnUrl] = useState(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState(null);
 
   const getContract = async () => {
-    if (window.ethereum) {
-      // get injected provider from metamask
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const network = await provider.getNetwork();
-      const account = await provider.getSigner().getAddress();
-      const signer = provider.getSigner();
-      console.log("User is on network:", network.name);
-      setNetworkName(network.name);
-      setAccount(account);
-      setProvider(provider);
-      setSigner(signer);
-
-      // get contract address from firebase
-      const docRef = doc(db, "contracts", network.name);
+    // get contract address from firebase
+    if (networkName) {
+      const docRef = doc(db, "contracts", networkName);
       if (docRef) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data) {
-            let { address, abi } = data;
+            let { address, abi } = data.deployment;
             console.log("Connecting to contract:", address);
             abi = JSON.parse(abi).abi;
             console.log("ABI:", abi);
-            const contract = new ethers.Contract(address, abi, provider);
+            const contract = new ethers.Contract(address, abi, user.provider);
             setContract(contract);
             const mintPrice = await contract.MINT_PRICE();
             console.log("Mint price:", mintPrice.toString());
@@ -68,16 +52,19 @@ export default function Mint({
         }
       } else {
         alert(
-          "No contract address found for the connected network: " + network.name
+          "No contract address found for the connected network: " + networkName
         );
       }
     } else {
-      alert("Please install metamask");
+      console.error("Not connected to metamask");
     }
   };
 
   const mint = async () => {
+    const { signer, provider, account } = user;
+
     setLoading(true);
+    // check we have everything needed to mint
     if (!selectedModal) {
       alert("Please select a model and generate an image first");
       setLoading(false);
@@ -88,7 +75,12 @@ export default function Mint({
       setLoading(false);
       return;
     }
-    if (networkName === null || provider === null || signer === null) {
+    if (
+      networkName === null ||
+      provider === null ||
+      signer === null ||
+      account === null
+    ) {
       alert("Please connect your wallet");
       setLoading(false);
       return;
@@ -117,8 +109,6 @@ export default function Mint({
       setLoading(false);
       return;
     }
-
-    // set image URI for NFT TODO
 
     // estimate gas
     const methodSignature = await contract.interface.encodeFunctionData(
@@ -149,6 +139,14 @@ export default function Mint({
       // get the token id
       const tokenId = receipt.events[0].args[2].toString();
       console.log("Token ID:", tokenId);
+
+      // upload the img url (which points at firebase storage)
+      // to the nft_images firestore, so that the api can serve it
+      // for tokenuri requests
+      await setDoc(doc(db, "nft_images", `contract_${tokenId}`), {
+        url: images[selectedIdx],
+      });
+
       await setLoading(false);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
@@ -162,10 +160,10 @@ export default function Mint({
 
   // get current network from moralis
   useEffect(() => {
-    if (moralisAuth.auth.currentUser) {
+    if (user.provider) {
       getContract();
     }
-  }, [moralisAuth, moralisAuth?.auth?.currentUser?.uid]);
+  }, [user?.provider]);
 
   return (
     <div>

@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Spinner from "../spinner";
+import { User } from "../../lib/hooks";
 
 type Props = {
-  uid: string;
+  user: User;
   selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
@@ -12,7 +13,7 @@ type Props = {
 };
 
 export default function Generate({
-  uid,
+  user,
   selectedModal,
   setJobId,
   prompt,
@@ -52,7 +53,7 @@ export default function Generate({
     const res = await fetch("/api/txt2img", {
       method: "POST",
       body: JSON.stringify({
-        uid: uid,
+        uid: user.uid,
         prompt: prompt,
         base_model: baseModel,
       }),
