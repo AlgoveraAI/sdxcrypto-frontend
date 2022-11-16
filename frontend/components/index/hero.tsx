@@ -42,7 +42,7 @@ export default function Hero() {
                 can trade or sell.
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
-                <div className="rounded-md shadow">
+                <div className="rounded-md shadow w-1/2 mx-auto sm:mx-0">
                   <Link
                     href="/generate"
                     className="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-4 md:px-10 md:text-lg"
