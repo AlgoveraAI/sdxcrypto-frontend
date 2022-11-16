@@ -60,6 +60,13 @@ export default function Mint({
     }
   };
 
+  // get current network from moralis
+  useEffect(() => {
+    if (user.provider) {
+      getContract();
+    }
+  }, [user.provider]);
+
   const mint = async () => {
     const { signer, provider, account, networkName } = user;
 
@@ -192,13 +199,6 @@ export default function Mint({
       setLoading(false);
     }
   };
-
-  // get current network from moralis
-  useEffect(() => {
-    if (user.provider) {
-      getContract();
-    }
-  }, [user.provider]);
 
   return (
     <div>

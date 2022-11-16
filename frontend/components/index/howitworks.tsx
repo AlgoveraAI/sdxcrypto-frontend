@@ -8,7 +8,7 @@ type Props = {
 export default function HowItWorks({ howitworksRef }: Props) {
   return (
     <div
-      className="relative overflow-hidden bg-white pb-24"
+      className="relative overflow-hidden bg-gray-50 py-24"
       ref={howitworksRef}
     >
       <div className="relative">
