@@ -30,6 +30,7 @@ export interface User {
   account: string | null;
   networkName: string | null;
   credits: number | null;
+  loading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   setCredits: (credits: number) => Promise<void>;
@@ -50,6 +51,7 @@ export const useUser = () => {
   const [signer, setSigner] = useState<Signer | null>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const moralisAuth = useMoralisAuth();
 
@@ -81,7 +83,14 @@ export const useUser = () => {
     // and get the users uid from firebase
     if (moralisAuth) {
       console.log("signing in");
-      await signInWithMoralis(moralisAuth);
+      try {
+        setLoading(true);
+        await signInWithMoralis(moralisAuth);
+      } catch (error) {
+        // if user rejects signature request
+        console.error(error);
+        setLoading(false);
+      }
     }
   };
 
@@ -106,6 +115,7 @@ export const useUser = () => {
       const { uid } = moralisAuth.auth.currentUser;
       console.log("got UID", uid);
       setUid(uid);
+      setLoading(false);
       console.log("checking MetaMask");
       getAccount();
     }
@@ -146,6 +156,7 @@ export const useUser = () => {
     networkName,
     moralisAuth,
     credits,
+    loading,
     signIn,
     signOut,
     setCredits,

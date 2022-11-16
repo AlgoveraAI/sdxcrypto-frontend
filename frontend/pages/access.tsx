@@ -4,12 +4,6 @@ import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
-import {
-  BoltIcon,
-  EnvelopeIcon,
-  GlobeAltIcon,
-  ScaleIcon,
-} from "@heroicons/react/24/outline";
 
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../lib/firebase";
@@ -22,22 +16,18 @@ const features = [
   {
     name: "Credits",
     description: "Get 200 free credits per month",
-    icon: GlobeAltIcon,
   },
   {
     name: "Minting",
     description: "Mint your AI art as an NFT for free",
-    icon: ScaleIcon,
   },
   {
     name: "Early Access",
     description: "Be the first to use new models",
-    icon: BoltIcon,
   },
   {
     name: "Community",
     description: "Access a holders-only Discord channel",
-    icon: EnvelopeIcon,
   },
 ];
 
