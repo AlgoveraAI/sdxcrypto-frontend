@@ -41,7 +41,7 @@ response = requests.get(url, headers={"Accept": "application/json"})
 
 if response.status_code == 200:
 
-    holders = response.json()['ownerAddresses']
+    holders = response.json()["ownerAddresses"]
     print(f"Found {len(holders)} holders")
 
     # get the database
@@ -61,6 +61,8 @@ if response.status_code == 200:
                 # increment existing credits
                 doc_ref.update({"credits": firestore.Increment(credits)})
         else:
+            # create new document with credits
+            # this will also create the base collection if it doesnt exist
             doc_ref.set({"credits": credits})
 
 else:
