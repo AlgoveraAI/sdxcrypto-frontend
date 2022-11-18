@@ -10,6 +10,9 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: "Enable Firebase Experiments"
+        run: /usr/local/bin/npx firebase-tools@latest experiments:enable webframeworks
+
       - uses: actions/checkout@v2
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -17,3 +20,4 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SDXCRYPTO_ALGOVERA }}'
           channelId: live
           projectId: sdxcrypto-algovera
+
