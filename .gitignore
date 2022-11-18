@@ -68,3 +68,5 @@ node_modules/
 *.vscode
 
 .env.sdxcrypto-algovera
+
+python/firebase-credentials.json
