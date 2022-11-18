@@ -28,7 +28,10 @@ const GeneratePage: NextPage<PageProps> = ({
   const [selectedModal, setSelectedModal] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const [jobId, setJobId] = useState<string | null>(null);
-  const [images, setImages] = useState<string[]>([]);
+  // const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([
+    "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/0xfdad2c16a5c3551856337ca415455562683e78f6c487c8046c89e350e4435828%2Fimages%2Fd9516feba65540eb9fcb8b10d0fa28f0%2Fd9516feba65540eb9fcb8b10d0fa28f0.jpg?alt=media&token=6fcb1c0d-67fa-42a5-b04f-8313ff7c8245",
+  ]);
   const [jobStatus, setJobStatus] = useState("");
   const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
 
