@@ -18,12 +18,18 @@ type NavProps = {
 };
 
 export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
+  const [currentPage, setCurrentPage] = useState<null | string>(null);
+
+  useEffect(() => {
+    setCurrentPage(window.location.pathname);
+  }, []);
+
   return (
     <Popover className="relative bg-black/[0.3]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
-            <Link href="/">
+            <Link href="https://algovera.ai">
               <span className="sr-only">Algovera</span>
               <Image
                 // className="h-8 w-auto sm:h-10"
@@ -42,16 +48,28 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
           </div>
           <Popover.Group as="nav" className="hidden space-x-10 md:flex">
             <Link
+              href="/"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/" ? "underline" : ""
+              }`}
+            >
+              About
+            </Link>
+            <Link
               href="generate"
-              className="text-base font-medium text-gray-50 hover:text-gray-400"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/generate" ? "underline" : ""
+              }`}
             >
               Generate
             </Link>
             <Link
-              href="access"
-              className="text-base font-medium text-gray-50 hover:text-gray-400"
+              href="creator"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/creator" ? "underline" : ""
+              }`}
             >
-              Access Pass
+              Creator Pass
             </Link>
 
             <Popover className="relative">
@@ -147,16 +165,22 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
               <Link
+                href="/"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                About
+              </Link>
+              <Link
                 href="generate"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 Generate
               </Link>
               <Link
-                href="access"
+                href="creator"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
-                Access Pass
+                Creator Pass
               </Link>
 
               {user.loading ? (

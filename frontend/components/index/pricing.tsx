@@ -1,7 +1,32 @@
-const includedFeatures = [
-  "One credit is worth one generation, and costs $0.001.",
-  "You can purchase as many credits as you want, with any crypto you want.",
-  "Credits never expire.",
+import { CheckIcon } from "@heroicons/react/24/outline";
+
+const tiers = [
+  {
+    name: "Credits",
+    href: "#",
+    priceMonthly: "$0.001",
+    priceType: "per-credit",
+    description: "Pay as you go",
+    features: [
+      "Pariatur quod similique",
+      "Sapiente libero doloribus modi nostrum",
+      "Vel ipsa esse repudiandae excepturi",
+      "Itaque cupiditate adipisci quibusdam",
+    ],
+  },
+  {
+    name: "Creator Pass",
+    href: "#",
+    priceMonthly: "0.1 ETH",
+    priceType: "",
+    description: "200 credits/month and other perks",
+    features: [
+      "Pariatur quod similique",
+      "Sapiente libero doloribus modi nostrum",
+      "Vel ipsa esse repudiandae excepturi",
+      "Itaque cupiditate adipisci quibusdam",
+    ],
+  },
 ];
 
 type Props = {
@@ -15,59 +40,106 @@ export default function Pricing({
 }: Props) {
   return (
     <div className="bg-background">
-      <div className="pt-12 sm:pt-16 lg:pt-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-100 sm:text-4xl lg:text-5xl">
-              Purchase credits using using your prefered cryptocurrency
+      <div className="pt-12 sm:pt-16 lg:pt-24">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
+            <h2 className="text-xl font-semibold leading-6 text-gray-300">
+              {/* Pricing */}
             </h2>
-            <p className="mt-4 text-xl text-gray-100">
-              Powered by Coinbase Commerce
+            <p className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Flexible plans for every creator
+            </p>
+            <p className="text-xl text-gray-300">
+              Pay as you go, or get a monthly subscription
             </p>
           </div>
         </div>
       </div>
-      <div className="mt-8 bg-gray-100 pb-16 sm:mt-12 sm:pb-20 lg:pb-28">
+      <div className="mt-8 bg-gray-50 pb-12 sm:mt-12 sm:pb-16 lg:mt-16 lg:pb-24">
         <div className="relative">
-          <div className="absolute inset-0 h-1/2 bg-background" />
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-lg overflow-hidden rounded-lg shadow-lg lg:flex lg:max-w-none">
-              <div className="flex-1 bg-gray-100 px-6 py-8 lg:p-12">
-                <div className="mt-8">
-                  <div className="flex items-center">
-                    <h4 className="flex-shrink-0 bg-gray-100 pr-4 text-base font-semibold text-primary">
-                      How do the credits work?
-                    </h4>
-                    <div className="flex-1 border-t-2 border-gray-200" />
-                  </div>
-                  <ul
-                    role="list"
-                    className="mt-8 space-y-5 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-5 lg:space-y-0"
-                  >
-                    {includedFeatures.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start lg:col-span-1"
+          <div className="absolute inset-0 h-3/4 bg-gray-900" />
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-5xl lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+              {tiers.map((tier) => (
+                <div
+                  key={tier.name}
+                  className="flex flex-col overflow-hidden rounded-lg shadow-lg"
+                >
+                  <div className="bg-white px-6 py-8 sm:p-10 sm:pb-6">
+                    <div>
+                      <h3
+                        className="inline-flex rounded-full bg-indigo-100 px-4 py-1 text-base font-semibold text-primary"
+                        id="tier-standard"
                       >
-                        <p className="ml-3 text-sm text-gray-700">{feature}</p>
-                      </li>
-                    ))}
-                  </ul>
+                        {tier.name}
+                      </h3>
+                    </div>
+                    <div className="text-black mt-4 flex items-baseline text-6xl font-bold tracking-tight">
+                      {tier.priceMonthly}
+                      <span className="ml-1 text-2xl font-medium tracking-normal text-primary">
+                        {tier.priceType}
+                      </span>
+                    </div>
+                    <p className="mt-5 text-lg text-gray-500">
+                      {tier.description}
+                    </p>
+                  </div>
+                  <div className="flex flex-1 flex-col justify-between space-y-6 bg-gray-50 px-6 pt-6 pb-8 sm:p-10 sm:pt-6">
+                    <div className="rounded-md shadow">
+                      {tier.name === "Credits" ? (
+                        <a
+                          onClick={() => {
+                            setCreditsModalTrigger(true);
+                          }}
+                          className="flex items-center justify-center rounded-md border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
+                          aria-describedby="tier-standard"
+                        >
+                          Purchase Credits
+                        </a>
+                      ) : (
+                        <a
+                          href="creator"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
+                          aria-describedby="tier-standard cursor-pointer"
+                        >
+                          Mint the NFT
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="relative mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:mt-5 lg:px-8">
+          <div className="mx-auto max-w-md lg:max-w-5xl">
+            <div className="rounded-lg bg-gray-100 px-6 py-8 sm:p-10 lg:flex lg:items-center">
+              <div className="flex-1">
+                <div>
+                  <h3 className="inline-flex rounded-full bg-white px-4 py-1 text-base font-semibold text-gray-800">
+                    Free Credits
+                  </h3>
+                </div>
+                <div className="mt-4 text-lg text-gray-600">
+                  Algovera community members who have earned a Reputation Badge
+                  get 100 free credits each.
+                </div>
+                <div className="mt-4 text-lg text-gray-600">
+                  Holders of particular NFTs also have a chance to win a free
+                  Creator Pass! <br />
+                  See Discord for more details.
                 </div>
               </div>
-              <div className="bg-gray-100 py-8 px-6 text-center lg:flex lg:flex-shrink-0 lg:flex-col lg:justify-center lg:p-12">
-                <div className="mt-6">
-                  <div className="rounded-md shadow">
-                    <a
-                      onClick={() => {
-                        setCreditsModalTrigger(true);
-                      }}
-                      className="flex items-center justify-center rounded-md border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
-                    >
-                      Buy Credits
-                    </a>
-                  </div>
-                </div>
+              <div className="mt-6 rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
+                <a
+                  href="https://discord.com/invite/e65RuHSDS5"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-gray-900 hover:bg-gray-50"
+                >
+                  Join Discord
+                </a>
               </div>
             </div>
           </div>

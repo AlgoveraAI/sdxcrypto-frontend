@@ -105,7 +105,7 @@ const C: NextPage<PageProps> = ({
           <div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-center sm:text-6xl">
-                Premium Access Pass
+                Premium Creator Pass
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
                 Tired of buying credits? <br /> Make a one-time NFT purchase for

@@ -37,9 +37,9 @@ export default function Hero() {
                 </span>{" "}
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-                Pay with crypto to use our custom generative AI pipeline. If you
-                love your output, mint it directly as an NFT that you own and
-                can trade or sell.
+                Create any image you need with the latest generative models, no
+                code required! If you love your output, mint it for free to our
+                Community Art NFT collection.
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow w-1/2 mx-auto sm:mx-0">

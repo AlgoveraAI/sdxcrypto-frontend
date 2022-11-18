@@ -50,14 +50,14 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
               <div className="mt-2">
                 <button
                   type="button"
-                  className="text-sm inline-flex items-center rounded-md border border-transparent bg-primary px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer"
+                  className="text-sm inline-flex items-center rounded-md border border-transparent bg-primary px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer hover:bg-primary-darker"
                   onClick={() => setSelectedModal(model.name)}
                 >
                   Select Model
                 </button>
                 <button
                   type="button"
-                  className="ml-2 text-sm inline-flex items-center rounded-md border border-transparent border-primary px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer"
+                  className="ml-2 text-sm inline-flex items-center rounded-md border border-transparent border-primary px-5 py-1 font-medium text-white  cursor-pointer hover:text-gray-300"
                   onClick={() => {
                     console.log("clicked");
                     window.open(model.website, "_blank");
