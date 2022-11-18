@@ -80,11 +80,13 @@ export default function Mint({
       if (!selectedModal) {
         alert("Please select a model and generate an image first");
         setLoading(false);
+        setStatus(null);
         return;
       }
       if (!images.length) {
         alert("Please generate an image first");
         setLoading(false);
+        setStatus(null);
         return;
       }
       if (
@@ -95,6 +97,7 @@ export default function Mint({
       ) {
         alert("Please connect your wallet");
         setLoading(false);
+        setStatus(null);
         return;
       }
       if (contract === null) {
@@ -103,6 +106,7 @@ export default function Mint({
             networkName
         );
         setLoading(false);
+        setStatus(null);
         return;
       }
       // check the desired name of the NFT
@@ -110,6 +114,7 @@ export default function Mint({
       if (name.value === "") {
         alert("Please enter a name");
         setLoading(false);
+        setStatus(null);
         return;
       }
       // check the desired description of the NFT
@@ -119,6 +124,7 @@ export default function Mint({
       if (description.value === "") {
         alert("Please enter a description");
         setLoading(false);
+        setStatus(null);
         return;
       }
 
@@ -234,7 +240,7 @@ export default function Mint({
   };
 
   return (
-    <div>
+    <div className="mb-12">
       <h2 className="mb-6 text-3xl font-bold text-center">Mint Your NFT</h2>
       <div className="mx-auto">
         <label className="block text-sm font-medium text-gray-500">Name</label>
@@ -288,19 +294,23 @@ export default function Mint({
             </span>
           </button>
           {status ? (
-            <p className="mt-2 text-sm text-gray-500">{status}</p>
-          ) : null}
-          {openseaAssetUrl ? (
-            <p className="mt-0 text-sm text-gray-500">
-              <a
-                className="underline"
-                href={openseaAssetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View on OpenSea
-              </a>
-            </p>
+            <div>
+              <p className="mt-2 text-sm text-gray-500">{status}</p>
+              <p className="mt-0 text-sm text-gray-500">
+                {openseaAssetUrl ? (
+                  <a
+                    className="underline"
+                    href={openseaAssetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View on OpenSea
+                  </a>
+                ) : (
+                  <span>Please don't close this page</span>
+                )}
+              </p>
+            </div>
           ) : null}
         </div>
       ) : null}
