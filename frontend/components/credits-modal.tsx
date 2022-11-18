@@ -122,7 +122,6 @@ export default function CreditsModal({
                     {user.credits === 1 ? "credit" : "credits"} remaining
                   </div>
                   <div className="mt-6">Use credits to generate images.</div>
-                  <div>{"100 credits = 100 generations = $1"}</div>
                   <div className="mt-6 shadow-sm w-full mx-auto">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 text-left">

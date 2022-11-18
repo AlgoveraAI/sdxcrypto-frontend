@@ -9,6 +9,7 @@ const models = [
     website: "https://github.com/CompVis/stable-diffusion",
     imageUrl:
       "https://pbs.twimg.com/profile_images/1505934249228185602/8Wkiy3vL_400x400.jpg",
+    credits_per_use: 1,
   },
   {
     name: "SDxMJ",
@@ -17,6 +18,7 @@ const models = [
     website: "https://huggingface.co/prompthero/midjourney-v4-diffusion",
     imageUrl:
       "https://pbs.twimg.com/profile_images/1348748676282388482/nr8ZuLBE_400x400.jpg",
+    credits_per_use: 1,
   },
 ];
 
@@ -47,6 +49,11 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
             <div className="min-w-0 flex-1">
               <p className="text-lg font-medium text-white">{model.name}</p>
               <p className="text-sm text-gray-300">{model.description}</p>
+              <p className="text-sm text-primary-lighter">
+                {model.credits_per_use}{" "}
+                {model.credits_per_use > 1 ? "credits" : "credit"} per
+                generation
+              </p>
               <div className="mt-2">
                 <button
                   type="button"
