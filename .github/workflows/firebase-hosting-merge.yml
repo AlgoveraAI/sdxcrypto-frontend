@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Enable Firebase Experiments"
+        working-directory: ./frontend
         run: /usr/local/bin/npx firebase-tools@latest experiments:enable webframeworks
 
       - uses: actions/checkout@v2
