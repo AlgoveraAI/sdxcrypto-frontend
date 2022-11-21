@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { updateDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
 const admin = require("firebase-admin");
 
 // users can be 'gifted' free credits by adding a credits entry
@@ -120,7 +118,7 @@ export default async function handler(
     const currentMonth = currentDateUTC.getUTCMonth();
     const currentYear = currentDateUTC.getUTCFullYear();
     let totalNewCredits = 0; // total new credits to add from each month processed
-    let processNewUser = false; // flag to create new user doc if needed
+    let processNewCreator = false; // flag to create new user doc if needed
 
     if (isCreator) {
       if (userSnap.exists) {
@@ -160,27 +158,31 @@ export default async function handler(
               if (!monthSnap.exists) {
                 // month doesnt exist, add it
                 console.log("adding creator month", uid, docId);
-                await updateDoc(monthRef, {
-                  credits: MONTHLY_CREDITS, // record the number of new credits added
-                  receivedAt: currentDateUTC.toUTCString(),
-                });
+                await monthRef.set(
+                  {
+                    credits: MONTHLY_CREDITS,
+                    receivedAt: currentDateUTC.toUTCString(),
+                  },
+                  { merge: true }
+                );
                 totalNewCredits += MONTHLY_CREDITS;
               }
             }
           }
           console.log("updating credits", uid, totalNewCredits);
-          await updateDoc(userRef, {
-            credits: data.credits + totalNewCredits,
-          });
+          await userRef.set(
+            { credits: admin.firestore.FieldValue.increment(totalNewCredits) },
+            { merge: true }
+          );
         } else {
           // user is already in the db but hasnt been processed as a creator yet
-          processNewUser = true;
+          processNewCreator = true;
         }
       } else {
         // user is not in the db yet
-        processNewUser = true;
+        processNewCreator = true;
       }
-      if (processNewUser) {
+      if (processNewCreator) {
         const monthRef = firestore
           .collection("users")
           .doc(uid)
@@ -188,15 +190,21 @@ export default async function handler(
           .doc(`${currentYear}-${currentMonth}`);
 
         console.log("adding creator first month", uid, MONTHLY_CREDITS);
-        await updateDoc(monthRef, {
-          credits: MONTHLY_CREDITS, // record the number of new credits added
-          receivedAt: currentDateUTC.toUTCString(),
-        });
+        await monthRef.set(
+          {
+            credits: MONTHLY_CREDITS,
+            receivedAt: currentDateUTC.toUTCString(),
+          },
+          { merge: true }
+        );
         console.log("updating credits", uid, MONTHLY_CREDITS);
-        await updateDoc(userRef, {
-          credits: MONTHLY_CREDITS,
-          creatorStartDate: currentDateUTC.toUTCString(),
-        });
+        await userRef.set(
+          {
+            credits: admin.firestore.FieldValue.increment(MONTHLY_CREDITS),
+            creatorStartDate: currentDateUTC.toUTCString(),
+          },
+          { merge: true }
+        );
       }
       // resolve
     } else {

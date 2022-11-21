@@ -1,12 +1,12 @@
 const functions = require("firebase-functions");
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
+const admin = require("firebase-admin");
 
 // setup cors
 const cors = require("cors")({ origin: "*" });
 
-// prepare app
-const admin = require("firebase-admin");
+// prepare app (use admin SDK)
 admin.initializeApp();
 const firestore = admin.firestore();
 
