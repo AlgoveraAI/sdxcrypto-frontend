@@ -4,8 +4,12 @@ import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
-const { ethers } = require("ethers");
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db, auth } from "../lib/firebase";
+import { sign } from "crypto";
+import { database } from "firebase-functions/v1/firestore";
 
+const { ethers } = require("ethers");
 const accessImg = require("../assets/access.png");
 
 const features = [
@@ -29,20 +33,64 @@ const features = [
 
 const TOKEN_ID = 0; // todo configure this in db
 
+type SignatureInfo = {
+  sig: string;
+  price: number;
+  tokenId: number;
+};
+
 const C: NextPage<PageProps> = ({
   user,
   creatorContract,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
+  const [status, setStatus] = useState<string | null>(null);
+  const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
+  const [signature, setSignature] = useState<SignatureInfo | null>(null);
+
+  const getSignature = async () => {
+    if (user.networkName && user.account && creatorContract?.address) {
+      const sigDocRef = doc(
+        db,
+        "creator_pass_signatures",
+        user.networkName,
+        creatorContract.address,
+        `token_${TOKEN_ID}`,
+        "wallets",
+        user.account
+      );
+      const sigDocSnap = await getDoc(sigDocRef);
+      if (sigDocSnap.exists()) {
+        const data = sigDocSnap.data();
+        if (data) {
+          console.log("got signature", data);
+          setSignature(data as SignatureInfo);
+        }
+      } else {
+        console.log("no signature found");
+        setSignature({
+          sig: "0x",
+          price: 0, // will get below during mint()
+          tokenId: TOKEN_ID,
+        });
+      }
+    }
+  };
+
+  // once we have user account and contract address, look for a signature
+  useEffect(() => {
+    if (user.account && user.networkName && creatorContract?.address) {
+      getSignature();
+    }
+  }, [user.account, user.networkName, creatorContract?.address]);
+
   const mint = async () => {
-    // todo: check for signature for free mints
     const { signer, provider, account, networkName } = user;
     if (!signer || !provider || !account || !networkName) {
       alert("Not connected to metamask");
       return;
     }
-
     if (!creatorContract) {
       alert("No contract found");
       return;
@@ -52,17 +100,83 @@ const C: NextPage<PageProps> = ({
       alert("Minting is not active");
       return;
     }
-    const balance = await creatorContract.balanceOf(account);
+    const balance = await creatorContract.balanceOf(account, TOKEN_ID);
     if (balance > 0) {
       alert("You can only mint 1 Creator Pass per wallet");
       return;
     }
-    const mintPrice = await creatorContract.tokenPrices(TOKEN_ID);
+
+    setStatus("Preparing transaction");
+
+    if (signature === null) {
+      // should not be null (getSignature is automatically triggered)
+      // but if it is, run again before minting so we dont miss a signature
+      await getSignature();
+    }
+
+    let sig, mintPrice;
+    if (signature === null || signature.sig === "0x") {
+      sig = "0x";
+      mintPrice = await creatorContract.mintPrice(TOKEN_ID);
+    } else {
+      sig = signature.sig;
+      mintPrice = signature.price;
+    }
+
     console.log("Mint price:", mintPrice.toString());
-    const txn = await creatorContract.mint(TOKEN_ID, "0x", {
-      value: mintPrice,
-    });
-    console.log("Mint txn:", txn);
+    console.log("Signature:", sig);
+
+    try {
+      const methodSignature =
+        await creatorContract.interface.encodeFunctionData(
+          "mint",
+          [TOKEN_ID, sig] // TODO get real signatures for approved mints
+        );
+
+      const txnParams = {
+        to: creatorContract.address,
+        value: 0, // all Community art mints are free
+        data: methodSignature,
+        from: account,
+      };
+      const gasEstimate = await signer.estimateGas(txnParams);
+      console.log("Gas estimate:", gasEstimate.toString());
+
+      // send transaction
+      setStatus("Awaiting signature");
+      const txn = await signer.sendTransaction({
+        to: creatorContract.address,
+        value: 0, // all Community art mints are free
+        data: methodSignature,
+        gasLimit: gasEstimate,
+      });
+      console.log("Transaction:", txn);
+
+      // wait for transaction to be mined
+      setStatus("Transaction executing");
+      const receipt = await txn.wait();
+      console.log("Receipt:", receipt);
+      setStatus("Mint successful!");
+
+      // get opensea url
+      let openseaUrl = "";
+      if (networkName === "mainnet") {
+        openseaUrl = "https://opensea.io/assets/";
+      } else {
+        openseaUrl = "https://testnets.opensea.io/assets/";
+      }
+      setOpenseaAssetUrl(
+        openseaUrl + creatorContract.address + "/" + TOKEN_ID.toString()
+      );
+    } catch (error: any) {
+      if (error.message?.includes("user rejected transaction")) {
+        console.error("User rejected transaction");
+        setStatus(null);
+      } else {
+        console.error(error);
+      }
+      setStatus(null);
+    }
   };
 
   return (
@@ -91,6 +205,29 @@ const C: NextPage<PageProps> = ({
                 >
                   Mint
                 </div>
+                {status ? (
+                  <div>
+                    <p className="mt-2 text-sm text-gray-500">{status}</p>
+                    <p className="mt-0 text-sm text-gray-500">
+                      {openseaAssetUrl ? (
+                        <a
+                          className="underline"
+                          href={openseaAssetUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          View on OpenSea
+                        </a>
+                      ) : (
+                        <span>{"Please keep the page open"}</span>
+                      )}
+                    </p>
+                  </div>
+                ) : signature?.price === 0 && signature?.sig != "0x" ? (
+                  <span className="mt-2 text-sm text-gray-500">
+                    {"You can mint for free!"}
+                  </span>
+                ) : null}
               </div>
             </div>
             <Image
