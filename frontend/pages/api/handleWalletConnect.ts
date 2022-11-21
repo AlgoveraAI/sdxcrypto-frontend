@@ -55,13 +55,27 @@ export default async function handler(
 
     // check for gifted credits
     console.log("getting wallet credits", walletAddress);
-    const docRef = firestore.collection("wallet_credits").doc(walletAddress);
-    const docSnap = await docRef.get();
+    let walletCreditsRef = firestore
+      .collection("wallet_credits")
+      .doc(walletAddress);
+    let walletCreditsSnap = await walletCreditsRef.get();
+
+    if (!walletCreditsSnap.exists) {
+      // try lower case wallet (in case some get stored this way)
+      walletCreditsRef = firestore
+        .collection("wallet_credits")
+        .doc(walletAddress.toLowerCase());
+      walletCreditsSnap = await walletCreditsRef.get();
+    }
+
     // check it exists
-    if (docSnap.exists) {
-      const data = docSnap.data();
-      console.log("got wallet credits", data);
-      const { credits } = data;
+    if (walletCreditsSnap.exists) {
+      const data = walletCreditsSnap.data();
+      console.log("new gifted wallet credits", data);
+      let { credits, nextGiftId } = data;
+      if (!nextGiftId) {
+        nextGiftId = 1;
+      }
 
       if (credits > 0) {
         // update user credits
@@ -75,26 +89,24 @@ export default async function handler(
           newCredits = credits;
         }
         // add credits to the users doc (uid is the doc id)
-        await updateDoc(userRef, {
-          credits: newCredits,
-        });
-        // delete the wallet_credits entry (wallet is the doc id)
-        await updateDoc(docRef, {
-          credits: 0,
-        });
+        console.log("updating user credits", newCredits);
+        await userRef.set({ credits: newCredits }, { merge: true });
+        await walletCreditsRef.set(
+          { credits: 0, nextGiftId: nextGiftId + 1 },
+          { merge: true }
+        );
         // store a record of the gift (as we do for charges and creator subs)
-        // use timestamp to ensure a unique doc is created
+        //  as the next number (total length of existing gifts)
         const timestampStr = new Date().toUTCString();
-        // const giftRef = doc(db, "users", uid, "gifts", timestampStr);
         const giftRef = firestore
           .collection("users")
           .doc(uid)
           .collection("gifts")
-          .doc(timestampStr);
-        await updateDoc(giftRef, {
-          credits: credits,
-          receivedAt: timestampStr,
-        });
+          .doc(String(nextGiftId));
+        await giftRef.set(
+          { credits, receivedAt: timestampStr },
+          { merge: true }
+        );
       }
     } else {
       console.log("no wallet credits");

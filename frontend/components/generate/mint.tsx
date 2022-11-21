@@ -307,7 +307,7 @@ export default function Mint({
                     View on OpenSea
                   </a>
                 ) : (
-                  <span>Please don't close this page</span>
+                  <span>{"Please keep the page open"}</span>
                 )}
               </p>
             </div>

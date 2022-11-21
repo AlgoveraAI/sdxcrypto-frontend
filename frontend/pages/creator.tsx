@@ -29,26 +29,25 @@ const features = [
 
 const C: NextPage<PageProps> = ({
   user,
-  contract,
+  creatorContract,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
   const mint = async () => {
+    // todo: check for signature for free mints
     const { signer, provider, account, networkName } = user;
-
     if (!signer || !provider || !account || !networkName) {
       alert("Not connected to metamask");
       return;
     }
 
-    if (!contract || !mintPrice) {
+    if (!creatorContract) {
       alert("No contract found");
       return;
     }
-    const mintPrice = await contract.MINT_PRICE();
+    const mintPrice = await creatorContract.MINT_PRICE();
     console.log("Mint price:", mintPrice.toString());
-    setMintPrice(mintPrice.toString());
-    const txn = await contract.mint({ value: mintPrice });
+    const txn = await creatorContract.mint({ value: mintPrice });
   };
 
   return (
@@ -71,7 +70,10 @@ const C: NextPage<PageProps> = ({
                 0.05 ETH to get monthly credits and other perks.
               </p>
               <div className="mt-8 text-center justify-center">
-                <div className="block rounded-lg bg-primary mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center">
+                <div
+                  onClick={mint}
+                  className="block rounded-lg bg-primary mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center"
+                >
                   Mint
                 </div>
               </div>
