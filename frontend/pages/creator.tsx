@@ -27,6 +27,8 @@ const features = [
   },
 ];
 
+const TOKEN_ID = 0; // todo configure this in db
+
 const C: NextPage<PageProps> = ({
   user,
   creatorContract,
@@ -45,9 +47,22 @@ const C: NextPage<PageProps> = ({
       alert("No contract found");
       return;
     }
-    const mintPrice = await creatorContract.MINT_PRICE();
+    const mintingActive = await creatorContract.mintingActive(TOKEN_ID);
+    if (!mintingActive) {
+      alert("Minting is not active");
+      return;
+    }
+    const balance = await creatorContract.balanceOf(account);
+    if (balance > 0) {
+      alert("You can only mint 1 Creator Pass per wallet");
+      return;
+    }
+    const mintPrice = await creatorContract.tokenPrices(TOKEN_ID);
     console.log("Mint price:", mintPrice.toString());
-    const txn = await creatorContract.mint({ value: mintPrice });
+    const txn = await creatorContract.mint(TOKEN_ID, "0x", {
+      value: mintPrice,
+    });
+    console.log("Mint txn:", txn);
   };
 
   return (
@@ -72,7 +87,7 @@ const C: NextPage<PageProps> = ({
               <div className="mt-8 text-center justify-center">
                 <div
                   onClick={mint}
-                  className="block rounded-lg bg-primary mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center"
+                  className="block rounded-lg bg-primary mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center cursor-pointer"
                 >
                   Mint
                 </div>
