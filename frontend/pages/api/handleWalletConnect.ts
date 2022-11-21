@@ -183,6 +183,7 @@ export default async function handler(
         processNewCreator = true;
       }
       if (processNewCreator) {
+        // create a new doc for the creator this month
         const monthRef = firestore
           .collection("users")
           .doc(uid)
@@ -190,6 +191,7 @@ export default async function handler(
           .doc(`${currentYear}-${currentMonth}`);
 
         console.log("adding creator first month", uid, MONTHLY_CREDITS);
+        // create a receipt of this months payment
         await monthRef.set(
           {
             credits: MONTHLY_CREDITS,
@@ -197,6 +199,8 @@ export default async function handler(
           },
           { merge: true }
         );
+        // update the users total credits
+        // (they may already have some paid or gifted credits)
         console.log("updating credits", uid, MONTHLY_CREDITS);
         await userRef.set(
           {
@@ -206,7 +210,6 @@ export default async function handler(
           { merge: true }
         );
       }
-      // resolve
     } else {
       console.log("not a creator, no credits to add");
     }
