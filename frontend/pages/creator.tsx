@@ -4,11 +4,7 @@ import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
-
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
 const { ethers } = require("ethers");
-import { Contract } from "@ethersproject/contracts";
 
 const accessImg = require("../assets/access.png");
 
@@ -33,49 +29,10 @@ const features = [
 
 const C: NextPage<PageProps> = ({
   user,
+  contract,
   creditsModalTrigger,
   setCreditsModalTrigger,
 }) => {
-  const [contract, setContract] = useState<Contract | null>(null);
-  const [mintPrice, setMintPrice] = useState(null);
-
-  const getContract = async () => {
-    // get contract address from firebase
-    if (user.provider && user.networkName) {
-      const docRef = doc(db, "contracts", user.networkName);
-      if (docRef) {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data) {
-            let { address, abi } = JSON.parse(data.access);
-            console.log("Connecting to contract:", address);
-            console.log("ABI:", abi);
-            const contract = new ethers.Contract(address, abi, user.provider);
-            setContract(contract);
-            const mintPrice = await contract.MINT_PRICE();
-            console.log("Mint price:", mintPrice.toString());
-            setMintPrice(mintPrice.toString());
-          }
-        }
-      } else {
-        alert(
-          "No contract address found for the connected network: " +
-            user.networkName
-        );
-      }
-    } else {
-      console.error("Not connected to metamask");
-    }
-  };
-
-  // get current network from moralis
-  useEffect(() => {
-    if (user.provider) {
-      getContract();
-    }
-  }, [user.provider]);
-
   const mint = async () => {
     const { signer, provider, account, networkName } = user;
 
@@ -88,7 +45,9 @@ const C: NextPage<PageProps> = ({
       alert("No contract found");
       return;
     }
-
+    const mintPrice = await contract.MINT_PRICE();
+    console.log("Mint price:", mintPrice.toString());
+    setMintPrice(mintPrice.toString());
     const txn = await contract.mint({ value: mintPrice });
   };
 

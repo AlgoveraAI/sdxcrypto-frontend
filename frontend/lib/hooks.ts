@@ -11,6 +11,7 @@ import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
 const { ethers } = require("ethers");
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { Contract } from "@ethersproject/contracts";
 
 declare var window: any; // to avoid typescript error on window.ethereum
 
@@ -31,9 +32,11 @@ export interface User {
   networkName: string | null;
   credits: number | null;
   loading: boolean;
+  isCreator: boolean | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   setCredits: (credits: number) => Promise<void>;
+  checkIsCreator: () => Promise<void>;
 }
 
 export const useUser = () => {
@@ -52,6 +55,7 @@ export const useUser = () => {
   const [account, setAccount] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isCreator, setIsCreator] = useState<boolean | null>(null);
 
   const moralisAuth = useMoralisAuth();
 
@@ -108,6 +112,24 @@ export const useUser = () => {
     }
   };
 
+  const checkIsCreator = async (contract: Contract) => {
+    // check if the user owns a token on the Creator contract
+    console.log("checking if user is a creator", account, contract);
+    if (account && contract !== null) {
+      let isCreator = false;
+      const tokenIds = [0]; // todo update if launch more tokens
+      for (let i = 0; i < tokenIds.length; i++) {
+        const tokenId = tokenIds[i];
+        const balance = await contract.balanceOf(account, tokenId);
+        if (balance > 0) {
+          isCreator = true;
+          return;
+        }
+      }
+      setIsCreator(isCreator);
+    }
+  };
+
   useEffect(() => {
     // if moralisAuth connects, check for metamask wallet
     // (metamask might not be logged in, in which case dont display the user)
@@ -148,6 +170,29 @@ export const useUser = () => {
     }
   }, [uid]);
 
+  useEffect(() => {
+    // handleWalletConnect API call
+    // must have uid and wallet and isCreator flag to run
+    console.log("api/handleWalletConnect", uid, account, isCreator);
+    if (uid && account && isCreator !== null) {
+      // now that we have a wallet, run checks of
+      // gifted credits and creator pass
+      console.log("sending api req");
+      fetch("/api/handleWalletConnect", {
+        method: "POST",
+        body: JSON.stringify({
+          uid: uid,
+          walletAddress: account,
+          isCreator: isCreator,
+        }),
+      }).then((res) => {
+        if (!res.ok) {
+          console.log(res);
+        }
+      });
+    }
+  }, [uid, account, isCreator]);
+
   return {
     uid,
     provider,
@@ -157,8 +202,10 @@ export const useUser = () => {
     moralisAuth,
     credits,
     loading,
+    isCreator,
     signIn,
     signOut,
     setCredits,
+    checkIsCreator,
   };
 };
