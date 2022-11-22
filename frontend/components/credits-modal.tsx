@@ -116,7 +116,7 @@ export default function CreditsModal({
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="text-gray-300 rounded-lg bg-background border focus:outline-none p-12 sm:p-24">
+                <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
                   <div className="text-white text-3xl">
                     You have {user.credits}{" "}
                     {user.credits === 1 ? "credit" : "credits"} remaining
