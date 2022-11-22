@@ -11,6 +11,7 @@ import {
   CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 import Spinner from "./spinner";
+import FeedbackModal from "./feedback-modal";
 
 type NavProps = {
   user: User;
@@ -19,6 +20,7 @@ type NavProps = {
 
 export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
+  const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
   useEffect(() => {
     setCurrentPage(window.location.pathname);
@@ -26,6 +28,11 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
 
   return (
     <Popover className="relative bg-black/[0.3]">
+      <FeedbackModal
+        user={user}
+        feedbackModalTrigger={feedbackModalTrigger}
+        setFeedbackModalTrigger={setFeedbackModalTrigger}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -47,14 +54,14 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
             </Popover.Button>
           </div>
           <Popover.Group as="nav" className="hidden space-x-10 md:flex">
-            {/* <Link
-              href="/"
-              className={`text-base font-medium text-gray-50  ${
-                currentPage === "/" ? "underline" : ""
-              }`}
+            <span
+              onClick={
+                () => setFeedbackModalTrigger(true)
+              }
+              className={`text-base font-medium text-gray-50 cursor-pointer`}
             >
-              About
-            </Link> */}
+              Feedback
+            </span>
             <Link
               href="generate"
               className={`text-base font-medium text-gray-50  ${
@@ -163,12 +170,14 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
         >
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
-              {/* <Link
-                href="/"
+              <span
+              onClick={
+                () => setFeedbackModalTrigger(true)
+              }
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
-                About
-              </Link> */}
+                Feedback
+              </span> 
               <Link
                 href="generate"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
