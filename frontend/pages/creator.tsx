@@ -12,7 +12,7 @@ const accessImg = require("../assets/access.png");
 const features = [
   {
     name: "Credits",
-    description: "Get 200 free credits per month",
+    description: "Get 100 free credits per month", // todo read from config
   },
   {
     name: "Minting",
@@ -28,7 +28,7 @@ const features = [
   },
 ];
 
-const TOKEN_ID = 0; // todo configure this in db
+const TOKEN_ID = 0; // todo read from config
 
 type SignatureInfo = {
   sig: string;

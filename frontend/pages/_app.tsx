@@ -26,17 +26,21 @@ export default function App({ Component, pageProps }: AppProps) {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data) {
+        if (data && data.creator) {
           let { address, abi } = JSON.parse(data.creator);
           console.log("Connecting to creator contract:", address);
           console.log("ABI:", abi);
           const contract = new ethers.Contract(address, abi, user.provider);
           setcreatorContract(contract);
+        } else {
+          console.error(
+            `No Creator contract deployed on: ${user.networkName}`
+          );
         }
       } else {
         console.error(
-          `No contract address found for the connected network: ${user.networkName}`
-        );
+          `No Creator contract deployed on: ${user.networkName}`
+          );
       }
     } else {
       console.error("Not connected to metamask");
