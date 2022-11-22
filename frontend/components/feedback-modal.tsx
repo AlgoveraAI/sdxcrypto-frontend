@@ -33,6 +33,7 @@ export default function Feedback({
   function closeModal() {
     setOpen(false);
     setFeedbackModalTrigger(false);
+    setStatus(null);
   }
 
   async function submit() {
