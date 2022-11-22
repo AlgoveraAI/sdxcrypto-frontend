@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { NextPage } from "next";
 import Nav from "../components/nav";
+import Footer from "../components/footer";
 import Hero from "../components/index/hero";
 import HowItWorks from "../components/index/howitworks";
 import Pricing from "../components/index/pricing";
@@ -28,6 +29,7 @@ const Home: NextPage<PageProps> = ({
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
+      <Footer />
     </div>
   );
 };
