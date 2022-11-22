@@ -37,7 +37,7 @@ export default function Mint({
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          if (data) {
+          if (data && data.community) {
             // get the latest Community.sol deployment
             // on the conencted network
             let { address, abi } = JSON.parse(data.community);
@@ -45,12 +45,16 @@ export default function Mint({
             console.log("ABI:", abi);
             const contract = new ethers.Contract(address, abi, user.provider);
             setContract(contract);
+          } else {
+            console.error(
+              "No Community contract on the connected network: " +
+                user.networkName
+            );
           }
         }
       } else {
-        alert(
-          "No contract address found for the connected network: " +
-            user.networkName
+        console.error(
+          "No Community contract on the connected network: " + user.networkName
         );
       }
     } else {
