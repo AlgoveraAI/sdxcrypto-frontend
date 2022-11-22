@@ -34,6 +34,13 @@ export default function Generate({
 
   const generateImg = async () => {
     setLoading(true);
+
+    if (!user.uid) {
+      alert("Not logged in");
+      setLoading(false);
+      return;
+    }
+
     if (!selectedModal) {
       alert("Please select a model");
       setLoading(false);
@@ -57,6 +64,10 @@ export default function Generate({
         uid: user.uid,
         prompt: prompt,
         base_model: baseModel,
+        height: resolution,
+        width: resolution,
+        inf_steps: inferenceSteps,
+        guidance_scale: guidanceScale,
       }),
     });
     // todo handle out of credits error
@@ -77,9 +88,7 @@ export default function Generate({
         {selectedModal ? selectedModal : "No model selected"}
       </h2>
       <div>
-        <label className="block text-sm font-medium text-gray-500">
-          Prompt
-        </label>
+        <label className="block font-medium text-gray-500">Prompt</label>
         <div className="mt-1 md:flex shadow-sm ">
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <input
@@ -118,7 +127,9 @@ export default function Generate({
             width={512}
             height={512}
           />
-        ) : null}
+        ) : (
+          <div className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col border border-gray-700" />
+        )}
         <div className="mt-6 md:mt-12 md:ml-12">
           <h2 className="text-2xl font-bold">Settings</h2>
           <div className="mt-6">
@@ -132,9 +143,9 @@ export default function Generate({
                     key={res}
                     onClick={() => setResolution(res)}
                     type="button"
-                    className={`relative -ml-px mt-2 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none ${
+                    className={`relative -ml-px mt-2 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2  hover:bg-primary-darker focus:outline-none ${
                       resolution === res
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-white font-bold"
                         : "bg-black/[0.3] text-gray-500"
                     }`}
                   >
@@ -164,8 +175,8 @@ export default function Generate({
                 />
               </div>
               <div className="flex justify-between w-full mt-2 text-sm font-medium text-gray-500">
-                <span>1</span>
-                <span>100</span>
+                {/* <span>1</span>
+                <span>100</span> */}
               </div>
             </div>
           </div>
@@ -189,8 +200,8 @@ export default function Generate({
                 />
               </div>
               <div className="flex justify-between w-full mt-2 text-sm font-medium text-gray-500">
-                <span>1</span>
-                <span>50</span>
+                {/* <span>1</span>
+                <span>50</span> */}
               </div>
             </div>
           </div>
