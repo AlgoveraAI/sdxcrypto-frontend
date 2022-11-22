@@ -8,9 +8,9 @@ const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
 
 // suppress console.log when in production
-if (process.env.NODE_ENV !== "development") {
-  console.log = () => {};
-}
+// if (process.env.NODE_ENV !== "development") {
+//   console.log = () => {};
+// }
 
 export default function App({ Component, pageProps }: AppProps) {
   const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
@@ -28,7 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
         const data = docSnap.data();
         if (data) {
           let { address, abi } = JSON.parse(data.creator);
-          console.log("Connecting to contract:", address);
+          console.log("Connecting to creator contract:", address);
           console.log("ABI:", abi);
           const contract = new ethers.Contract(address, abi, user.provider);
           setcreatorContract(contract);

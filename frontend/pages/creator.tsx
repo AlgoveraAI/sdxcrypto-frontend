@@ -4,12 +4,9 @@ import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
-import { sign } from "crypto";
-import { database } from "firebase-functions/v1/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
-const { ethers } = require("ethers");
 const accessImg = require("../assets/access.png");
 
 const features = [

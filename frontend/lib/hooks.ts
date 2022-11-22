@@ -114,18 +114,21 @@ export const useUser = () => {
 
   const checkIsCreator = async (contract: Contract) => {
     // check if the user owns a token on the Creator contract
-    console.log("checking if user is a creator", account, contract);
     if (account && contract !== null) {
+      console.log("checking if user is a creator", account, contract);
       let isCreator = false;
       const tokenIds = [0]; // todo update if launch more tokens
       for (let i = 0; i < tokenIds.length; i++) {
         const tokenId = tokenIds[i];
+        console.log("checking balance", tokenId);
         const balance = await contract.balanceOf(account, tokenId);
-        if (balance > 0) {
+        console.log("balance", balance);
+        if (balance.gt(0)) {
           isCreator = true;
-          return;
+          break;
         }
       }
+      console.log("isCreator: ", isCreator);
       setIsCreator(isCreator);
     }
   };
