@@ -29,7 +29,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
-            <Link href="https://algovera.ai">
+            <Link href="/">
               <span className="sr-only">Algovera</span>
               <Image
                 // className="h-8 w-auto sm:h-10"
@@ -47,14 +47,14 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
             </Popover.Button>
           </div>
           <Popover.Group as="nav" className="hidden space-x-10 md:flex">
-            <Link
+            {/* <Link
               href="/"
               className={`text-base font-medium text-gray-50  ${
                 currentPage === "/" ? "underline" : ""
               }`}
             >
               About
-            </Link>
+            </Link> */}
             <Link
               href="generate"
               className={`text-base font-medium text-gray-50  ${
@@ -94,7 +94,8 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                     <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
                       <div className="overflow-hidden rounded-lg shadow-lg">
                         <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
-                          <div className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400">
+                          <div className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400" 
+                          onClick={user.loading ? () => {} : user.uid ? user.signOut : user.signIn}>
                             <WalletIcon
                               className="h-6 w-6 flex-shrink-0 "
                               aria-hidden="true"
@@ -102,21 +103,19 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                             <div className="ml-4">
                               {user.loading ? (
                                 <p
-                                  onClick={user.signOut}
+                                  
                                   className="text-base font-medium relative"
                                 >
                                   Signing in...
                                 </p>
                               ) : user.uid ? (
                                 <p
-                                  onClick={user.signOut}
                                   className="text-base font-medium "
                                 >
                                   Sign Out
                                 </p>
                               ) : (
                                 <p
-                                  onClick={user.signIn}
                                   className="text-base font-medium"
                                 >
                                   Sign In
@@ -164,12 +163,12 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
         >
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
-              <Link
+              {/* <Link
                 href="/"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 About
-              </Link>
+              </Link> */}
               <Link
                 href="generate"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
