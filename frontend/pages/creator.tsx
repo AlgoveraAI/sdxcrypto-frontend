@@ -114,7 +114,7 @@ const C: NextPage<PageProps> = ({
     let sig, mintPrice;
     if (signature === null || signature.sig === "0x") {
       sig = "0x";
-      mintPrice = await creatorContract.mintPrice(TOKEN_ID);
+      mintPrice = await creatorContract.tokenPrices(TOKEN_ID);
     } else {
       sig = signature.sig;
       mintPrice = signature.price;
