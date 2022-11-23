@@ -134,11 +134,13 @@ export default function Mint({
 
       // generate a signature
       console.log("Generating signature");
+      const balance = await contract.balanceOf(account);
       const resp = await fetch("/api/genSignature", {
         method: "POST",
         body: JSON.stringify({
           allowlistAddress: user.account,
           contractAddress: contract.address,
+          balance: balance,
         }),
       });
       // check the response is ok
@@ -150,15 +152,14 @@ export default function Mint({
         return;
       }
 
-      const { signature, sigId } = await resp.json();
+      const { signature } = await resp.json();
 
       console.log("signature:", signature);
-      console.log("sigId:", sigId);
 
       // estimate gas
       const methodSignature = await contract.interface.encodeFunctionData(
         "mint",
-        [signature, sigId]
+        [signature]
       );
       const txnParams = {
         to: contract.address,

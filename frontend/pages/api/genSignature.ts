@@ -6,12 +6,12 @@ async function getSignatureCommunity(
   signer: any,
   contractAddress: string,
   allowlistAddress: string,
-  sigId: string
+  balance: number
 ) {
   console.log("creating signature");
   const payload = defaultAbiCoder.encode(
-    ["address", "address", "string"],
-    [contractAddress, allowlistAddress, sigId]
+    ["address", "address", "uint256"],
+    [contractAddress, allowlistAddress, balance]
   );
   console.log("signing");
   const signature = await signer.signMessage(ethers.utils.arrayify(payload));
@@ -23,14 +23,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { contractAddress, allowlistAddress } = JSON.parse(req.body);
+    const { contractAddress, allowlistAddress, balance } = JSON.parse(req.body);
     if (!contractAddress || !allowlistAddress) {
       throw new Error("Missing contractAddress or allowlistAddress");
     }
-    // get a random string to create a unique signature
-    // (to allow the same address to mint multiple times)
-    const sigId = Math.random().toString(36).substring(7);
-    console.log("sigId", sigId);
     // get the signer (this address should be added to the contract as a signer)
     // (should be stored in frontend/.env.local)
     const sk = process.env.COMMUNITY_SIGNER_PRIVATE_KEY;
@@ -43,10 +39,10 @@ export default async function handler(
       signer,
       contractAddress,
       allowlistAddress,
-      sigId
+      balance
     );
     console.log("signature", signature);
-    res.status(200).json({ signature, sigId });
+    res.status(200).json({ signature });
   } catch (error: any) {
     try {
       res.status(500).json({ error: error.message });
