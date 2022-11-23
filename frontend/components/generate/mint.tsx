@@ -135,14 +135,17 @@ export default function Mint({
       // generate a signature
       console.log("Generating signature");
       const balance = await contract.balanceOf(account);
-      const resp = await fetch("/api/genSignature", {
-        method: "POST",
-        body: JSON.stringify({
-          allowlistAddress: user.account,
-          contractAddress: contract.address,
-          balance: balance,
-        }),
-      });
+      const resp = await fetch(
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genSignature",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            allowlistAddress: user.account,
+            contractAddress: contract.address,
+            balance: balance,
+          }),
+        }
+      );
       // check the response is ok
       if (!resp.ok) {
         alert("Error generating signature");
