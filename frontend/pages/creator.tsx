@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
+import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
@@ -185,7 +186,7 @@ const C: NextPage<PageProps> = ({
       />
       <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
       <div className="relative px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl pt-12 pb-32 sm:pt-24 sm:pb-40">
+        <div className="mx-auto max-w-5xl pt-12 pb-32 sm:pt-24 sm:pb-40">
           <div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-center sm:text-6xl">
@@ -259,6 +260,7 @@ const C: NextPage<PageProps> = ({
               </div>
             </div>
           </div>
+          <Roadmap />
         </div>
       </div>
     </div>

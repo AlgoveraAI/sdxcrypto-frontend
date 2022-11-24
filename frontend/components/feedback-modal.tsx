@@ -71,8 +71,8 @@ export default function Feedback({
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0 ">
+          <div className="fixed inset-0 z-10 overflow-y-auto pt-48">
+            <div className="flex justify-center p-4 text-center items-center sm:p-0 max-w-[1200px] mx-auto">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -88,7 +88,7 @@ export default function Feedback({
                     <div className="mt-4">
                       <textarea
                         id="feedback"
-                        className="w-full h-50 sm:h-40 p-2 rounded-lg bg-background border border-gray-500 outline-none"
+                        className="w-full h-50 sm:h-40 p-2 rounded-lg bg-black/[0.3] outline-none"
                         placeholder="Enter your feedback or suggestions..."
                       />
 

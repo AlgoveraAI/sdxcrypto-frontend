@@ -118,7 +118,7 @@ export default function CreditsModal({
               >
                 <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
                   <div className="text-white text-3xl">
-                    You have {user.credits}{" "}
+                    You have {user.credits ? user.credits : 0}{" "}
                     {user.credits === 1 ? "credit" : "credits"} remaining
                   </div>
                   <div className="mt-6">Use credits to generate images.</div>
