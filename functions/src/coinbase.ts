@@ -1,28 +1,13 @@
-const functions = require("firebase-functions");
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-const admin = require("firebase-admin");
-const { ethers } = require("ethers");
-const { defaultAbiCoder } = ethers.utils;
-
-// RUN LOCALLY: firebase emulators:start --only functions
-
-// setup cors
-const cors = require("cors")({ origin: "*" });
-
-// prepare app (use admin SDK)
-admin.initializeApp();
-const firestore = admin.firestore();
 
 // get env variables
 require("dotenv").config();
 const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
 const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
-const signerPrivateKey = process.env.COMMUNITY_SIGNER_PRIVATE_KEY;
-
 Client.init(cbApiKey);
 
-exports.createCharge = functions.https.onRequest((request, response) => {
+exports.createCharge = function (request, response) {
   cors(request, response, async () => {
     console.log("creating charge", request.body);
     const data = JSON.parse(request.body);
@@ -46,9 +31,9 @@ exports.createCharge = functions.https.onRequest((request, response) => {
     console.log(charge);
     response.send(charge);
   });
-});
+};
 
-async function handleChargeEvent(event) {
+exports.handleChargeEvent = async function handleChargeEvent(event) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -128,9 +113,9 @@ async function handleChargeEvent(event) {
   if (event.type === "charge:failed") {
     console.log("Charge failed");
   }
-}
+};
 
-exports.testChargeEvent = functions.https.onRequest((request, response) => {
+exports.testChargeEvent = function (request, response) {
   cors(request, response, async () => {
     console.log("testing charge event", request.body);
     const data = JSON.parse(request.body);
@@ -140,62 +125,19 @@ exports.testChargeEvent = functions.https.onRequest((request, response) => {
       status: "ok",
     });
   });
-});
+};
 
-exports.webhookHandler = functions.https.onRequest(
-  async (request, response) => {
-    const rawBody = request.rawBody;
-    const signature = request.headers["x-cc-webhook-signature"];
+exports.webhookHandler = async function (request, response) {
+  const rawBody = request.rawBody;
+  const signature = request.headers["x-cc-webhook-signature"];
 
-    try {
-      const event = Webhook.verifyEventBody(
-        rawBody,
-        signature,
-        cbWebhookSecret
-      );
-      await handleChargeEvent(event);
+  try {
+    const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
+    await handleChargeEvent(event);
 
-      return response.status(200).send("Webhook received");
-    } catch (error) {
-      console.log(error);
-      response.status(400).send(`Webhook Error: ${error.message}`);
-    }
+    return response.status(200).send("Webhook received");
+  } catch (error) {
+    console.log(error);
+    response.status(400).send(`Webhook Error: ${error.message}`);
   }
-);
-
-exports.genSignature = functions.https.onRequest((request, response) => {
-  // to mint community art we need a securely generated signature (to prevent bot abuse)
-  // to instantiate the signer we need a private key, which is stored on google's secret manager
-  // this can only be securely accesses server-side, so it needs to run in a firebase function
-  cors(request, response, async () => {
-    console.log("generating signature", request.body);
-    try {
-      const { contractAddress, allowlistAddress, balance } = JSON.parse(
-        request.body
-      );
-      if (!contractAddress || !allowlistAddress) {
-        throw new Error("Missing contractAddress or allowlistAddress");
-      }
-      // get the signer (this address should be added to the contract as a signer)
-      const signer = new ethers.Wallet(signerPrivateKey);
-      console.log("signer", signer.address);
-      const payload = defaultAbiCoder.encode(
-        ["address", "address", "uint256"],
-        [contractAddress, allowlistAddress, balance]
-      );
-      console.log("signing");
-      const signature = await signer.signMessage(
-        ethers.utils.arrayify(payload)
-      );
-      console.log("signature", signature);
-      response.status(200).json({ signature });
-    } catch (error) {
-      console.log * ("error", error);
-      try {
-        response.status(500).json({ error: error.message });
-      } catch {
-        response.status(500).json({ unknown_error: error });
-      }
-    }
-  });
-});
+};
