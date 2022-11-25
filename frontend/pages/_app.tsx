@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import Head from "next/head";
 import { useState, useEffect } from "react";
 import type { AppProps } from "next/app";
 import { useUser } from "../lib/hooks";
@@ -33,14 +34,10 @@ export default function App({ Component, pageProps }: AppProps) {
           const contract = new ethers.Contract(address, abi, user.provider);
           setcreatorContract(contract);
         } else {
-          console.error(
-            `No Creator contract deployed on: ${user.networkName}`
-          );
+          console.error(`No Creator contract deployed on: ${user.networkName}`);
         }
       } else {
-        console.error(
-          `No Creator contract deployed on: ${user.networkName}`
-          );
+        console.error(`No Creator contract deployed on: ${user.networkName}`);
       }
     } else {
       console.error("Not connected to metamask");
@@ -62,12 +59,19 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [user.provider, user.networkName]);
 
   return (
-    <Component
-      {...pageProps}
-      user={user}
-      creatorContract={creatorContract}
-      creditsModalTrigger={creditsModalTrigger}
-      setCreditsModalTrigger={setCreditsModalTrigger}
-    />
+    <>
+      <Head>
+        <title>Algovera Flow</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Component
+        {...pageProps}
+        user={user}
+        creatorContract={creatorContract}
+        creditsModalTrigger={creditsModalTrigger}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+      />
+    </>
   );
 }

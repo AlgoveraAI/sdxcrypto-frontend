@@ -166,6 +166,9 @@ const C: NextPage<PageProps> = ({
       setOpenseaAssetUrl(
         openseaUrl + creatorContract.address + "/" + TOKEN_ID.toString()
       );
+
+      // mark user as creator (to trigger checkCreatorCredits)
+      user.checkIsCreator();
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
