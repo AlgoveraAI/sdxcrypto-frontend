@@ -13,6 +13,8 @@ import { Contract } from "@ethersproject/contracts";
 //   console.log = () => {};
 // }
 
+declare var window: any; // to avoid typescript error on window.ethereum
+
 export default function App({ Component, pageProps }: AppProps) {
   const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
   const user = useUser();
@@ -39,8 +41,6 @@ export default function App({ Component, pageProps }: AppProps) {
       } else {
         console.error(`No Creator contract deployed on: ${user.networkName}`);
       }
-    } else {
-      console.error("Not connected to metamask");
     }
   };
 
@@ -57,6 +57,23 @@ export default function App({ Component, pageProps }: AppProps) {
       getCreatorContract();
     }
   }, [user.provider, user.networkName]);
+
+  // metamask listeners
+  useEffect(() => {
+    if (window.ethereum) {
+      // add listener for window.ethereum metamask network change
+      window.ethereum.on("chainChanged", () => {
+        console.log("chainChanged");
+        window.location.reload();
+      });
+      // add listener for metamask account change
+      window.ethereum.on("accountsChanged", () => {
+        console.log("accountsChanged");
+        user.getAccount();
+        // TODO log out moralis user
+      });
+    }
+  }, []);
 
   return (
     <>

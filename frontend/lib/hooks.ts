@@ -18,12 +18,16 @@ declare var window: any; // to avoid typescript error on window.ethereum
 export const useMoralisAuth = () => {
   const [user] = useAuthState(auth);
   const [moralisAuth, setMoralisAuth] = useState<MoralisAuth | null>(null);
-  useEffect(() => {
+  const login = async () => {
     setMoralisAuth(getMoralisAuth(firebaseApp));
+  };
+  useEffect(() => {
+    login();
   }, []);
   return moralisAuth;
 };
 
+// TODO switch user to a class?
 export interface User {
   uid: string | null;
   provider: BaseProvider | null;
@@ -33,8 +37,10 @@ export interface User {
   credits: number | null;
   loading: boolean;
   isCreator: boolean | null;
+  moralisAuth: MoralisAuth | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
+  getAccount: () => Promise<void>;
   setCredits: (credits: number) => Promise<void>;
   checkIsCreator: () => Promise<void>;
 }
@@ -45,8 +51,6 @@ export const useUser = () => {
   // if metamask is locked, firebase will still authenticate
   // and the user can buy credits and generate images
   // to mint, metamask must be unlocked (signer and account will be null)
-
-  // TODO should this be a class instead?
 
   const [uid, setUid] = useState<string | null>(null);
   const [provider, setProvider] = useState<BaseProvider | null>(null);
@@ -235,6 +239,7 @@ export const useUser = () => {
     signIn,
     signOut,
     setCredits,
+    getAccount,
     checkIsCreator,
   };
 };
