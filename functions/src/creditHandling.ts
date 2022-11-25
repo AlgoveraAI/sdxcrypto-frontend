@@ -1,4 +1,4 @@
-exports.checkGiftedCredits = async function (req, res) {
+exports.checkGiftedCredits = async function (req, res, firestore) {
   const { uid, walletAddress } = JSON.parse(req.body);
 
   // TODO check that the uid's username == the wallet
@@ -72,7 +72,13 @@ exports.checkGiftedCredits = async function (req, res) {
   }
 };
 
-exports.checkCreatorCredits = async function (req, res) {
+exports.checkCreatorCredits = async function (
+  req,
+  res,
+  admin,
+  firestore,
+  remoteConfig
+) {
   const { uid, walletAddress, isCreator } = JSON.parse(req.body);
 
   // TODO check that the uid's username == the wallet
@@ -85,15 +91,15 @@ exports.checkCreatorCredits = async function (req, res) {
   }
 
   // get params from remote config
-  const createSubscriptionLength = getValue(
-    "creator_subscription_length",
-    remoteConfig
-  ).asNumber();
+  const template = await remoteConfig.getTemplate();
 
-  const creatorMonthlyCredits = getValue(
-    "creator_monthly_credits",
-    remoteConfig
-  ).asNumber();
+  const createSubscriptionLength = parseInt(
+    template.parameters.creator_subscription_length.defaultValue.value
+  );
+
+  const creatorMonthlyCredits = parseInt(
+    template.parameters.creator_monthly_credits.defaultValue.value
+  );
 
   // get user doc
   console.log("getting users doc", uid);

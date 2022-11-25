@@ -173,26 +173,55 @@ export const useUser = () => {
     }
   }, [uid]);
 
-  useEffect(() => {
-    // handleWalletConnect API call
-    // must have uid and wallet and isCreator flag to run
-    console.log("api/handleWalletConnect", uid, account, isCreator);
-    if (uid && account && isCreator !== null) {
-      // now that we have a wallet, run checks of
-      // gifted credits and creator pass
-      console.log("sending api req");
-      fetch("/api/handleWalletConnect", {
+  const checkGiftedCredits = async () => {
+    fetch(
+      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkGiftedCredits",
+      "us-central1-sdxcrypto-algovera.cloudfunctions.net/checkGiftedCredits",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uid: uid,
+          walletAddress: account,
+        }),
+      }
+    ).then((res) => {
+      if (!res.ok) {
+        console.error("error checking gifted credits", res);
+      }
+    });
+  };
+
+  const checkCreatorCredits = async () => {
+    fetch(
+      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkCreatorCredits",
+      "us-central1-sdxcrypto-algovera.cloudfunctions.net/checkCreatorCredits",
+      {
         method: "POST",
         body: JSON.stringify({
           uid: uid,
           walletAddress: account,
           isCreator: isCreator,
         }),
-      }).then((res) => {
-        if (!res.ok) {
-          console.log(res);
-        }
-      });
+      }
+    ).then((res) => {
+      if (res.ok) {
+        console.log("checked creator credits");
+      }
+      if (!res.ok) {
+        console.error("error checking creator credits", res);
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (uid && account) {
+      checkGiftedCredits();
+    }
+  }, [uid, account]);
+
+  useEffect(() => {
+    if (uid && account && isCreator !== null) {
+      checkCreatorCredits();
     }
   }, [uid, account, isCreator]);
 

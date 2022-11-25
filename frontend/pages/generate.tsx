@@ -36,8 +36,7 @@ const GeneratePage: NextPage<PageProps> = ({
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
-    console.log("fetching status", user.uid, jobId);
-    const res = await fetch("/api/status", {
+    const res = await fetch("/api/checkJobStatus", {
       method: "POST",
       body: JSON.stringify({
         job_uuid: jobId,

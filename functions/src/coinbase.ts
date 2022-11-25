@@ -7,7 +7,7 @@ const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
 const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
 Client.init(cbApiKey);
 
-exports.createCharge = function (request, response) {
+exports.createCharge = async function (request, response) {
   cors(request, response, async () => {
     console.log("creating charge", request.body);
     const data = JSON.parse(request.body);
@@ -33,7 +33,8 @@ exports.createCharge = function (request, response) {
   });
 };
 
-exports.handleChargeEvent = async function handleChargeEvent(event) {
+// local function, not exported
+async function handleChargeEvent(event) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -113,7 +114,7 @@ exports.handleChargeEvent = async function handleChargeEvent(event) {
   if (event.type === "charge:failed") {
     console.log("Charge failed");
   }
-};
+}
 
 exports.testChargeEvent = function (request, response) {
   cors(request, response, async () => {
