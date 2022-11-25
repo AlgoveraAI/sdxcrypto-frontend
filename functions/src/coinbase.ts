@@ -8,33 +8,29 @@ const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
 Client.init(cbApiKey);
 
 exports.createCharge = async function (request, response) {
-  cors(request, response, async () => {
-    console.log("creating charge", request.body);
-    const data = JSON.parse(request.body);
-    const { uid, credits } = data;
-    const amount = String(credits * 0.01);
-    const chargeData = {
-      name: "Algovera AI Credits",
-      description: `Purchase request: ${credits} AI credits`,
-      local_price: {
-        amount: amount,
-        currency: "USD",
-      },
-      pricing_type: "fixed_price",
-      metadata: {
-        uid: uid,
-        credits: credits,
-      },
-    };
-
-    const charge = await Charge.create(chargeData);
-    console.log(charge);
-    response.send(charge);
-  });
+  console.log("creating charge", request.body);
+  const data = JSON.parse(request.body);
+  const { uid, credits } = data;
+  const amount = String(credits * 0.01);
+  const chargeData = {
+    name: "Algovera AI Credits",
+    description: `Purchase request: ${credits} AI credits`,
+    local_price: {
+      amount: amount,
+      currency: "USD",
+    },
+    pricing_type: "fixed_price",
+    metadata: {
+      uid: uid,
+      credits: credits,
+    },
+  };
+  const charge = await Charge.create(chargeData);
+  return charge;
 };
 
 // local function, not exported
-async function handleChargeEvent(event) {
+async function handleChargeEvent(event, firestore) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -116,25 +112,25 @@ async function handleChargeEvent(event) {
   }
 }
 
-exports.testChargeEvent = function (request, response) {
+exports.testChargeEvent = function (request, response, firestore) {
   cors(request, response, async () => {
     console.log("testing charge event", request.body);
     const data = JSON.parse(request.body);
     const event = data.event;
-    await handleChargeEvent(event);
+    await handleChargeEvent(event, firestore);
     response.send({
       status: "ok",
     });
   });
 };
 
-exports.webhookHandler = async function (request, response) {
+exports.webhookHandler = async function (request, response, firestore) {
   const rawBody = request.rawBody;
   const signature = request.headers["x-cc-webhook-signature"];
 
   try {
     const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
-    await handleChargeEvent(event);
+    await handleChargeEvent(event, firestore);
 
     return response.status(200).send("Webhook received");
   } catch (error) {

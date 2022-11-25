@@ -14,7 +14,7 @@ const cors = require("cors")({ origin: "*" });
 const {
   checkGiftedCredits,
   checkCreatorCredits,
-} = require("./creditHandling.ts");
+} = require("./credit-handling.ts");
 exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     checkGiftedCredits(req, res, firestore);
@@ -32,8 +32,14 @@ exports.checkCreatorCredits = functions.https.onRequest((req, res) => {
 const { genCommunitySignature } = require("./contracts.ts");
 exports.genCommunitySignature = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    genCommunitySignature(req, res);
-    res.status(200).send("OK");
+    try {
+      const signature = await genCommunitySignature(req, res);
+      console.log("returning signature", signature);
+      res.status(200).json({ signature });
+    } catch (error) {
+      console.log("error", error);
+      res.status(500).send(error);
+    }
   });
 });
 
@@ -45,19 +51,19 @@ const {
 } = require("./coinbase.ts");
 exports.createCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    createCharge(req, res);
-    res.status(200).send("OK");
+    const charge = await createCharge(req, res);
+    res.status(200).send(charge);
   });
 });
 exports.testChargeEvent = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    testChargeEvent(req, res);
+    testChargeEvent(req, res, firestore);
     res.status(200).send("OK");
   });
 });
 exports.webhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    webhookHandler(req, res);
+    webhookHandler(req, res, firestore);
     res.status(200).send("OK");
   });
 });

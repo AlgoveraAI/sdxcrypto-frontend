@@ -23,13 +23,8 @@ exports.genCommunitySignature = async function (req, res) {
     console.log("signing");
     const signature = await signer.signMessage(ethers.utils.arrayify(payload));
     console.log("signature", signature);
-    res.status(200).json({ signature });
+    return signature;
   } catch (error) {
     console.log("error", error);
-    try {
-      res.status(500).json({ error: error.message });
-    } catch {
-      res.status(500).json({ unknown_error: error });
-    }
   }
 };
