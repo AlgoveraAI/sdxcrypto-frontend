@@ -85,6 +85,7 @@ export default function CreditsModal({
       }
     );
     const data = await chargeRes.json();
+    console.log("got charge data", data);
     window.open(data.hosted_url, "_blank", "noopener,noreferrer");
     setLoading(false);
   }

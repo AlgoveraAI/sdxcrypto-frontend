@@ -30,7 +30,7 @@ exports.createCharge = async function (request, response) {
 };
 
 // local function, not exported
-async function handleChargeEvent(event, firestore) {
+async function handleChargeEvent(event, admin, firestore) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -112,27 +112,20 @@ async function handleChargeEvent(event, firestore) {
   }
 }
 
-exports.testChargeEvent = function (request, response, firestore) {
-  cors(request, response, async () => {
-    console.log("testing charge event", request.body);
-    const data = JSON.parse(request.body);
-    const event = data.event;
-    await handleChargeEvent(event, firestore);
-    response.send({
-      status: "ok",
-    });
-  });
+exports.testChargeEvent = async function (request, response, admin, firestore) {
+  console.log("testing charge event", request.body);
+  const data = JSON.parse(request.body);
+  const event = data.event;
+  await handleChargeEvent(event, admin, firestore);
 };
 
-exports.webhookHandler = async function (request, response, firestore) {
+exports.webhookHandler = async function (request, response, admin, firestore) {
   const rawBody = request.rawBody;
   const signature = request.headers["x-cc-webhook-signature"];
 
   try {
     const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
-    await handleChargeEvent(event, firestore);
-
-    return response.status(200).send("Webhook received");
+    await handleChargeEvent(event, admin, firestore);
   } catch (error) {
     console.log(error);
     response.status(400).send(`Webhook Error: ${error.message}`);

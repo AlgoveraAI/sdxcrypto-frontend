@@ -136,7 +136,8 @@ export default function Mint({
       console.log("Generating signature");
       const balance = await contract.balanceOf(account);
       const resp = await fetch(
-        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genSignature",
+        "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
+        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
         {
           method: "POST",
           body: JSON.stringify({

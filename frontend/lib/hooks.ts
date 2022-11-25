@@ -174,9 +174,10 @@ export const useUser = () => {
   }, [uid]);
 
   const checkGiftedCredits = async () => {
-    fetch(
+    console.log("checking gifted credits");
+    const res = await fetch(
       // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkGiftedCredits",
-      "us-central1-sdxcrypto-algovera.cloudfunctions.net/checkGiftedCredits",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkGiftedCredits",
       {
         method: "POST",
         body: JSON.stringify({
@@ -184,17 +185,17 @@ export const useUser = () => {
           walletAddress: account,
         }),
       }
-    ).then((res) => {
-      if (!res.ok) {
-        console.error("error checking gifted credits", res);
-      }
-    });
+    );
+    if (!res.ok) {
+      console.error("error checking gifted credits", res);
+    }
   };
 
   const checkCreatorCredits = async () => {
-    fetch(
+    console.log("checking creator credits");
+    const res = await fetch(
       // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkCreatorCredits",
-      "us-central1-sdxcrypto-algovera.cloudfunctions.net/checkCreatorCredits",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkCreatorCredits",
       {
         method: "POST",
         body: JSON.stringify({
@@ -203,14 +204,10 @@ export const useUser = () => {
           isCreator: isCreator,
         }),
       }
-    ).then((res) => {
-      if (res.ok) {
-        console.log("checked creator credits");
-      }
-      if (!res.ok) {
-        console.error("error checking creator credits", res);
-      }
-    });
+    );
+    if (!res.ok) {
+      console.error("error checking creator credits", res);
+    }
   };
 
   useEffect(() => {
