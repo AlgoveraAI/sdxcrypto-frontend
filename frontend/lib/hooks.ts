@@ -42,7 +42,7 @@ export interface User {
   signOut: () => Promise<void>;
   getAccount: () => Promise<void>;
   setCredits: (credits: number) => Promise<void>;
-  checkIsCreator: () => Promise<void>;
+  checkIsCreator: (contract: Contract) => Promise<void>;
 }
 
 export const useUser = () => {
@@ -118,7 +118,7 @@ export const useUser = () => {
 
   const checkIsCreator = async (contract: Contract) => {
     // check if the user owns a token on the Creator contract
-    if (account && contract !== null) {
+    if (account && contract) {
       console.log("checking if user is a creator", account, contract);
       let isCreator = false;
       const tokenIds = [0]; // todo update if launch more tokens

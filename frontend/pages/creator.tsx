@@ -168,7 +168,7 @@ const C: NextPage<PageProps> = ({
       );
 
       // mark user as creator (to trigger checkCreatorCredits)
-      user.checkIsCreator();
+      user.checkIsCreator(creatorContract);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
