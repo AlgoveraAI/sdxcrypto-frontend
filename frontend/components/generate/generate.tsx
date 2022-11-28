@@ -1,7 +1,9 @@
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Spinner from "../spinner";
 import { User } from "../../lib/hooks";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
   user: User;
@@ -25,30 +27,57 @@ export default function Generate({
   const [inferenceSteps, setInferenceSteps] = useState(50);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
 
+  const toastId = useRef<any>(null);
+
   // once images are received, turn off loading
   useEffect(() => {
-    if (images.length > 0) {
+    if (images.length > 0 && toastId) {
+      closeToast();
+      toastId.current = toast("Loading image...", {
+        position: "bottom-left",
+        autoClose: false,
+        closeOnClick: true,
+        theme: "dark",
+        hideProgressBar: false,
+      });
+
       setLoading(false);
     }
   }, [images]);
 
+  const closeToast = () => {
+    toast.dismiss(toastId.current);
+    toastId.current = null;
+  };
+
   const generateImg = async () => {
     setLoading(true);
+
+    toastId.current = toast("Generating image", {
+      position: "bottom-left",
+      autoClose: false,
+      closeOnClick: true,
+      theme: "dark",
+      hideProgressBar: false,
+    });
 
     if (!user.uid) {
       alert("Not logged in");
       setLoading(false);
+      toast.dismiss(toastId.current);
       return;
     }
 
     if (!selectedModal) {
       alert("Please select a model");
       setLoading(false);
+      toast.dismiss(toastId.current);
       return;
     }
     if (prompt === "") {
       alert("Please enter a prompt");
       setLoading(false);
+      toast.dismiss(toastId.current);
       return;
     }
     let baseModel;
@@ -126,6 +155,7 @@ export default function Generate({
             alt="Generated Image"
             width={512}
             height={512}
+            onLoad={closeToast}
           />
         ) : (
           <div className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col border border-gray-700" />
@@ -207,6 +237,7 @@ export default function Generate({
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
