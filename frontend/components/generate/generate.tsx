@@ -14,6 +14,7 @@ type Props = {
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
+  jobStatus: string | null;
 };
 
 export default function Generate({
@@ -23,6 +24,7 @@ export default function Generate({
   prompt,
   setPrompt,
   images,
+  jobStatus,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [height, setHeight] = useState(512);
@@ -32,8 +34,8 @@ export default function Generate({
 
   const toastId = useRef<any>(null);
 
-  const closeToast = () => {
-    console.log("cloasing toast");
+  const imgLoaded = () => {
+    setLoading(false);
     toast.dismiss(toastId.current);
   };
 
@@ -43,7 +45,7 @@ export default function Generate({
       const min = parseInt(e.min);
       const max = parseInt(e.max);
       const percent = ((value - min) / (max - min)) * 100;
-      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #3b82f6 ${
+      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #0A101D ${
         // const bg = `linear-gradient(90deg, #5771f2 ${percent * 100}%, #1937D6 ${
         percent
       }%)`;
@@ -99,6 +101,11 @@ export default function Generate({
       return;
     }
 
+    if (loading || jobStatus === "pending" || jobStatus === "in-process") {
+      error("Please wait for the previous image to finish generating!");
+      return;
+    }
+
     let baseModel;
     if (selectedModal === "SDxMJ") {
       baseModel = "midjourney-v4";
@@ -112,6 +119,8 @@ export default function Generate({
       closeOnClick: true,
       theme: "dark",
       hideProgressBar: false,
+      // show spinner
+      icon: <Spinner />,
     });
 
     const res = await fetch("/api/txt2img", {
@@ -162,10 +171,7 @@ export default function Generate({
             className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-non text-white bg-gradient-to-r from-primary to-blue-500"
           >
             {/* keep text here when loading to maintain same width */}
-            <span className={loading ? "text-transparent" : ""}>Generate</span>
-            <span className={loading ? "" : "hidden"}>
-              <Spinner />
-            </span>
+            <span>Generate</span>
           </button>
         </div>
       </div>
@@ -177,18 +183,22 @@ export default function Generate({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
         {images.length ? (
           <Image
-            className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col"
+            className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col shadow"
             src={images[0]}
             alt="Generated Image"
             width={512}
             height={512}
-            onLoadedData={closeToast}
-            onLoad={closeToast}
+            onLoadedData={imgLoaded}
+            onLoad={imgLoaded}
           />
         ) : (
-          <div className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col border border-gray-700" />
+          <div
+            className={`mt-6 md:mt-12 grid-col bg-background-darker shadow
+              w-full h-auto
+            `}
+          />
         )}
-        <div className="mt-6 md:mt-12 md:ml-12">
+        <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
           <div className="mt-6">
             <label className="block font-medium text-gray-500">

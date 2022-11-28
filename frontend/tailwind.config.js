@@ -16,6 +16,7 @@ module.exports = {
         "primary-darker": "#112695",
         "primary-lighter": "#3b82f6",
         background: "#0f172a",
+        "background-darker": "#0a101d",
       },
     },
   },
