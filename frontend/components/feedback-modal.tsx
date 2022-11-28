@@ -94,7 +94,7 @@ export default function Feedback({
 
                       <div className="mt-4 text-center sm:text-left">
                         <button
-                          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                          className="bg-gradient-to-r from-primary to-primary-lighter text-white font-bold py-2 px-4 rounded"
                           onClick={submit}
                         >
                           Submit
@@ -103,7 +103,7 @@ export default function Feedback({
                       {
                         // if the status is success, show a success message
                         status === "success" ? (
-                          <div className="mt-4 text-green-500">
+                          <div className="mt-4 text-primary-lighter">
                             Thanks for your input!
                           </div>
                         ) : null

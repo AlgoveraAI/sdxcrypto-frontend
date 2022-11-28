@@ -44,7 +44,7 @@ export default function Generate({
       const min = parseInt(e.min);
       const max = parseInt(e.max);
       const percent = ((value - min) / (max - min)) * 100;
-      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #5771f2 ${
+      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #3b82f6 ${
         // const bg = `linear-gradient(90deg, #5771f2 ${percent * 100}%, #1937D6 ${
         percent
       }%)`;
@@ -146,7 +146,7 @@ export default function Generate({
           <button
             onClick={generateImg}
             type="button"
-            className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-primary text-white"
+            className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-non text-white bg-gradient-to-r from-primary to-blue-500"
           >
             {/* keep text here when loading to maintain same width */}
             <span className={loading ? "text-transparent" : ""}>Generate</span>

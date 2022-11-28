@@ -91,7 +91,7 @@ export default function Pricing({
                           onClick={() => {
                             setCreditsModalTrigger(true);
                           }}
-                          className="flex items-center justify-center rounded-md border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
                           aria-describedby="tier-standard"
                         >
                           Purchase Credits
@@ -99,7 +99,7 @@ export default function Pricing({
                       ) : (
                         <a
                           href="creator"
-                          className="flex items-center justify-center rounded-md border border-transparent bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Mint the NFT
