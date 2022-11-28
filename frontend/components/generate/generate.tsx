@@ -58,16 +58,16 @@ export default function Generate({
       baseModel = "stable-diffusion-v1-5";
     }
 
-    const res = await fetch("/api/banana", {
+    const res = await fetch("/api/txt2img", {
       method: "POST",
       body: JSON.stringify({
         uid: user.uid,
         prompt: prompt,
-        // base_model: baseModel,
-        // height: resolution,
-        // width: resolution,
-        // inf_steps: inferenceSteps,
-        // guidance_scale: guidanceScale,
+        base_model: baseModel,
+        height: resolution,
+        width: resolution,
+        inf_steps: inferenceSteps,
+        guidance_scale: guidanceScale,
       }),
     });
     // todo handle out of credits error
