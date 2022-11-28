@@ -38,6 +38,32 @@ export default function Generate({
     toast.dismiss(toastId.current);
   };
 
+  const changeSliderColor = (e: HTMLInputElement) => {
+    if (e.value) {
+      const value = parseInt(e.value);
+      const min = parseInt(e.min);
+      const max = parseInt(e.max);
+      const percent = ((value - min) / (max - min)) * 100;
+      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #5771f2 ${
+        // const bg = `linear-gradient(90deg, #5771f2 ${percent * 100}%, #1937D6 ${
+        percent
+      }%)`;
+      e.style.background = bg;
+    }
+  };
+
+  useEffect(() => {
+    // set bg colors on load
+    changeSliderColor(document.getElementById("width") as HTMLInputElement);
+    changeSliderColor(document.getElementById("height") as HTMLInputElement);
+    changeSliderColor(
+      document.getElementById("inferenceSteps") as HTMLInputElement
+    );
+    changeSliderColor(
+      document.getElementById("guidanceScale") as HTMLInputElement
+    );
+  }, []);
+
   const generateImg = async () => {
     setLoading(true);
 
@@ -170,13 +196,17 @@ export default function Generate({
               <div className="text-white font-bold text-left">{width}</div>
               <div>
                 <input
+                  id="width"
                   type="range"
                   value={width}
-                  className="w-full h-2 bg-primary rounded-lg appearance-none cursor-pointer dark:bg-primary"
-                  min="512"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
+                  min="128"
                   max="1024"
                   step="8"
-                  onChange={(e) => setWidth(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    setWidth(parseInt(e.target.value));
+                    changeSliderColor(e.target);
+                  }}
                 />
               </div>
             </div>
@@ -200,13 +230,17 @@ export default function Generate({
               <div className="text-white font-bold text-left">{height}</div>
               <div>
                 <input
+                  id="height"
                   type="range"
                   value={height}
-                  className="w-full h-2 bg-primary rounded-lg appearance-none cursor-pointer dark:bg-primary"
-                  min="512"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
+                  min="128"
                   max="1024"
                   step="8"
-                  onChange={(e) => setHeight(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    setHeight(parseInt(e.target.value));
+                    changeSliderColor(e.target);
+                  }}
                 />
               </div>
             </div>
@@ -233,13 +267,17 @@ export default function Generate({
               </div>
               <div>
                 <input
+                  id="inferenceSteps"
                   type="range"
                   value={inferenceSteps}
-                  className="w-full h-2 bg-primary rounded-lg appearance-none cursor-pointer dark:bg-primary"
+                  className="w-full h-2  rounded-lg appearance-none cursor-pointer bg-primary-lighter"
                   min="1"
                   max="100"
                   step="1"
-                  onChange={(e) => setInferenceSteps(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    setInferenceSteps(parseInt(e.target.value));
+                    changeSliderColor(e.target);
+                  }}
                 />
               </div>
             </div>
@@ -266,13 +304,17 @@ export default function Generate({
               </div>
               <div>
                 <input
+                  id="guidanceScale"
                   type="range"
                   value={guidanceScale}
-                  className="w-full h-2 bg-primary rounded-lg appearance-none cursor-pointer dark:bg-primary"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary"
                   min="1"
                   max="50"
                   step="1"
-                  onChange={(e) => setGuidanceScale(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    setGuidanceScale(parseInt(e.target.value));
+                    changeSliderColor(e.target);
+                  }}
                 />
               </div>
               <div className="flex justify-between w-full mt-2 text-sm font-medium text-gray-500">
