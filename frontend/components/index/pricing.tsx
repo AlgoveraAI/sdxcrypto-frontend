@@ -1,43 +1,35 @@
-import { CheckIcon } from "@heroicons/react/24/outline";
-
-const tiers = [
-  {
-    name: "Credits",
-    href: "#",
-    priceMonthly: "$0.001",
-    priceType: "per-credit",
-    description: "Pay as you go",
-    features: [
-      "Pariatur quod similique",
-      "Sapiente libero doloribus modi nostrum",
-      "Vel ipsa esse repudiandae excepturi",
-      "Itaque cupiditate adipisci quibusdam",
-    ],
-  },
-  {
-    name: "Creator Pass",
-    href: "#",
-    priceMonthly: "0.1 ETH",
-    priceType: "",
-    description: "200 credits/month and other perks",
-    features: [
-      "Pariatur quod similique",
-      "Sapiente libero doloribus modi nostrum",
-      "Vel ipsa esse repudiandae excepturi",
-      "Itaque cupiditate adipisci quibusdam",
-    ],
-  },
-];
+import { useEffect, useState } from "react";
 
 type Props = {
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  creditCost: number | null;
+  creatorPassCost: number | null;
+  creatorCreditsPerMonth: number | null;
 };
 
 export default function Pricing({
   creditsModalTrigger,
   setCreditsModalTrigger,
+  creditCost,
+  creatorPassCost,
+  creatorCreditsPerMonth,
 }: Props) {
+  const tiers = [
+    {
+      name: "Credits",
+      priceMonthly: `${creditCost} USD`,
+      priceType: "per-credit",
+      description: "Pay as you go",
+    },
+    {
+      name: "Creator Pass",
+      priceMonthly: `${creatorPassCost} ETH`,
+      priceType: "",
+      description: `${creatorCreditsPerMonth} credits per month + perks`,
+    },
+  ];
+
   return (
     <div className="bg-background">
       <div className="pt-12 sm:pt-16 lg:pt-24">
@@ -74,9 +66,9 @@ export default function Pricing({
                         {tier.name}
                       </h3>
                     </div>
-                    <div className="text-black mt-4 flex items-baseline text-6xl font-bold tracking-tight">
+                    <div className="text-black mt-4 flex items-baseline text-5xl font-bold tracking-tight">
                       {tier.priceMonthly}
-                      <span className="ml-1 text-2xl font-medium tracking-normal text-primary">
+                      <span className="ml-2 text-2xl font-medium tracking-normal text-primary">
                         {tier.priceType}
                       </span>
                     </div>
@@ -91,7 +83,7 @@ export default function Pricing({
                           onClick={() => {
                             setCreditsModalTrigger(true);
                           }}
-                          className="flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
+                          className="flex items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
                           aria-describedby="tier-standard"
                         >
                           Purchase Credits
@@ -99,10 +91,10 @@ export default function Pricing({
                       ) : (
                         <a
                           href="creator"
-                          className="flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
+                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
                           aria-describedby="tier-standard cursor-pointer"
                         >
-                          Mint the NFT
+                          Read More
                         </a>
                       )}
                     </div>

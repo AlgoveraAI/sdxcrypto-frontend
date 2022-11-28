@@ -6,4 +6,8 @@ export type PageProps = {
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   creatorContract: Contract | null;
+  creditCost: number | null;
+  creatorPassCost: number | null;
+  creatorCreditsPerMonth: number | null;
+  creatorSubscriptionLength: number | null;
 };

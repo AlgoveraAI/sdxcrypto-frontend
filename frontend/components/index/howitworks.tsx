@@ -90,7 +90,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
           onClick={() => {
             window.location.href = "/generate";
           }}
-          className="inline-flex items-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white  md:py-3 md:px-8 md:text-lg"
+          className="inline-flex items-center rounded-md bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white shadow-md md:py-3 md:px-8 md:text-lg"
         >
           Try it now!
         </button>

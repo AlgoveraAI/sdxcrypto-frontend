@@ -3,7 +3,7 @@ import {
   MoralisAuth,
 } from "@moralisweb3/client-firebase-auth-utils";
 import { firebaseApp, auth } from "./firebase";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { BaseProvider } from "@ethersproject/providers";
 import { Signer } from "@ethersproject/abstract-signer";
@@ -34,14 +34,14 @@ export interface User {
   signer: Signer | null;
   account: string | null;
   networkName: string | null;
+  moralisAuth: MoralisAuth | null;
   credits: number | null;
   loading: boolean;
   isCreator: boolean | null;
-  moralisAuth: MoralisAuth | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
+  setCredits: React.Dispatch<React.SetStateAction<number | null>>;
   getAccount: () => Promise<void>;
-  setCredits: (credits: number) => Promise<void>;
   checkIsCreator: (contract: Contract) => Promise<void>;
 }
 

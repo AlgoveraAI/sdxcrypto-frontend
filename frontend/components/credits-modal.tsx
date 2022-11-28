@@ -2,10 +2,6 @@ import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
 import { User } from "../lib/hooks";
-import { getValue } from "firebase/remote-config";
-import { firebaseApp } from "../lib/firebase";
-import { fetchAndActivate } from "firebase/remote-config";
-import { getRemoteConfig } from "firebase/remote-config";
 
 type Props = {
   user: User;
@@ -29,19 +25,6 @@ export default function CreditsModal({
       openModal();
     }
   }, [creditsModalTrigger]);
-
-  useEffect(() => {
-    // get credit cost from remote config
-    const remoteConfig = getRemoteConfig(firebaseApp);
-    fetchAndActivate(remoteConfig)
-      .then(() => {
-        const cost = getValue(remoteConfig, "credit_cost").asNumber();
-        setCreditCost(cost);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
 
   function openModal() {
     if (user.uid) {

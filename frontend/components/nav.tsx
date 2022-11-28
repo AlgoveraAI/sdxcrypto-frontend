@@ -57,7 +57,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
             <Link
               href="generate"
               className={`text-base font-medium text-gray-50  ${
-                currentPage === "/generate" ? "underline" : ""
+                currentPage === "/generate" ? "" : ""
               }`}
             >
               Generate
@@ -65,7 +65,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
             <Link
               href="creator"
               className={`text-base font-medium text-gray-50  ${
-                currentPage === "/creator" ? "underline" : ""
+                currentPage === "/creator" ? "" : ""
               }`}
             >
               Creator Pass

@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import type { NextPage } from "next";
-import Nav from "../components/nav";
 import Footer from "../components/footer";
 import Hero from "../components/index/hero";
 import HowItWorks from "../components/index/howitworks";
@@ -12,22 +11,22 @@ const Home: NextPage<PageProps> = ({
   user,
   creditsModalTrigger,
   setCreditsModalTrigger,
+  creditCost,
+  creatorPassCost,
+  creatorCreditsPerMonth,
 }) => {
   const howitworksRef = useRef<HTMLDivElement>(null);
 
   return (
     <div>
-      <CreditsModal
-        user={user}
-        creditsModalTrigger={creditsModalTrigger}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-      />
-      <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
       <Hero />
       <HowItWorks howitworksRef={howitworksRef} />
       <Pricing
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
+        creditCost={creditCost}
+        creatorPassCost={creatorPassCost}
+        creatorCreditsPerMonth={creatorCreditsPerMonth}
       />
       <Footer />
     </div>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import Nav from "../components/nav";
 import CreditsModal from "../components/credits-modal";
 import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
@@ -9,25 +8,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 const accessImg = require("../assets/access.png");
-
-const features = [
-  {
-    name: "Credits",
-    description: "Get 100 free credits per month", // todo read from config
-  },
-  {
-    name: "Minting",
-    description: "Mint your AI art as an NFT for free",
-  },
-  {
-    name: "Early Access",
-    description: "Be the first to use new models",
-  },
-  {
-    name: "Community",
-    description: "Access a holders-only Discord channel",
-  },
-];
 
 const TOKEN_ID = 0; // todo read from config
 
@@ -40,12 +20,32 @@ type SignatureInfo = {
 const C: NextPage<PageProps> = ({
   user,
   creatorContract,
-  creditsModalTrigger,
-  setCreditsModalTrigger,
+  creatorPassCost,
+  creatorCreditsPerMonth,
+  creatorSubscriptionLength,
 }) => {
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [signature, setSignature] = useState<SignatureInfo | null>(null);
+
+  const features = [
+    {
+      name: "Credits",
+      description: `${creatorCreditsPerMonth} credits per month for ${creatorSubscriptionLength} months`,
+    },
+    {
+      name: "Minting",
+      description: "Mint your AI art as an NFT for free",
+    },
+    {
+      name: "Early Access",
+      description: "Be the first to use new models",
+    },
+    {
+      name: "Community",
+      description: "Access a holders-only Discord channel",
+    },
+  ];
 
   const getSignature = async () => {
     if (user.networkName && user.account && creatorContract?.address) {
@@ -182,12 +182,6 @@ const C: NextPage<PageProps> = ({
 
   return (
     <div>
-      <CreditsModal
-        user={user}
-        creditsModalTrigger={creditsModalTrigger}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-      />
-      <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
       <div className="relative px-6 lg:px-8">
         <div className="mx-auto max-w-5xl pt-12 pb-32 sm:pt-24 sm:pb-40">
           <div>
@@ -196,8 +190,8 @@ const C: NextPage<PageProps> = ({
                 Premium Creator Pass
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
-                Tired of buying credits? <br /> Make a one-time NFT purchase for
-                0.05 ETH to get monthly credits and other perks.
+                Tired of buying credits? <br /> Make a one-time NFT purchase for{" "}
+                {creatorPassCost} ETH to get monthly credits and other perks.
               </p>
               <div className="mt-8 text-center justify-center">
                 <div

@@ -45,7 +45,7 @@ export default function Hero() {
                 <div className="rounded-md shadow w-1/2 mx-auto sm:mx-0">
                   <Link
                     href="/generate"
-                    className="flex w-full items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white  md:py-4 md:px-10 md:text-lg"
+                    className="flex w-full items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white  md:py-4 md:px-10 md:text-lg"
                   >
                     Start Generating
                   </Link>
