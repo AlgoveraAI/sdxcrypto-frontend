@@ -2,6 +2,10 @@ import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
 import { User } from "../lib/hooks";
+import { getValue } from "firebase/remote-config";
+import { firebaseApp } from "../lib/firebase";
+import { fetchAndActivate } from "firebase/remote-config";
+import { getRemoteConfig } from "firebase/remote-config";
 
 type Props = {
   user: User;
@@ -17,6 +21,7 @@ export default function CreditsModal({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [desiredNumCredits, setDesiredNumCredits] = useState(100);
+  const [creditCost, setCreditCost] = useState<number | null>(null);
 
   // if the trigger prop changes, open the modal
   useEffect(() => {
@@ -24,6 +29,19 @@ export default function CreditsModal({
       openModal();
     }
   }, [creditsModalTrigger]);
+
+  useEffect(() => {
+    // get credit cost from remote config
+    const remoteConfig = getRemoteConfig(firebaseApp);
+    fetchAndActivate(remoteConfig)
+      .then(() => {
+        const cost = getValue(remoteConfig, "credit_cost").asNumber();
+        setCreditCost(cost);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   function openModal() {
     if (user.uid) {
@@ -122,7 +140,10 @@ export default function CreditsModal({
                     You have {user.credits ? user.credits : 0}{" "}
                     {user.credits === 1 ? "credit" : "credits"} remaining
                   </div>
-                  <div className="mt-6">Use credits to generate images.</div>
+                  <div className="mt-6">Use credits to generate images</div>
+                  {creditCost !== null ? (
+                    <div>100 credits costs ${creditCost * 100} USD</div>
+                  ) : null}
                   <div className="mt-6 shadow-sm w-full mx-auto">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 text-left">
