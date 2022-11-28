@@ -136,8 +136,8 @@ export default function Mint({
       console.log("Generating signature");
       const balance = await contract.balanceOf(account);
       const resp = await fetch(
-        "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
-        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
+        // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
         {
           method: "POST",
           body: JSON.stringify({
@@ -155,9 +155,7 @@ export default function Mint({
         setStatus(null);
         return;
       }
-
-      const { signature } = await resp.json();
-
+      const signature = await resp.text();
       console.log("signature:", signature);
 
       // estimate gas

@@ -3,6 +3,10 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { getValue } = require("firebase/remote-config");
 
+// local test (from /functions dir)
+// firebase emulators:start --only functions
+
+// setup firebase conn
 admin.initializeApp();
 const firestore = admin.firestore();
 const remoteConfig = admin.remoteConfig();
@@ -23,27 +27,17 @@ exports.checkCreatorCredits = functions.https.onRequest((req, res) => {
 });
 exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    // await checkCreatorCredits(req, res, admin, firestore, remoteConfig);
     await checkGiftedCredits(req, res, firestore);
     res.status(200).send("OK");
   });
-  // cors(req, res, async () => {
-  //   res.status(200).send("OK");
-  // });
 });
 
 // contract functionality
 const { genCommunitySignature } = require("./contracts.ts");
 exports.genCommunitySignature = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    try {
-      const signature = await genCommunitySignature(req, res);
-      console.log("returning signature", signature);
-      res.status(200).json({ signature });
-    } catch (error) {
-      console.log("error", error);
-      res.status(500).send(error);
-    }
+    const signature = await genCommunitySignature(req, res);
+    res.status(200).send(signature);
   });
 });
 
