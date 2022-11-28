@@ -6,6 +6,7 @@ import { db, auth } from "../../lib/firebase";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
 import { User } from "../../lib/hooks";
+import { toast } from "react-toastify";
 
 type Props = {
   selectedModal: string | null;
@@ -62,6 +63,20 @@ export default function Mint({
     }
   };
 
+  const error = (msg: string) => {
+    toast(msg, {
+      position: "bottom-left",
+      type: "error",
+      autoClose: 5000,
+      theme: "dark",
+      style: {
+        fontSize: ".9rem",
+      },
+    });
+    setLoading(false);
+    setStatus(null);
+  };
+
   // get current network from moralis
   useEffect(() => {
     if (user.provider) {
@@ -74,7 +89,7 @@ export default function Mint({
       const { signer, provider, account, networkName } = user;
 
       if (status === "Mint successful!") {
-        alert("You already minted this image!");
+        error("You already minted this image!");
         return;
       }
 
@@ -82,15 +97,11 @@ export default function Mint({
       setStatus("Preparing transaction");
       // check we have everything needed to mint
       if (!selectedModal) {
-        alert("Please select a model and generate an image first");
-        setLoading(false);
-        setStatus(null);
+        error("No image to mint");
         return;
       }
       if (!images.length) {
-        alert("Please generate an image first");
-        setLoading(false);
-        setStatus(null);
+        error("No image to mint");
         return;
       }
       if (
@@ -99,26 +110,17 @@ export default function Mint({
         signer === null ||
         account === null
       ) {
-        alert("Please connect your wallet");
-        setLoading(false);
-        setStatus(null);
+        error("Connect to Metamask to mint");
         return;
       }
       if (contract === null) {
-        alert(
-          "Could not get contract details for the connected network: " +
-            networkName
-        );
-        setLoading(false);
-        setStatus(null);
+        error("No contract found");
         return;
       }
       // check the desired name of the NFT
       const name = document.getElementById("name") as HTMLInputElement;
       if (name.value === "") {
-        alert("Please enter a name");
-        setLoading(false);
-        setStatus(null);
+        error("Enter a name for your NFT!");
         return;
       }
       // check the desired description of the NFT
@@ -126,9 +128,7 @@ export default function Mint({
         "description"
       ) as HTMLInputElement;
       if (description.value === "") {
-        alert("Please enter a description");
-        setLoading(false);
-        setStatus(null);
+        error("Enter a description for your NFT!");
         return;
       }
 
@@ -149,10 +149,8 @@ export default function Mint({
       );
       // check the response is ok
       if (!resp.ok) {
-        alert("Error generating signature");
+        error("Error generating signature");
         console.error(await resp.text());
-        setLoading(false);
-        setStatus(null);
         return;
       }
       const signature = await resp.text();

@@ -2,8 +2,7 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Spinner from "../spinner";
 import { User } from "../../lib/hooks";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
@@ -64,8 +63,48 @@ export default function Generate({
     );
   }, []);
 
+  const error = (msg: string) => {
+    toast(msg, {
+      position: "bottom-left",
+      type: "error",
+      autoClose: 5000,
+      theme: "dark",
+      style: {
+        fontSize: ".9rem",
+      },
+    });
+    setLoading(false);
+  };
+
   const generateImg = async () => {
     setLoading(true);
+
+    if (!user.uid) {
+      error("Please sign in to generate images!");
+      return;
+    }
+
+    if (!selectedModal) {
+      error("Please select a model!");
+      return;
+    }
+
+    if (prompt === "") {
+      error("Please enter a prompt!");
+      return;
+    }
+
+    if (user.credits === null || user.credits < 1) {
+      error("You don't have enough credits!");
+      return;
+    }
+
+    let baseModel;
+    if (selectedModal === "SDxMJ") {
+      baseModel = "midjourney-v4";
+    } else {
+      baseModel = "stable-diffusion-v1-5";
+    }
 
     toastId.current = toast("Generating image", {
       position: "bottom-left",
@@ -74,32 +113,6 @@ export default function Generate({
       theme: "dark",
       hideProgressBar: false,
     });
-
-    if (!user.uid) {
-      alert("Not logged in");
-      setLoading(false);
-      toast.dismiss(toastId.current);
-      return;
-    }
-
-    if (!selectedModal) {
-      alert("Please select a model");
-      setLoading(false);
-      toast.dismiss(toastId.current);
-      return;
-    }
-    if (prompt === "") {
-      alert("Please enter a prompt");
-      setLoading(false);
-      toast.dismiss(toastId.current);
-      return;
-    }
-    let baseModel;
-    if (selectedModal === "SDxMJ") {
-      baseModel = "midjourney-v4";
-    } else {
-      baseModel = "stable-diffusion-v1-5";
-    }
 
     const res = await fetch("/api/txt2img", {
       method: "POST",
@@ -121,7 +134,7 @@ export default function Generate({
       console.log("job result:", data);
       setJobId(data.jobId);
     } else {
-      alert("Error generating image");
+      error("Error generating image");
     }
   };
 
@@ -325,7 +338,6 @@ export default function Generate({
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }

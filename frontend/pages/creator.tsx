@@ -6,6 +6,7 @@ import { PageProps } from "../lib/types";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { toast } from "react-toastify";
 
 const accessImg = require("../assets/access.png");
 
@@ -76,6 +77,18 @@ const C: NextPage<PageProps> = ({
     }
   };
 
+  const error = (msg: string) => {
+    toast(msg, {
+      position: "bottom-left",
+      type: "error",
+      autoClose: 5000,
+      theme: "dark",
+      style: {
+        fontSize: ".9rem",
+      },
+    });
+  };
+
   // once we have user account and contract address, look for a signature
   useEffect(() => {
     if (user.account && user.networkName && creatorContract?.address) {
@@ -86,21 +99,21 @@ const C: NextPage<PageProps> = ({
   const mint = async () => {
     const { signer, provider, account, networkName } = user;
     if (!signer || !provider || !account || !networkName) {
-      alert("Not connected to metamask");
+      error("Please connect your wallet");
       return;
     }
     if (!creatorContract) {
-      alert("No contract found");
+      error("Creator contract not found");
       return;
     }
     const mintingActive = await creatorContract.mintingActive(TOKEN_ID);
     if (!mintingActive) {
-      alert("Minting is not active");
+      error("Creator pass minting is not active");
       return;
     }
     const balance = await creatorContract.balanceOf(account, TOKEN_ID);
     if (balance > 0) {
-      alert("You can only mint 1 Creator Pass per wallet");
+      error("You already have a creator pass");
       return;
     }
 

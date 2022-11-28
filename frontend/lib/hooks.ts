@@ -12,6 +12,7 @@ const { ethers } = require("ethers");
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Contract } from "@ethersproject/contracts";
+import { toast } from "react-toastify";
 
 declare var window: any; // to avoid typescript error on window.ethereum
 
@@ -82,7 +83,7 @@ export const useUser = () => {
         console.error("could not get MetaMask account");
       }
     } else {
-      alert("Please install metamask");
+      console.error("MetaMask not installed");
     }
   };
 

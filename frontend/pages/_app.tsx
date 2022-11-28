@@ -1,4 +1,6 @@
 import "../styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
+
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import type { AppProps } from "next/app";
@@ -13,6 +15,7 @@ import {
   getValue,
   getRemoteConfig,
 } from "firebase/remote-config";
+import { ToastContainer } from "react-toastify";
 
 import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
@@ -135,6 +138,7 @@ export default function App({ Component, pageProps }: AppProps) {
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
+      <ToastContainer />
       <Component
         {...pageProps}
         user={user}

@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
 import { User } from "../lib/hooks";
+import { toast } from "react-toastify";
 
 type Props = {
   user: User;
@@ -30,7 +31,7 @@ export default function CreditsModal({
     if (user.uid) {
       setOpen(true);
     } else {
-      alert("Please connect wallet to purchase credits");
+      error("Please connect wallet to purchase credits");
       setCreditsModalTrigger(false);
     }
   }
@@ -39,6 +40,18 @@ export default function CreditsModal({
     setOpen(false);
     setCreditsModalTrigger(false);
   }
+
+  const error = (msg: string) => {
+    toast(msg, {
+      position: "bottom-left",
+      type: "error",
+      autoClose: 5000,
+      theme: "dark",
+      style: {
+        fontSize: ".9rem",
+      },
+    });
+  };
 
   async function testChargeEvent() {
     // use this instead of buyCredits to locally test the handleChargeEvent firebase function

@@ -81,7 +81,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                 <>
                   <Popover.Button>
                     <UserIcon
-                      className="h-6 w-6 flex-shrink-0 text-white bg-transparent"
+                      className="h-6 w-6 flex-shrink-0 text-white bg-transparent outline-none border-none focus:outline-none"
                       aria-hidden="true"
                     />
                   </Popover.Button>
