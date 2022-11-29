@@ -15,11 +15,7 @@ const steps = [
   { id: "3", name: "Mint", href: "#" },
 ];
 
-const GeneratePage: NextPage<PageProps> = ({
-  user,
-  creditsModalTrigger,
-  setCreditsModalTrigger,
-}) => {
+const GeneratePage: NextPage<PageProps> = ({ user }) => {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
   // store params and details for each step here
