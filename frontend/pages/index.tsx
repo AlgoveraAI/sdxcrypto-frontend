@@ -19,13 +19,6 @@ const Home: NextPage<PageProps> = ({
 
   return (
     <div>
-      <button
-        onClick={() => {
-          throw new Error("Test error");
-        }}
-      >
-        Error
-      </button>
       <Hero />
       <HowItWorks howitworksRef={howitworksRef} />
       <Pricing
