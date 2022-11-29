@@ -1,49 +1,36 @@
-const functions = require("firebase-functions");
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-
-// setup cors
-const cors = require("cors")({ origin: "*" });
-
-// prepare app
-const admin = require("firebase-admin");
-admin.initializeApp();
-const firestore = admin.firestore();
 
 // get env variables
 require("dotenv").config();
 const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
 const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
-
 Client.init(cbApiKey);
 
-exports.createCharge = functions.https.onRequest((request, response) => {
-  cors(request, response, async () => {
-    console.log("creating charge", request.body);
-    const data = JSON.parse(request.body);
-    const { uid, credits } = data;
-    const amount = String(credits * 0.01);
-    const chargeData = {
-      name: "Algovera AI Credits",
-      description: `Purchase request: ${credits} AI credits`,
-      local_price: {
-        amount: amount,
-        currency: "USD",
-      },
-      pricing_type: "fixed_price",
-      metadata: {
-        uid: uid,
-        credits: credits,
-      },
-    };
+exports.createCharge = async function (request, response) {
+  console.log("creating charge", request.body);
+  const data = JSON.parse(request.body);
+  const { uid, credits } = data;
+  const amount = String(credits * 0.01);
+  const chargeData = {
+    name: "Algovera AI Credits",
+    description: `Purchase request: ${credits} AI credits`,
+    local_price: {
+      amount: amount,
+      currency: "USD",
+    },
+    pricing_type: "fixed_price",
+    metadata: {
+      uid: uid,
+      credits: credits,
+    },
+  };
+  const charge = await Charge.create(chargeData);
+  return charge;
+};
 
-    const charge = await Charge.create(chargeData);
-    console.log(charge);
-    response.send(charge);
-  });
-});
-
-async function handleChargeEvent(event) {
+// local function, not exported
+async function handleChargeEvent(event, admin, firestore) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -125,35 +112,22 @@ async function handleChargeEvent(event) {
   }
 }
 
-exports.testChargeEvent = functions.https.onRequest((request, response) => {
-  cors(request, response, async () => {
-    console.log("testing charge event", request.body);
-    const data = JSON.parse(request.body);
-    const event = data.event;
-    await handleChargeEvent(event);
-    response.send({
-      status: "ok",
-    });
-  });
-});
+exports.testChargeEvent = async function (request, response, admin, firestore) {
+  console.log("testing charge event", request.body);
+  const data = JSON.parse(request.body);
+  const event = data.event;
+  await handleChargeEvent(event, admin, firestore);
+};
 
-exports.webhookHandler = functions.https.onRequest(
-  async (request, response) => {
-    const rawBody = request.rawBody;
-    const signature = request.headers["x-cc-webhook-signature"];
+exports.webhookHandler = async function (request, response, admin, firestore) {
+  const rawBody = request.rawBody;
+  const signature = request.headers["x-cc-webhook-signature"];
 
-    try {
-      const event = Webhook.verifyEventBody(
-        rawBody,
-        signature,
-        cbWebhookSecret
-      );
-      await handleChargeEvent(event);
-
-      return response.status(200).send("Webhook received");
-    } catch (error) {
-      console.log(error);
-      response.status(400).send(`Webhook Error: ${error.message}`);
-    }
+  try {
+    const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
+    await handleChargeEvent(event, admin, firestore);
+  } catch (error) {
+    console.log(error);
+    response.status(400).send(`Webhook Error: ${error.message}`);
   }
-);
+};

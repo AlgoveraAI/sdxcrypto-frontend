@@ -1,270 +1,224 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
-import Image from "next/image";
-import { signInWithMoralis } from "@moralisweb3/client-firebase-evm-auth";
-import { useMoralisAuth } from "../lib/hooks";
-import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
-
-// function classNames(...classes: string[]) {
-//   return classes.filter(Boolean).join(" ");
-// }
+import { User } from "../lib/hooks";
+import {
+  WalletIcon,
+  UserIcon,
+  Bars3Icon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
+import Spinner from "./spinner";
+import FeedbackModal from "./feedback-modal";
 
 type NavProps = {
-  uid: string;
-  credits: number;
-  setCredits: React.Dispatch<React.SetStateAction<number>>;
-  setUid: React.Dispatch<React.SetStateAction<string>>;
-  // howitworksRef?: React.RefObject<HTMLDivElement>; // optional (only on index.tsx)
-  // creditsModalTrigger: boolean;
+  user: User;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Nav({
-  uid,
-  setUid,
-  credits,
-  setCredits,
-  setCreditsModalTrigger,
-}: NavProps) {
-  // store which page we're on to manage nav behaviour
-  // (scrolling to howitworks section on index.tsx)
-  // const [onHome, setOnHome] = React.useState(true);
-
-  // set app to poll database to update credits once signed in
-  const [pollCredits, setPollCredits] = useState(false);
-
-  const moralisAuth = useMoralisAuth();
+export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
+  const [currentPage, setCurrentPage] = useState<null | string>(null);
+  const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
   useEffect(() => {
-    // triggers when user logs in or out
-    console.log("checking auth");
-    if (moralisAuth) {
-      console.log("connected user:", moralisAuth.auth.currentUser);
-      if (moralisAuth.auth.currentUser) {
-        setUid(moralisAuth.auth.currentUser.uid);
-        setPollCredits(true);
-      }
-    }
-  }, [moralisAuth, moralisAuth?.auth.currentUser, setUid]);
-
-  useEffect(() => {
-    // poll credits every 10 seconds
-    if (pollCredits) {
-      const interval = setInterval(async () => {
-        if (moralisAuth?.auth.currentUser) {
-          const docRef = doc(db, "users", moralisAuth.auth.currentUser.uid);
-          getDoc(docRef).then((docSnap) => {
-            if (docSnap.exists()) {
-              setCredits(docSnap.data().credits);
-            } else {
-              console.log("User not in firestore db");
-            }
-          });
-        }
-      }, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [pollCredits, moralisAuth, setCredits]);
-
-  const handleConnect = async () => {
-    // todo: handle signature rejection
-    if (moralisAuth) {
-      await signInWithMoralis(moralisAuth);
-    }
-  };
-
-  const handleDisconnect = async () => {
-    await auth.signOut();
-  };
-
-  // useEffect(() => {
-  //   console.log("loading page", window.location.pathname);
-  //   setOnHome(window.location.pathname == "/" ? true : false);
-  // }, []);
+    setCurrentPage(window.location.pathname);
+  }, []);
 
   return (
-    <div>
-      <Popover className="relative bg-black/[0.3]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex items-center justify-between border-gray-100 py-6 md:justify-start md:space-x-10">
-            <div className="flex justify-start lg:w-0 lg:flex-1">
-              <Link href="/">
-                <span className="sr-only">Algovera</span>
-                <Image
-                  // className="h-8 w-auto sm:h-10"
-                  src={require("../assets/algovera.svg")}
-                  alt=""
-                  width={200}
-                  height={100}
-                />
-              </Link>
-            </div>
-            <div className="-my-2 -mr-2 md:hidden">
-              <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-300 hover:text-gray-400 focus:outline-none">
-                <span className="sr-only">Open menu</span>
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-              </Popover.Button>
-            </div>
-            {/* <Popover.Group as="nav" className="hidden space-x-10 md:flex">
-              <a
-                href="#"
-                className="text-base font-medium text-gray-300 hover:text-gray-400 focus:outline-none"
-              >
-                About Us
-              </a>
-              <span
-                onClick={() => {
-                  if (onHome) {
-                    howitworksRef?.current?.scrollIntoView({
-                      behavior: "smooth",
-                    });
-                  } else {
-                    window.location.href = "/";
-                  }
-                }}
-                className="text-base font-medium text-gray-300 hover:text-gray-400 focus:outline-none cursor-pointer"
-              >
-                How it Works
-              </span>
+    <Popover className="relative bg-black/[0.3]">
+      <FeedbackModal
+        user={user}
+        feedbackModalTrigger={feedbackModalTrigger}
+        setFeedbackModalTrigger={setFeedbackModalTrigger}
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
+          <div className="flex justify-start lg:w-0 lg:flex-1">
+            <Link href="/">
+              <span className="sr-only">Algovera</span>
+              <Image
+                // className="h-8 w-auto sm:h-10"
+                src={require("../assets/algovera.svg")}
+                alt=""
+                width={200}
+                height={100}
+              />
+            </Link>
+          </div>
+          <div className="-my-2 -mr-2 md:hidden">
+            <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-50  hover:text-gray-500 focus:outline-none">
+              <span className="sr-only">Open menu</span>
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </Popover.Button>
+          </div>
+          <Popover.Group as="nav" className="hidden space-x-10 md:flex">
+            <Link
+              href="generate"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/generate" ? "" : ""
+              }`}
+            >
+              Generate
+            </Link>
+            <Link
+              href="creator"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/creator" ? "" : ""
+              }`}
+            >
+              Creator Pass
+            </Link>
+            <span
+              onClick={() => setFeedbackModalTrigger(true)}
+              className={`text-base font-medium text-gray-50 cursor-pointer`}
+            >
+              Feedback
+            </span>
+            <Popover className="relative">
+              {({ open }) => (
+                <>
+                  <Popover.Button>
+                    <UserIcon
+                      className="h-6 w-6 flex-shrink-0 text-white bg-transparent outline-none border-none focus:outline-none"
+                      aria-hidden="true"
+                    />
+                  </Popover.Button>
 
-              <Popover className="relative">
-                {({ open }) => (
-                  <>
-                    <Popover.Button
-                      onClick={() => {
-                        window.location.href = "/generate";
-                      }}
-                      className={classNames(
-                        open ? "text-gray-400" : "text-gray-300",
-                        "group inline-flex items-center rounded-md text-base font-medium hover:text-gray-400 focus:outline-none"
-                      )}
-                    >
-                      <span>Generate</span>
-                    </Popover.Button>
-                  </>
-                )}
-              </Popover>
-            </Popover.Group> */}
-
-            <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-              {moralisAuth?.auth?.currentUser && (
-                <span
-                  className={`cursor-pointer ${
-                    !credits
-                      ? "text-red-500 hover:text-red-600 "
-                      : "text-green-500 hover:text-green-600 "
-                  }`}
-                  onClick={() => {
-                    setCreditsModalTrigger(true);
-                  }}
-                >
-                  {credits === 0
-                    ? "Out of Credits"
-                    : credits === 1
-                    ? "1 Credit"
-                    : `${credits} Credits`}
-                </span>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                  >
+                    <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
+                      <div className="overflow-hidden rounded-lg shadow-lg">
+                        <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
+                          <div
+                            className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
+                            onClick={
+                              user.loading
+                                ? () => {}
+                                : user.uid
+                                ? user.signOut
+                                : user.signIn
+                            }
+                          >
+                            <WalletIcon
+                              className="h-6 w-6 flex-shrink-0 "
+                              aria-hidden="true"
+                            />
+                            <div className="ml-4">
+                              {user.loading ? (
+                                <p className="text-base font-medium relative">
+                                  Signing in...
+                                </p>
+                              ) : user.uid ? (
+                                <p className="text-base font-medium ">
+                                  Sign Out
+                                </p>
+                              ) : (
+                                <p className="text-base font-medium">Sign In</p>
+                              )}
+                            </div>
+                          </div>
+                          <div
+                            className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
+                            onClick={() => {
+                              setCreditsModalTrigger(true);
+                            }}
+                          >
+                            <CurrencyDollarIcon
+                              className="h-6 w-6 flex-shrink-0 "
+                              aria-hidden="true"
+                            />
+                            <div className="ml-4">
+                              <p className="text-base font-medium ">Credits</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Popover.Panel>
+                  </Transition>
+                </>
               )}
-              {moralisAuth?.auth?.currentUser ? (
-                <span
-                  onClick={handleDisconnect}
-                  className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
+            </Popover>
+          </Popover.Group>
+        </div>
+      </div>
+
+      <Transition
+        as={Fragment}
+        enter="duration-200 ease-out"
+        enterFrom="opacity-0 scale-95"
+        enterTo="opacity-100 scale-100"
+        leave="duration-100 ease-in"
+        leaveFrom="opacity-100 scale-100"
+        leaveTo="opacity-0 scale-95"
+      >
+        <Popover.Panel
+          focus
+          className="absolute inset-x-0 top-0 origin-top-right transform p-2 transition md:hidden z-50"
+        >
+          <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
+            <div className="space-y-5 py-5 px-5">
+              {user.loading ? (
+                <p
+                  onClick={user.signOut}
+                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Disconnect Wallet
-                </span>
+                  Signing in...
+                </p>
+              ) : user.uid ? (
+                <p
+                  onClick={user.signOut}
+                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                >
+                  Sign out
+                </p>
               ) : (
-                <span
-                  onClick={handleConnect}
-                  className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-solid border-primary px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-500 cursor-pointer"
+                <p
+                  onClick={user.signIn}
+                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Connect Wallet
-                </span>
+                  Sign in
+                </p>
               )}
+              <Link
+                href="generate"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                Generate
+              </Link>
+              <Link
+                href="creator"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                Creator Pass
+              </Link>
+
+              <div
+                className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                onClick={() => {
+                  setCreditsModalTrigger(true);
+                }}
+              >
+                Credits
+              </div>
+              <span
+                onClick={() => setFeedbackModalTrigger(true)}
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                Feedback
+              </span>
             </div>
           </div>
-        </div>
-
-        <Transition
-          as={Fragment}
-          enter="duration-200 ease-out"
-          enterFrom="opacity-0 scale-95"
-          enterTo="opacity-100 scale-100"
-          leave="duration-100 ease-in"
-          leaveFrom="opacity-100 scale-100"
-          leaveTo="opacity-0 scale-95"
-        >
-          <Popover.Panel
-            focus
-            className="absolute inset-x-0 top-0 origin-top-right transform p-2 transition md:hidden"
-          >
-            <div className="divide-y-2 divide-gray-50 rounded-lg bg-gray-800 shadow-lg">
-              <div className="space-y-3 py-6 px-5">
-                {/* <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                  <a
-                    href="#"
-                    className="text-base font-medium text-gray-300 hover:text-gray-400"
-                  >
-                    About Us
-                  </a>
-                  <a
-                    href="#"
-                    className="text-base font-medium text-gray-300 hover:text-gray-400"
-                  >
-                    How it works
-                  </a>
-                  <a
-                    href="/generate"
-                    className="text-base font-medium text-gray-300 hover:text-gray-400"
-                  >
-                    Generate
-                  </a>
-                </div> */}
-                <div className="flex w-full items-center justify-center px-4 py-2  bg-black/[0.3]">
-                  {moralisAuth?.auth?.currentUser && (
-                    <span
-                      className={`cursor-pointer ${
-                        !credits
-                          ? "text-red-500 hover:text-red-600 "
-                          : "text-green-500 hover:text-green-600 "
-                      }`}
-                      onClick={() => {
-                        setCreditsModalTrigger(true);
-                      }}
-                    >
-                      {credits === 0
-                        ? "Out of Credits"
-                        : credits === 1
-                        ? "1 Credit"
-                        : `${credits} Credits`}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  {moralisAuth?.auth?.currentUser ? (
-                    <span
-                      onClick={handleDisconnect}
-                      className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
-                    >
-                      Disconnect Wallet
-                    </span>
-                  ) : (
-                    <span
-                      onClick={handleConnect}
-                      className="flex w-full items-center justify-center px-4 py-2 text-base font-medium text-gray-300 shadow-sm hover:text-gray-400 bg-black/[0.3] cursor-pointer"
-                    >
-                      Connect Wallet
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Popover.Panel>
-        </Transition>
-      </Popover>
-    </div>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
   );
 }

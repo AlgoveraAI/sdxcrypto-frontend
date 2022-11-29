@@ -8,7 +8,7 @@ type Props = {
 export default function HowItWorks({ howitworksRef }: Props) {
   return (
     <div
-      className="relative overflow-hidden bg-white pb-24"
+      className="relative overflow-hidden bg-gray-50 py-24"
       ref={howitworksRef}
     >
       <div className="relative">
@@ -28,7 +28,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
             <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
               <Image
                 className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2 lg:max-w-none "
-                src={require("../assets/howitworks/1.png")}
+                src={require("../../assets/howitworks/1.png")}
                 alt="Inbox user interface"
                 width={512}
                 height={512}
@@ -51,7 +51,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
             <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
               <Image
                 className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2"
-                src={require("../assets/howitworks/2.png")}
+                src={require("../../assets/howitworks/2.png")}
                 alt="Customer profile user interface"
                 width={512}
                 height={512}
@@ -75,7 +75,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
           <div className="px-6 sm:px-0 lg:relative lg:m-0 lg:h-full lg:px-0">
             <Image
               className="w-full mx-auto rounded-xl shadow-xl lg:relative lg:top-1/2 lg:transform lg:-translate-y-1/2 lg:max-w-none "
-              src={require("../assets/howitworks/3.png")}
+              src={require("../../assets/howitworks/3.png")}
               alt="Inbox user interface"
               width={512}
               height={512}
@@ -90,7 +90,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
           onClick={() => {
             window.location.href = "/generate";
           }}
-          className="inline-flex items-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary-darker md:py-3 md:px-8 md:text-lg"
+          className="inline-flex items-center rounded-md bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white shadow-md md:py-3 md:px-8 md:text-lg"
         >
           Try it now!
         </button>

@@ -1,12 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+const config = require("../../config.json");
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-    const baseUrl = "http://3.250.11.166:8501/job/status";
+    const baseUrl = `${config.api_base_url}/job/status`;
     const headers = { "Content-Type": "application/json" };
     const paramUrl = new URL(baseUrl);
     const reqBody = JSON.parse(req.body);

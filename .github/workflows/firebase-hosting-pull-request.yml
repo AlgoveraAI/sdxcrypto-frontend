@@ -8,9 +8,13 @@
 #     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
 #     runs-on: ubuntu-latest
 #     steps:
+#       - name: "Enable Firebase Experiments"
+#         run: /usr/local/bin/npx firebase-tools@latest experiments:enable webframeworks
+
 #       - uses: actions/checkout@v2
 #       - uses: FirebaseExtended/action-hosting-deploy@v0
 #         with:
+#           working-directory: ./frontend
 #           repoToken: '${{ secrets.GITHUB_TOKEN }}'
 #           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SDXCRYPTO_ALGOVERA }}'
 #           projectId: sdxcrypto-algovera
