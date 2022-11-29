@@ -3,7 +3,6 @@ import type { NextPage } from "next";
 import Select from "../components/generate/select";
 import Generate from "../components/generate/generate";
 import Mint from "../components/generate/mint";
-import CreditsModal from "../components/credits-modal";
 import { PageProps } from "../lib/types";
 
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
