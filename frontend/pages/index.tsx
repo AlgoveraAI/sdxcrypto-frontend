@@ -28,6 +28,13 @@ const Home: NextPage<PageProps> = ({
         creatorPassCost={creatorPassCost}
         creatorCreditsPerMonth={creatorCreditsPerMonth}
       />
+      <button
+        onClick={() => {
+          throw new Error("Test error");
+        }}
+      >
+        Error
+      </button>
       <Footer />
     </div>
   );
