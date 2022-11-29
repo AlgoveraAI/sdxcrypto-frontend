@@ -1,15 +1,17 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  images: {
-    domains: [
-      "images.unsplash.com",
-      "pbs.twimg.com",
-      "firebasestorage.googleapis.com",
-    ],
-  },
-};
+// const nextConfig = {
+//   reactStrictMode: true,
+//   swcMinify: true,
+//   images: {
+//     domains: [
+//       "images.unsplash.com",
+//       "pbs.twimg.com",
+//       "firebasestorage.googleapis.com",
+//     ],
+//   },
+// };
+
+// module.exports = nextConfig;
 
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
@@ -19,7 +21,15 @@ const nextConfig = {
 const { withSentryConfig } = require("@sentry/nextjs");
 
 const moduleExports = {
-  nextConfig,
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    domains: [
+      "images.unsplash.com",
+      "pbs.twimg.com",
+      "firebasestorage.googleapis.com",
+    ],
+  },
 };
 
 const sentryWebpackPluginOptions = {
