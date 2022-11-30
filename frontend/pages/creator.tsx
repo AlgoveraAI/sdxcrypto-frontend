@@ -209,7 +209,7 @@ const C: NextPage<PageProps> = ({
               <div className="mt-8 text-center justify-center">
                 <div
                   onClick={mint}
-                  className="block rounded-lg bg-gradient-to-r from-primary to-primary-lighter mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center cursor-pointer"
+                  className="block rounded-lg bg-gradient-to-r from-primary to-primary-lighter mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center cursor-pointer hover:brightness-90"
                 >
                   Mint
                 </div>

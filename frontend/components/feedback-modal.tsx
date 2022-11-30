@@ -94,7 +94,7 @@ export default function Feedback({
 
                       <div className="mt-4 text-center sm:text-left">
                         <button
-                          className="bg-gradient-to-r from-primary to-primary-lighter text-white font-bold py-2 px-4 rounded"
+                          className="bg-gradient-to-r from-primary to-primary-lighter text-white font-bold py-2 px-4 rounded hover:brightness-90"
                           onClick={submit}
                         >
                           Submit

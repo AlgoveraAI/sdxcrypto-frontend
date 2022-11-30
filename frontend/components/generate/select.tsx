@@ -57,7 +57,7 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
               <div className="mt-2">
                 <button
                   type="button"
-                  className="text-sm inline-flex items-center rounded-md border border-primary bg-gradient-to-r from-primary to-primary-lighter px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer hover:bg-primary-darker"
+                  className="text-sm inline-flex items-center rounded-md border border-primary bg-gradient-to-r from-primary to-primary-lighter px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer hover:bg-primary-darker hover:brightness-90"
                   onClick={() => setSelectedModal(model.name)}
                 >
                   Select Model

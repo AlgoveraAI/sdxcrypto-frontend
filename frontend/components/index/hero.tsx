@@ -32,22 +32,31 @@ export default function Hero() {
           <div className="mx-auto w-full max-w-7xl pt-16 pb-20 text-center lg:py-48 lg:text-left">
             <div className="px-4 sm:px-8 lg:w-1/2 xl:pr-16">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
-                <span className="block xl:inline">
-                  State-of-the-art AI Image Generation
-                </span>{" "}
+                <span className="block xl:inline">Advanced AI Workflows</span>{" "}
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-                Create any image you need with the latest generative models, no
-                code required! If you love your output, mint it for free to our
-                Community Art NFT collection.
+                <div>
+                  Use state-of-the-art AI from your browser to create art,
+                  summarise text, and more.
+                </div>
               </p>
               <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
-                <div className="rounded-md shadow w-1/2 mx-auto sm:mx-0">
+                <div className="rounded-md shadow w-[40%] mx-auto sm:mx-0">
                   <Link
                     href="/generate"
-                    className="flex w-full items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white  md:py-4 md:px-10 md:text-lg"
+                    className="flex w-full items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white md:py-4 md:px-10 md:text-lg
+                    hover:brightness-90
+                    "
                   >
-                    Start Generating
+                    Start Now
+                  </Link>
+                </div>
+                <div className="rounded-md shadow w-[40%] mx-auto sm:ml-6">
+                  <Link
+                    href="/generate"
+                    className="flex w-full items-center justify-center rounded-md shadow-md px-8 py-3 text-base font-medium text-gray-900 md:py-4 md:px-10 md:text-lg border border-primary hover:bg-gray-100"
+                  >
+                    For Developers
                   </Link>
                 </div>
               </div>
