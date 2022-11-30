@@ -56,7 +56,7 @@ export default function Hero() {
           <div className="relative h-64 w-full sm:h-72 md:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-1/2">
             <Image
               className="absolute inset-0 h-full w-full object-cover"
-              src="https://images.unsplash.com/photo-1617396900799-f4ec2b43c7ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+              src={require("../../assets/hero.png")}
               alt=""
               width={1000}
               height={1000}
