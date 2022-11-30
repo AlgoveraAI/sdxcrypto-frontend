@@ -20,7 +20,7 @@ const Home: NextPage<PageProps> = ({
 
   return (
     <div>
-      <Hero />
+      <Hero developerRef={developerRef} />
       <HowItWorks howitworksRef={howitworksRef} />
       <Pricing
         creditsModalTrigger={creditsModalTrigger}

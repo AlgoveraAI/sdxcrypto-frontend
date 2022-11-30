@@ -9,7 +9,7 @@ export default function DeveloperInfo({ ref }: Props) {
   return (
     <div>
       {/* Hero card */}
-      <div className="relative bg-gray-50">
+      <div className="relative bg-gray-50 " ref={ref}>
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
             <div className="absolute inset-0">

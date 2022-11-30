@@ -24,7 +24,11 @@ const features = [
     icon: UserCircleIcon,
   },
 ];
-export default function Hero() {
+export default function Hero({
+  developerRef,
+}: {
+  developerRef: React.RefObject<HTMLDivElement>;
+}) {
   return (
     <div>
       <div className="relative bg-gray-50">
@@ -47,16 +51,21 @@ export default function Hero() {
               <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
                   <Link
-                    href="#"
+                    href="create"
                     className="flex w-full items-center justify-center rounded-md border-none px-8 py-3 text-base font-medium text-white bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 md:py-4 md:px-10 md:text-lg"
                   >
-                    Start Creating
+                    Start Using AI
                   </Link>
                 </div>
                 <div className="mt-3 sm:mt-0 sm:ml-3">
                   <a
                     onClick={() => {
                       // scroll to developer section
+                      console.log(developerRef.current);
+                      scrollTo({
+                        top: developerRef.current?.offsetTop,
+                        behavior: "smooth",
+                      });
                     }}
                     className="flex w-full items-center justify-center rounded-md bg-gray-50 px-8 py-3 text-base font-medium text-primary hover:bg-gray-100 md:py-4 md:px-10 md:text-lg border border-primary cursor-pointer"
                   >
