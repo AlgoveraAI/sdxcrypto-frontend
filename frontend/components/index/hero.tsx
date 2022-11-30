@@ -40,8 +40,8 @@ export default function Hero({
               </h1>
               <div className="mx-auto mt-4 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
                 <div>
-                  Use state-of-the-art AI from your browser to create art,
-                  summarise text, and more.
+                  Use state-of-the-art AI to create art, summarise text, and
+                  more.
                 </div>
                 <div className="mt-4">
                   Support independant developers, who earn money from their
