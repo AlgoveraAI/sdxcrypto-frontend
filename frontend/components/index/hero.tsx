@@ -61,9 +61,7 @@ export default function Hero({
                   <a
                     onClick={() => {
                       // scroll to developer section
-                      console.log(developerRef.current);
-                      scrollTo({
-                        top: developerRef.current?.offsetTop,
+                      developerRef?.current?.scrollIntoView({
                         behavior: "smooth",
                       });
                     }}

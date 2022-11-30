@@ -2,14 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
-  ref: React.RefObject<HTMLDivElement>;
+  developerRef: React.RefObject<HTMLDivElement>;
 };
 
-export default function DeveloperInfo({ ref }: Props) {
+export default function DeveloperInfo({ developerRef }: Props) {
   return (
     <div>
       {/* Hero card */}
-      <div className="relative bg-gray-50 " ref={ref}>
+      <div className="relative bg-gray-50 " ref={developerRef}>
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
             <div className="absolute inset-0">

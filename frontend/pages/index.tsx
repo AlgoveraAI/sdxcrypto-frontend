@@ -29,7 +29,7 @@ const Home: NextPage<PageProps> = ({
         creatorPassCost={creatorPassCost}
         creatorCreditsPerMonth={creatorCreditsPerMonth}
       />
-      <DeveloperInfo ref={developerRef} />
+      <DeveloperInfo developerRef={developerRef} />
       <Footer />
     </div>
   );
