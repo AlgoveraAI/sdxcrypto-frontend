@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import Select from "../components/create/select";
-import Generate from "../components/create/generate";
-import Mint from "../components/create/mint";
+import Select from "../components/workflows/select";
+import Generate from "../components/workflows/generate";
+import Mint from "../components/workflows/mint";
 import { PageProps } from "../lib/types";
 
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
