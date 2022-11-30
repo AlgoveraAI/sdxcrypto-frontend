@@ -15,6 +15,7 @@ const moduleExports = {
       "images.unsplash.com",
       "pbs.twimg.com",
       "firebasestorage.googleapis.com",
+      "tailwindui.com",
     ],
   },
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Props = {
   creditsModalTrigger: boolean;
@@ -89,13 +89,13 @@ export default function Pricing({
                           Purchase Credits
                         </a>
                       ) : (
-                        <a
+                        <Link
                           href="creator"
                           className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90"
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Read More
-                        </a>
+                        </Link>
                       )}
                     </div>
                   </div>
