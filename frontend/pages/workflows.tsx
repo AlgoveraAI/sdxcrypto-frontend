@@ -93,6 +93,18 @@ const Workflows: NextPage<PageProps> = ({ user }) => {
         </li>
       ))}
     </ul>
+      <div className="mt-24 bg-background-darker w-full py-16">
+        <h3 className="text-2xl font-bold text-center">Are you a developer?</h3>
+        <div className="mt-8 text-center">
+            <div>
+
+                Upload your code or models to Algovera Flow and get paid whenever they're used in a workflow!
+            </div>
+            <button className="bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mt-16  text-white font-bold py-2 px-4 rounded mt-4 mx-auto block">
+                Read the Docs
+            </button>
+            </div>
+        </div>
     </div>
     </div>
   )
