@@ -1,11 +1,11 @@
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
-import Spinner from "../spinner";
+import Spinner from "../../spinner";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../../lib/firebase";
+import { db, auth } from "../../../lib/firebase";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
-import { User } from "../../lib/hooks";
+import { User } from "../../../lib/hooks";
 import { toast } from "react-toastify";
 
 type Props = {
