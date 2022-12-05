@@ -4,8 +4,7 @@ const banana = require("@banana-dev/banana-dev");
 const config = require("../../config.json");
 
 const apiKey = "df57e0ae-ef46-4483-94a1-3e8b2bdd843e";
-// const modelKey = "8bf84735-70bf-4889-ad76-7cca41cdcf40";
-const modelKey = "4b74e6d5-eded-44aa-b86a-e79ede353e0e";
+const modelKey = "9416352f-ce72-455f-871f-1ccaf0273e14";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,6 +28,10 @@ export default async function handler(
     //   console.log(data);
     //   throw new Error("txt2img response not ok");
     // }
+
+    res.status(200).json({
+      jobId: out.modelOutputs.job_uuid,
+    });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ error: error });

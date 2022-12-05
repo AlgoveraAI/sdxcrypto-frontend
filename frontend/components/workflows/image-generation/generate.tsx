@@ -14,7 +14,6 @@ type Props = {
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
-  jobStatus: string | null;
 };
 
 export default function Generate({
@@ -24,7 +23,6 @@ export default function Generate({
   prompt,
   setPrompt,
   images,
-  jobStatus,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [height, setHeight] = useState(512);
@@ -66,7 +64,7 @@ export default function Generate({
   }, []);
 
   const error = (msg: string) => {
-    toast(msg, {
+    toast.error(msg, {
       position: "bottom-left",
       type: "error",
       autoClose: 5000,
@@ -79,70 +77,78 @@ export default function Generate({
   };
 
   const generateImg = async () => {
-    setLoading(true);
 
-    if (!user.uid) {
-      error("Please sign in to generate images!");
-      return;
+    try {
+
+      setLoading(true);
+  
+      if (!user.uid) {
+        error("Please sign in to generate images!");
+        return;
+      }
+  
+      if (!selectedModal) {
+        error("Please select a model!");
+        return;
+      }
+  
+      if (prompt === "") {
+        error("Please enter a prompt!");
+        return;
+      }
+  
+      if (user.credits === null || user.credits < 1) {
+        error("You don't have enough credits!");
+        return;
+      }
+  
+      if (loading) {
+        error("Please wait for the previous image to finish generating!");
+        return;
+      }
+  
+      let baseModel;
+      if (selectedModal === "SDxMJ") {
+        baseModel = "midjourney-v4";
+      } else {
+        baseModel = "stable-diffusion-v1-5";
+      }
+  
+      toastId.current = toast("Generating image", {
+        position: "bottom-left",
+        autoClose: false,
+        closeOnClick: true,
+        theme: "dark",
+        hideProgressBar: false,
+        // show spinner
+        icon: <Spinner />,
+      });
+  
+      const res = await fetch("/api/banana", {
+        method: "POST",
+        body: JSON.stringify({
+          uid: user.uid,
+          prompt: prompt,
+          // base_model: baseModel,
+          height: height,
+          width: width,
+          inf_steps: inferenceSteps,
+          guidance_scale: guidanceScale,
+        }),
+      });
+      // todo handle out of credits error
+      // todo handle unknown api error
+      console.log("res", res);
+      if (res.status === 200) {
+        const data = await res.json();
+        console.log("job result:", data);
+        setJobId(data.jobId);
+      } else {
+        error("Error generating image");
+      }
     }
-
-    if (!selectedModal) {
-      error("Please select a model!");
-      return;
-    }
-
-    if (prompt === "") {
-      error("Please enter a prompt!");
-      return;
-    }
-
-    if (user.credits === null || user.credits < 1) {
-      error("You don't have enough credits!");
-      return;
-    }
-
-    if (loading || jobStatus === "pending" || jobStatus === "in-process") {
-      error("Please wait for the previous image to finish generating!");
-      return;
-    }
-
-    let baseModel;
-    if (selectedModal === "SDxMJ") {
-      baseModel = "midjourney-v4";
-    } else {
-      baseModel = "stable-diffusion-v1-5";
-    }
-
-    toastId.current = toast("Generating image", {
-      position: "bottom-left",
-      autoClose: false,
-      closeOnClick: true,
-      theme: "dark",
-      hideProgressBar: false,
-      // show spinner
-      icon: <Spinner />,
-    });
-
-    const res = await fetch("/api/txt2img", {
-      method: "POST",
-      body: JSON.stringify({
-        uid: user.uid,
-        prompt: prompt,
-        base_model: baseModel,
-        height: height,
-        width: width,
-        inf_steps: inferenceSteps,
-        guidance_scale: guidanceScale,
-      }),
-    });
-    // todo handle out of credits error
-    // todo handle unknown api error
-    console.log("res", res);
-    if (res.status === 200) {
-      const data = await res.json();
-      console.log("job result:", data);
-      setJobId(data.jobId);
-    } else {
+    catch (e) {
+      console.error("Erorr generating image", e);
       error("Error generating image");
     }
   };
