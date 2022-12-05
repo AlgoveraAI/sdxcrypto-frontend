@@ -55,20 +55,20 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
           </div>
           <Popover.Group as="nav" className="hidden space-x-10 md:flex">
             <Link
-              href="generate"
+              href="/workflows"
               className={`text-base font-medium text-gray-50  ${
-                currentPage === "/generate" ? "" : ""
+                currentPage === "/workflows" ? "" : ""
               }`}
             >
-              Generate
+              AI Workflows
             </Link>
             <Link
-              href="creator"
+              href="/access"
               className={`text-base font-medium text-gray-50  ${
-                currentPage === "/creator" ? "" : ""
+                currentPage === "/access" ? "" : ""
               }`}
             >
-              Creator Pass
+              Access Pass
             </Link>
             <span
               onClick={() => setFeedbackModalTrigger(true)}
@@ -189,16 +189,16 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                 </p>
               )}
               <Link
-                href="generate"
+                href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
-                Generate
+                AI Workflows
               </Link>
               <Link
-                href="creator"
+                href="/access"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
-                Creator Pass
+                Access Pass
               </Link>
 
               <div

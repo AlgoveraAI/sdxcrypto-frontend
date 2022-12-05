@@ -24,31 +24,51 @@ const features = [
     icon: UserCircleIcon,
   },
 ];
-export default function Hero() {
+export default function Hero({
+  developerRef,
+}: {
+  developerRef: React.RefObject<HTMLDivElement>;
+}) {
   return (
     <div>
       <div className="relative bg-gray-50">
-        <main className="lg:relative">
+        <div className="lg:relative">
           <div className="mx-auto w-full max-w-7xl pt-16 pb-20 text-center lg:py-48 lg:text-left">
             <div className="px-4 sm:px-8 lg:w-1/2 xl:pr-16">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
-                <span className="block xl:inline">
-                  State-of-the-art AI Image Generation
-                </span>{" "}
+                <span className="block xl:inline">Advanced AI Workflows</span>{" "}
               </h1>
-              <p className="mx-auto mt-3 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
-                Create any image you need with the latest generative models, no
-                code required! If you love your output, mint it for free to our
-                Community Art NFT collection.
-              </p>
-              <div className="mt-10 sm:flex sm:justify-center lg:justify-start">
-                <div className="rounded-md shadow w-1/2 mx-auto sm:mx-0">
+              <div className="mx-auto mt-4 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
+                <div>
+                  Use state-of-the-art AI to create art, summarise text, and
+                  more.
+                </div>
+                <div className="mt-4">
+                  Support independant developers, who earn money from their
+                  models and code.
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                <div className="rounded-md shadow">
                   <Link
-                    href="/generate"
-                    className="flex w-full items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-8 py-3 text-base font-medium text-white  md:py-4 md:px-10 md:text-lg"
+                    href="/workflows"
+                    className="flex w-full items-center justify-center rounded-md border-none px-8 py-3 text-base font-medium text-white bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 md:py-4 md:px-10 md:text-lg"
                   >
-                    Start Generating
+                    Start Using AI
                   </Link>
+                </div>
+                <div className="mt-3 sm:mt-0 sm:ml-3">
+                  <a
+                    onClick={() => {
+                      // scroll to developer section
+                      developerRef?.current?.scrollIntoView({
+                        behavior: "smooth",
+                      });
+                    }}
+                    className="flex w-full items-center justify-center rounded-md bg-gray-50 px-8 py-3 text-base font-medium text-primary hover:bg-gray-100 md:py-4 md:px-10 md:text-lg border border-primary cursor-pointer"
+                  >
+                    {"I'm a Developer"}
+                  </a>
                 </div>
               </div>
             </div>
@@ -56,13 +76,13 @@ export default function Hero() {
           <div className="relative h-64 w-full sm:h-72 md:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-1/2">
             <Image
               className="absolute inset-0 h-full w-full object-cover"
-              src="https://images.unsplash.com/photo-1617396900799-f4ec2b43c7ae?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+              src={require("../../assets/hero.jpeg")}
               alt=""
               width={1000}
               height={1000}
             />
           </div>
-        </main>
+        </div>
       </div>
       <div className="relative bg-white py-24 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">

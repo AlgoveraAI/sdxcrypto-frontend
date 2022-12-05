@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Props = {
   creditsModalTrigger: boolean;
@@ -83,19 +83,19 @@ export default function Pricing({
                           onClick={() => {
                             setCreditsModalTrigger(true);
                           }}
-                          className="flex items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer"
+                          className="flex items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer hover:brightness-90"
                           aria-describedby="tier-standard"
                         >
                           Purchase Credits
                         </a>
                       ) : (
-                        <a
-                          href="creator"
-                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker"
+                        <Link
+                          href="/access"
+                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90"
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Read More
-                        </a>
+                        </Link>
                       )}
                     </div>
                   </div>

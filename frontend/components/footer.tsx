@@ -4,8 +4,8 @@ import Link from "next/link";
 const navigation = {
   pages: [
     { name: "Home", href: "/" },
-    { name: "Generate", href: "/generate" },
-    { name: "Creator Pass", href: "/creator" },
+    { name: "Workflows", href: "/workflows" },
+    { name: "Access Pass", href: "/access" },
   ],
   community: [
     { name: "Discord", href: "https://discord.gg/e65RuHSDS5" },
