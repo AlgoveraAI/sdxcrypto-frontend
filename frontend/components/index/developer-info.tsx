@@ -36,7 +36,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
               <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
                 <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
                   <Link
-                    href="docs"
+                    href="https://docs.algovera.ai/docs/developer/flow%20developers/"
                     className="flex items-center justify-center rounded-md border-none bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-4 py-3 text-base font-medium text-white shadow-sm sm:px-8"
                   >
                     View Docs

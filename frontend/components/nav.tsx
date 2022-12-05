@@ -55,7 +55,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
           </div>
           <Popover.Group as="nav" className="hidden space-x-10 md:flex">
             <Link
-              href="workflows"
+              href="/workflows"
               className={`text-base font-medium text-gray-50  ${
                 currentPage === "/workflows" ? "" : ""
               }`}
@@ -63,7 +63,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
               AI Workflows
             </Link>
             <Link
-              href="access"
+              href="/access"
               className={`text-base font-medium text-gray-50  ${
                 currentPage === "/access" ? "" : ""
               }`}
@@ -189,13 +189,13 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                 </p>
               )}
               <Link
-                href="workflows"
+                href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 AI Workflows
               </Link>
               <Link
-                href="access"
+                href="/access"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 Access Pass
