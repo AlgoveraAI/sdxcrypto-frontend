@@ -77,43 +77,41 @@ export default function Generate({
   };
 
   const generateImg = async () => {
-
     try {
-
       setLoading(true);
-  
+
       if (!user.uid) {
         error("Please sign in to generate images!");
         return;
       }
-  
+
       if (!selectedModal) {
         error("Please select a model!");
         return;
       }
-  
+
       if (prompt === "") {
         error("Please enter a prompt!");
         return;
       }
-  
+
       if (user.credits === null || user.credits < 1) {
         error("You don't have enough credits!");
         return;
       }
-  
+
       if (loading) {
         error("Please wait for the previous image to finish generating!");
         return;
       }
-  
+
       let baseModel;
       if (selectedModal === "SDxMJ") {
         baseModel = "midjourney-v4";
       } else {
         baseModel = "stable-diffusion-v1-5";
       }
-  
+
       toastId.current = toast("Generating image", {
         position: "bottom-left",
         autoClose: false,
@@ -123,7 +121,7 @@ export default function Generate({
         // show spinner
         icon: <Spinner />,
       });
-  
+
       const res = await fetch("/api/banana", {
         method: "POST",
         body: JSON.stringify({
@@ -141,13 +139,12 @@ export default function Generate({
       console.log("res", res);
       if (res.status === 200) {
         const data = await res.json();
-        console.log("job result:", data);
+        console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
       } else {
         error("Error generating image");
       }
-    }
-    catch (e) {
+    } catch (e) {
       console.error("Erorr generating image", e);
       error("Error generating image");
     }
