@@ -16,6 +16,8 @@ type Props = {
   images: string[];
 };
 
+const EXPECTED_TIME = 30;
+
 export default function Generate({
   user,
   selectedModal,
@@ -24,13 +26,15 @@ export default function Generate({
   setPrompt,
   images,
 }: Props) {
+  // app vars
   const [loading, setLoading] = useState(false);
+  const toastId = useRef<any>(null);
+
+  // model params
   const [height, setHeight] = useState(512);
   const [width, setWidth] = useState(512);
   const [inferenceSteps, setInferenceSteps] = useState(50);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
-
-  const toastId = useRef<any>(null);
 
   const imgLoaded = () => {
     setLoading(false);
@@ -122,6 +126,28 @@ export default function Generate({
         icon: <Spinner />,
       });
 
+      const startTime = Date.now();
+      let warningToastId: any = null;
+
+      const checkTimeTaken = () => {
+        if (!warningToastId) {
+          const timeTaken = Date.now() - startTime;
+          console.log(timeTaken);
+          if (timeTaken > EXPECTED_TIME) {
+            warningToastId = toast.warning(
+              "Sorry, your render is taking longer than expected. Our servers are busy!",
+              {
+                position: "bottom-left",
+                theme: "dark",
+                autoClose: false,
+              }
+            );
+          }
+        }
+      };
+
+      const interval = setInterval(checkTimeTaken, 5000);
+
       const res = await fetch("/api/banana", {
         method: "POST",
         body: JSON.stringify({
@@ -143,6 +169,14 @@ export default function Generate({
         setJobId(data.jobId);
       } else {
         error("Error generating image");
+      }
+
+      // clear interval
+      clearInterval(interval);
+
+      // clear warning toast
+      if (warningToastId) {
+        toast.dismiss(warningToastId);
       }
     } catch (e) {
       console.error("Erorr generating image", e);
