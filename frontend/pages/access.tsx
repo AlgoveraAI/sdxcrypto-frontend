@@ -35,16 +35,16 @@ const C: NextPage<PageProps> = ({
       description: `${creatorCreditsPerMonth} credits per month for ${creatorSubscriptionLength} months`,
     },
     {
-      name: "Minting",
-      description: "Mint your AI art as an NFT for free",
+      name: "Priority support",
+      description: "Get higher priority support from the core team",
     },
     {
       name: "Early Access",
-      description: "Be the first to use new models",
+      description: "Be the first to use new models and workflows",
     },
     {
       name: "Community",
-      description: "Access a holders-only Discord channel",
+      description: "NFT-gated Discord channel, events and rewards",
     },
   ];
 
