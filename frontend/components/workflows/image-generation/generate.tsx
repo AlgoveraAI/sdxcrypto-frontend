@@ -16,7 +16,7 @@ type Props = {
   images: string[];
 };
 
-const EXPECTED_TIME = 30;
+const EXPECTED_TIME = 30000;
 
 export default function Generate({
   user,
