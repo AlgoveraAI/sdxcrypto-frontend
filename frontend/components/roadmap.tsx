@@ -2,44 +2,37 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 
 const features = [
   {
-    name: "Invite team members",
+    name: "Multiple Workflows",
     description:
-      "Quam a velit animi fuga ad. Accusamus consectetur nulla perferendis quam. Aperiam error iusto id eos.",
+      "Use one credit system to access multiple workflows on the platform. Interact with AI to generate and automate your work.",
   },
   {
-    name: "Notifications",
-    description:
-      "Ut excepturi sequi et corrupti. Quidem est non ipsam sunt voluptatem. Velit dicta iusto. Molestiae.",
+    name: "Prompt Suggestions",
+    description: "Quickly access the most popular prompts.",
   },
   {
-    name: "List view",
+    name: "Third-Party Service Integrations",
     description:
-      "Quis ratione necessitatibus ullam id animi iure accusamus debitis voluptas. Cumque debitis exercitationem.",
+      "Include third-party services and tools like Discourse, Twitter, Discord, Notion, etc. in your workflows.",
   },
   {
-    name: "Boards",
-    description:
-      "Quae et accusantium quo molestiae sed sit ut quo. Quidem omnis iure et maiores porro. Eligendi deserunt.",
+    name: "Web3 Integrations",
+    description: "Use AI workflows to automate Web3 actions and tasks.",
   },
   {
-    name: "Keyboard shortcuts",
+    name: "GUI for Workflows",
     description:
-      "Optio assumenda eos neque. Quaerat temporibus dicta provident. Quia unde quo aut aut molestiae sit..",
+      "Visualize and build workflows easily with a graphical user interface.",
   },
   {
-    name: "Reporting",
+    name: "Google Auth & Fiat Payment",
     description:
       "Excepturi sed quo mollitia voluptatibus. Qui quo ut nihil quo. Dolor at dignissimos ea voluptatem.",
   },
   {
-    name: "Calendars",
+    name: "API for Workflows",
     description:
-      "Illum nesciunt odio. Dolorem nobis labore eveniet consequatur quas aut delectus molestias. Qui recusandae.",
-  },
-  {
-    name: "Mobile app",
-    description:
-      "Aut velit est eius dolore repudiandae. Vitae temporibus amet possimus mollitia. Quia molestiae rerum.",
+      "Embed your workflow or parts of your workflow in an application by generating an API endpoint.",
   },
 ];
 
