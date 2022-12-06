@@ -22,7 +22,7 @@ const features = [
   {
     name: "GUI for Workflows",
     description:
-      "Visualize and build workflows easily with a graphical user interface.",
+      "Easy-to-use drag-and-drop interface for building and managing AI workflows.",
   },
   {
     name: "Google Auth & Fiat Payment",
@@ -33,6 +33,11 @@ const features = [
     name: "API for Workflows",
     description:
       "Embed your workflow or parts of your workflow in an application by generating an API endpoint.",
+  },
+  {
+    name: "Collaborate with Others",
+    description:
+      "Built-in collaboration and sharing capabilities, such as version control and team-based permissions",
   },
 ];
 

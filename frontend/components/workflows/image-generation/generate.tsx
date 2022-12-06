@@ -16,7 +16,7 @@ type Props = {
   images: string[];
 };
 
-const EXPECTED_TIME = 30000;
+const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
   user,
