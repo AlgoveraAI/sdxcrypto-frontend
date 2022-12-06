@@ -1,14 +1,15 @@
 import Image from "next/image";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
+import stabilityLogo from "../../../assets/workflows/stability.jpeg";
+
 const models = [
   {
     name: "Stable Diffusion (v1.5)",
     description:
       "A latent text-to-image diffusion model capable of generating photo-realistic images given any text input, cultivates autonomous freedom to produce incredible imagery, empowers billions of people to create stunning art within seconds.",
     website: "https://github.com/CompVis/stable-diffusion",
-    imageUrl:
-      "https://pbs.twimg.com/profile_images/1505934249228185602/8Wkiy3vL_400x400.jpg",
+    image: stabilityLogo,
     credits_per_use: 1,
   },
   {
@@ -16,8 +17,7 @@ const models = [
     description:
       "A latent text-to-image diffusion model capable of generating photo-realistic images given any text input, cultivates autonomous freedom to produce incredible imagery, empowers billions of people to create stunning art within seconds.",
     website: "https://github.com/CompVis/stable-diffusion",
-    imageUrl:
-      "https://pbs.twimg.com/profile_images/1505934249228185602/8Wkiy3vL_400x400.jpg",
+    image: stabilityLogo,
     credits_per_use: 1,
   },
 ];
@@ -40,7 +40,7 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
             <div className="flex-shrink-0">
               <Image
                 className="h-24 w-24 rounded-full"
-                src={model.imageUrl}
+                src={model.image}
                 alt=""
                 width={400}
                 height={400}

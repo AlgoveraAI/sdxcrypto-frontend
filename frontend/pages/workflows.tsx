@@ -8,6 +8,10 @@ import imageGenerationImage from "../assets/workflows/image-generation.png";
 import textSummarizationImage from "../assets/workflows/text-summarization.png";
 import imageCaptioningImage from "../assets/workflows/image-captioning.png";
 import imageTranslationImage from "../assets/workflows/image-to-image.png";
+import discordBotImage from "../assets/workflows/discord-bot.png";
+import discourseBotImage from "../assets/workflows/discourse-bot.png";
+import notionImage from "../assets/workflows/notion.png";
+import gifImage from "../assets/workflows/gif.gif";
 
 const workflowOptions = [
   {
@@ -45,6 +49,42 @@ const workflowOptions = [
     author: "Algovera",
     description: "Generate images from images",
     image: imageTranslationImage,
+  },
+  {
+    id: "5",
+    name: "Animation Generation",
+    href: "/workflows/animation-generation",
+    available: false,
+    author: "Algovera",
+    description: "Generate animations from text prompts",
+    image: gifImage,
+  },
+  {
+    id: "6",
+    name: "Discord Integration",
+    href: "/workflows/animation-generation",
+    available: false,
+    author: "Algovera",
+    description: "Image generation via a Discord bot",
+    image: discordBotImage,
+  },
+  {
+    id: "7",
+    name: "Notion Integration",
+    href: "/workflows/animation-generation",
+    available: false,
+    author: "Algovera",
+    description: "Store text summarisation of Discord chat on Notion",
+    image: notionImage,
+  },
+  {
+    id: "8",
+    name: "Discourse Integration",
+    href: "/workflows/animation-generation",
+    available: false,
+    author: "Algovera",
+    description: "Generate image from a discourse post",
+    image: discourseBotImage,
   },
 ];
 
@@ -93,14 +133,14 @@ const Workflows: NextPage<PageProps> = ({ user }) => {
                       {workflow.description}
                     </dd>
                     <dt className="sr-only">
-                      {workflow.available ? "Available" : "Coming Soon"}
+                      {workflow.available ? "Live" : "Coming Soon"}
                     </dt>
                     <dd className="mt-3">
                       <span
                         className={`rounded-full text-gray-50 px-2 py-1 text-xs font-medium
                 ${workflow.available ? "bg-green-600" : "bg-gray-500"}`}
                       >
-                        {workflow.available ? "Available" : "Coming Soon"}
+                        {workflow.available ? "Live" : "Coming Soon"}
                       </span>
                     </dd>
                   </dl>
@@ -122,6 +162,7 @@ const Workflows: NextPage<PageProps> = ({ user }) => {
             <Link
               href="https://docs.algovera.ai/docs/developer/flow%20developers/"
               className="bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 text-white font-bold py-2 px-4 rounded mt-8 mx-auto block w-1/2 sm:w-1/4"
+              target={"_blank"}
             >
               Read the Docs
             </Link>

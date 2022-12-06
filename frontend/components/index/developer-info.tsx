@@ -38,6 +38,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
                   <Link
                     href="https://docs.algovera.ai/docs/developer/flow%20developers/"
                     className="flex items-center justify-center rounded-md border-none bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-4 py-3 text-base font-medium text-white shadow-sm sm:px-8"
+                    target={"_blank"}
                   >
                     View Docs
                   </Link>
