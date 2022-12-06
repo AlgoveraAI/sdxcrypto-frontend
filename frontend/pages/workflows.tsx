@@ -95,7 +95,7 @@ const Workflows: NextPage<PageProps> = ({ user }) => {
       <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto">
         <ul
           role="list"
-          className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 mt-12"
+          className="grid grid-cols-1 gap-12 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 mt-12"
         >
           {workflowOptions.map((workflow) => (
             <li

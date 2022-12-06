@@ -238,19 +238,7 @@ export default function Generate({
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
           <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Width
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">Image width</div>
-              </Popup>
-            </label>
+            <label className="block font-medium text-gray-500">Width</label>
 
             <div className="mt-2 shadow-sm ">
               <div className="text-white font-bold text-left">{width}</div>
@@ -272,19 +260,7 @@ export default function Generate({
             </div>
           </div>
           <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Height
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">Image height</div>
-              </Popup>
-            </label>
+            <label className="block font-medium text-gray-500">Height</label>
 
             <div className="mt-2 shadow-sm ">
               <div className="text-white font-bold text-left">{height}</div>
