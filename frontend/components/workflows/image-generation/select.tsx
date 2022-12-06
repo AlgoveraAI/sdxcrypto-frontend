@@ -30,7 +30,7 @@ type Props = {
 export default function Select({ selectedModal, setSelectedModal }: Props) {
   return (
     <>
-      <h2 className="mb-6 text-3xl font-bold text-center">Select a Model</h2>
+      {/* <h2 className="mb-6 text-3xl font-bold text-center">Select a Model</h2> */}
       <div className="grid grid-cols-1 gap-4">
         {models.map((model) => (
           <div

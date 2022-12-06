@@ -13,7 +13,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
     >
       <div className="relative">
         <p className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl w-full text-center">
-          Example Workflow
+          Example Workflow: Image Generation
         </p>
         <div className="mt-12 lg:mt-24 lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8 max-w-md mx-auto sm:max-w-3xl sm:px-6">
           <div className="mx-auto max-w-xl px-6 sm:px-6 lg:mx-0 lg:max-w-none lg:px-0 flex flex-col justify-center">
@@ -86,7 +86,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
 
       <div className="w-full text-center mt-24">
         <Link
-          href="/workflows"
+          href="/workflows/image-generation"
           className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90 w-1/3 mx-auto"
           aria-describedby="tier-standard cursor-pointer"
         >

@@ -8,7 +8,7 @@ export default async function handler(
 ) {
   try {
     console.log("got txt2img request", req.body);
-    const baseUrl = `${config.api_base_url}/job/create/txt2img`;
+    const baseUrl = `${config.api_base_url}`;
     const headers = { "Content-Type": "application/json" };
     const response = await fetch(baseUrl, {
       method: "POST",

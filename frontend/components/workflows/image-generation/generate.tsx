@@ -33,7 +33,7 @@ export default function Generate({
   // model params
   const [height, setHeight] = useState(512);
   const [width, setWidth] = useState(512);
-  const [inferenceSteps, setInferenceSteps] = useState(50);
+  const [inferenceSteps, setInferenceSteps] = useState(25);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
 
   const imgLoaded = () => {
@@ -148,12 +148,12 @@ export default function Generate({
 
       const interval = setInterval(checkTimeTaken, 5000);
 
-      const res = await fetch("/api/banana", {
+      const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
           uid: user.uid,
           prompt: prompt,
-          // base_model: baseModel,
+          base_model: baseModel,
           height: height,
           width: width,
           inf_steps: inferenceSteps,
@@ -194,9 +194,9 @@ export default function Generate({
 
   return (
     <div className="mb-12">
-      <h2 className="mb-6 text-3xl font-bold text-center">
+      {/* <h2 className="mb-6 text-3xl font-bold text-center">
         {selectedModal ? selectedModal : "No model selected"}
-      </h2>
+      </h2> */}
       <div>
         <label className="block font-medium text-gray-500">Prompt</label>
         <div className="mt-1 md:flex shadow-sm ">
