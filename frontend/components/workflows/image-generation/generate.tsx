@@ -184,6 +184,14 @@ export default function Generate({
     }
   };
 
+  const handleInputEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      generateImg();
+    }
+  };
+
   return (
     <div className="mb-12">
       <h2 className="mb-6 text-3xl font-bold text-center">
@@ -196,7 +204,10 @@ export default function Generate({
             <input
               id="prompt"
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+              }}
+              onKeyPress={handleInputEnter}
               data-lpignore="true"
               className="block p-2 w-full shadow-sm text-sm outline-none bg-black/[0.3] border-none"
               placeholder="Abstract 3D octane render, trending on artstation..."
