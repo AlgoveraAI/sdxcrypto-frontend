@@ -15,7 +15,7 @@ export default async function handler(
       headers: headers,
       body: req.body,
     });
-    // const data = await response.json();
+    // throw new Error("test error");
     if (response.ok) {
       const job_uuid = response.headers.get("job_uuid");
       console.log("got txt2img response", job_uuid);

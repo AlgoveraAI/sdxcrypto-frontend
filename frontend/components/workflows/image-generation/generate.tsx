@@ -67,7 +67,7 @@ export default function Generate({
     );
   }, []);
 
-  const error = (msg: string) => {
+  const error = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
       position: "bottom-left",
       type: "error",
@@ -77,8 +77,10 @@ export default function Generate({
         fontSize: ".9rem",
       },
     });
-    toast.dismiss(toastId.current);
-    setLoading(false);
+    if (dismissCurrent) {
+      toast.dismiss(toastId.current);
+      setLoading(false);
+    }
   };
 
   const generateImg = async () => {
@@ -106,7 +108,10 @@ export default function Generate({
       }
 
       if (loading) {
-        error("Please wait for the previous image to finish generating!");
+        error(
+          "Please wait for the previous image to finish generating!",
+          false
+        );
         return;
       }
 
