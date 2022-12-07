@@ -9,18 +9,20 @@ import {
 
 const features = [
   {
-    name: "Create art",
-    description: "Get creative and produce your own artworks.",
+    name: "Create Art",
+    description: "Produce artwork for your brand and mint it as an NFT",
     icon: PaintBrushIcon,
   },
   {
-    name: "Design Logos",
-    description: "Make a logo for your new business or product.",
+    name: "Automate Complex Tasks",
+    description:
+      "Generate newsletters based on your community’s Discord conversations",
     icon: BriefcaseIcon,
   },
   {
-    name: "Make a profile picture",
-    description: "Build your online identity with a custom profile-picture.",
+    name: "Make Better Decisions",
+    description:
+      "Feed data to workflows to analyse information and gain insights",
     icon: UserCircleIcon,
   },
 ];
@@ -36,16 +38,19 @@ export default function Hero({
           <div className="mx-auto w-full max-w-7xl pt-16 pb-20 text-center lg:py-48 lg:text-left">
             <div className="px-4 sm:px-8 lg:w-1/2 xl:pr-16">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
-                <span className="block xl:inline">Advanced AI Workflows</span>{" "}
+                <span className="block xl:inline">
+                  Augment your intelligence and ability with AI workflows
+                </span>{" "}
               </h1>
               <div className="mx-auto mt-4 max-w-md text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
                 <div>
-                  Use state-of-the-art AI to create art, summarise text, and
-                  more.
+                  Designed to help you harness the power of AI to boost your
+                  productivity, creativity, and problem-solving.
                 </div>
                 <div className="mt-4">
-                  Support independant developers, who earn money from their
-                  models and code.
+                  Whether you are a student, a professional, a startup or an
+                  online community, our platform can help you unlock your full
+                  potential.
                 </div>
               </div>
               <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
@@ -87,7 +92,7 @@ export default function Hero({
       <div className="relative bg-white py-24 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Create Stunning Images in Seconds
+            One Platform, Multiple AI Workflows
           </p>
           {/* <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
             Deploy models on dedicated and secure infrastructure without dealing

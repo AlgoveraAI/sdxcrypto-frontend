@@ -9,7 +9,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
   return (
     <div>
       {/* Hero card */}
-      <div className="relative bg-gray-50 " ref={developerRef}>
+      <div className="relative bg-gray-50 pb-24 " ref={developerRef}>
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
             <div className="absolute inset-0">
@@ -38,6 +38,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
                   <Link
                     href="https://docs.algovera.ai/docs/developer/flow%20developers/"
                     className="flex items-center justify-center rounded-md border-none bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-4 py-3 text-base font-medium text-white shadow-sm sm:px-8"
+                    target={"_blank"}
                   >
                     View Docs
                   </Link>
@@ -55,7 +56,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
       </div>
 
       {/* Logo cloud */}
-      <div className="bg-gray-100">
+      {/* <div className="bg-gray-100">
         <div className="mx-auto max-w-7xl py-16 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-base font-semibold text-gray-500">
             Build with a range of tools and frameworks
@@ -108,7 +109,7 @@ export default function DeveloperInfo({ developerRef }: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

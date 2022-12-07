@@ -8,9 +8,9 @@ import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { firebaseApp, auth } from "../../lib/firebase";
 
 const steps = [
-  { id: "1", name: "Setup", href: "#" },
-  { id: "2", name: "Generate", href: "#" },
-  { id: "3", name: "Mint", href: "#" },
+  { id: "1", name: "Select Model", href: "#" },
+  { id: "2", name: "Generate Image", href: "#" },
+  { id: "3", name: "Mint NFT", href: "#" },
 ];
 
 const GeneratePage: NextPage<PageProps> = ({ user }) => {
@@ -59,6 +59,8 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
 
   return (
     <div className="max-w-7xl mx-auto md:px-24 px-6">
+      <h1 className="text-3xl font-bold text-center my-12">Image Generation</h1>
+
       <nav aria-label="Progress">
         <ol
           role="list"

@@ -16,7 +16,7 @@ type Props = {
   images: string[];
 };
 
-const EXPECTED_TIME = 30000;
+const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
   user,
@@ -33,7 +33,7 @@ export default function Generate({
   // model params
   const [height, setHeight] = useState(512);
   const [width, setWidth] = useState(512);
-  const [inferenceSteps, setInferenceSteps] = useState(50);
+  const [inferenceSteps, setInferenceSteps] = useState(25);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
 
   const imgLoaded = () => {
@@ -77,6 +77,7 @@ export default function Generate({
         fontSize: ".9rem",
       },
     });
+    toast.dismiss(toastId.current);
     setLoading(false);
   };
 
@@ -110,10 +111,10 @@ export default function Generate({
       }
 
       let baseModel;
-      if (selectedModal === "SDxMJ") {
-        baseModel = "midjourney-v4";
+      if (selectedModal === "Stable Diffusion (v1.5)") {
+        baseModel = "stable diffusion v1.5";
       } else {
-        baseModel = "stable-diffusion-v1-5";
+        baseModel = "stable diffusion v2-512x512";
       }
 
       toastId.current = toast("Generating image", {
@@ -148,27 +149,28 @@ export default function Generate({
 
       const interval = setInterval(checkTimeTaken, 5000);
 
-      const res = await fetch("/api/banana", {
+      const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
           uid: user.uid,
           prompt: prompt,
-          // base_model: baseModel,
-          height: height,
-          width: width,
-          inf_steps: inferenceSteps,
-          guidance_scale: guidanceScale,
+          base_model: baseModel,
+          // height: height,
+          // width: width,
+          // inf_steps: inferenceSteps,
+          // guidance_scale: guidanceScale,
         }),
       });
       // todo handle out of credits error
       // todo handle unknown api error
       console.log("res", res);
+      const data = await res.json();
       if (res.status === 200) {
-        const data = await res.json();
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
       } else {
         error("Error generating image");
+        console.log(data);
       }
 
       // clear interval
@@ -184,11 +186,19 @@ export default function Generate({
     }
   };
 
+  const handleInputEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      generateImg();
+    }
+  };
+
   return (
     <div className="mb-12">
-      <h2 className="mb-6 text-3xl font-bold text-center">
+      {/* <h2 className="mb-6 text-3xl font-bold text-center">
         {selectedModal ? selectedModal : "No model selected"}
-      </h2>
+      </h2> */}
       <div>
         <label className="block font-medium text-gray-500">Prompt</label>
         <div className="mt-1 md:flex shadow-sm ">
@@ -196,7 +206,10 @@ export default function Generate({
             <input
               id="prompt"
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+              }}
+              onKeyPress={handleInputEnter}
               data-lpignore="true"
               className="block p-2 w-full shadow-sm text-sm outline-none bg-black/[0.3] border-none"
               placeholder="Abstract 3D octane render, trending on artstation..."
@@ -238,19 +251,7 @@ export default function Generate({
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
           <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Width
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">Image width</div>
-              </Popup>
-            </label>
+            <label className="block font-medium text-gray-500">Width</label>
 
             <div className="mt-2 shadow-sm ">
               <div className="text-white font-bold text-left">{width}</div>
@@ -272,19 +273,7 @@ export default function Generate({
             </div>
           </div>
           <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Height
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">Image height</div>
-              </Popup>
-            </label>
+            <label className="block font-medium text-gray-500">Height</label>
 
             <div className="mt-2 shadow-sm ">
               <div className="text-white font-bold text-left">{height}</div>
