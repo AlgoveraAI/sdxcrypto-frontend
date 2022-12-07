@@ -9,18 +9,20 @@ import {
 
 const features = [
   {
-    name: "Create art",
-    description: "Get creative and produce your own artworks.",
+    name: "Create Art",
+    description: "Produce artwork for your brand and mint it as an NFT",
     icon: PaintBrushIcon,
   },
   {
-    name: "Design Logos",
-    description: "Make a logo for your new business or product.",
+    name: "Automate Complex Tasks",
+    description:
+      "Generate newsletters based on your community’s Discord conversations",
     icon: BriefcaseIcon,
   },
   {
-    name: "Make a profile picture",
-    description: "Build your online identity with a custom profile-picture.",
+    name: "Make Better Decisions",
+    description:
+      "Feed data to workflows to analyse information and gain insights",
     icon: UserCircleIcon,
   },
 ];
@@ -90,7 +92,7 @@ export default function Hero({
       <div className="relative bg-white py-24 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Create & Use Multiple AI Workflows
+            One Platform, Multiple AI Workflows
           </p>
           {/* <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
             Deploy models on dedicated and secure infrastructure without dealing
