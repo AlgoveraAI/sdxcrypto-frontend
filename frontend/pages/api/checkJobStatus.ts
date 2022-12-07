@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    console.log("checking status");
+    console.log("checking status", req.body);
     const branch = getCurrentGitBranch();
 
     // get the backend for this env
@@ -21,16 +21,18 @@ export default async function handler(
       apiBaseUrl = config.api_base_url_dev;
     }
     const url = `${apiBaseUrl}/generate/status`;
+    // const paramUrl = new URL(url);
+    // paramUrl.searchParams.append("job_uuid", req.body.jobId);
+    // console.log("calling", paramUrl);
+    // const reqBody = JSON.parse(req.body);
+    // for (const key in reqBody) {
+    //   paramUrl.searchParams.append(key, reqBody[key]);
+    // }
     const headers = { "Content-Type": "application/json" };
-    const paramUrl = new URL(url);
-    const reqBody = JSON.parse(req.body);
-    for (const key in reqBody) {
-      paramUrl.searchParams.append(key, reqBody[key]);
-    }
-    const response = await fetch(paramUrl, {
+    const response = await fetch(url, {
       method: "GET",
       headers: headers,
-      // body: req.body,
+      body: req.body,
     });
     const data = await response.json();
     res.status(200).json(data);

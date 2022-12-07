@@ -183,6 +183,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
             prompt={prompt}
             setPrompt={setPrompt}
             images={images}
+            jobStatus={jobStatus}
           />
         ) : (
           <Mint

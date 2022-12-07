@@ -14,6 +14,7 @@ type Props = {
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
+  jobStatus: string;
 };
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
@@ -25,6 +26,7 @@ export default function Generate({
   prompt,
   setPrompt,
   images,
+  jobStatus,
 }: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
@@ -66,6 +68,13 @@ export default function Generate({
       document.getElementById("guidanceScale") as HTMLInputElement
     );
   }, []);
+
+  useEffect(() => {
+    // catch job status errors
+    if (jobStatus === "error") {
+      error("Error monitoring job");
+    }
+  }, [jobStatus]);
 
   const error = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {

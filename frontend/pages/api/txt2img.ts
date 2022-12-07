@@ -38,7 +38,7 @@ export default async function handler(
       const job_uuid = data.job_uuid;
       console.log("got txt2img response", job_uuid);
       if (!job_uuid) {
-        console.log();
+        console.log("Invalid job_uuid", job_uuid);
       }
       res.status(200).json({
         jobId: job_uuid,
