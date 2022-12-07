@@ -160,22 +160,21 @@ export default function Generate({
           uid: user.uid,
           prompt: prompt,
           base_model: baseModel,
-          // height: height,
-          // width: width,
-          // inf_steps: inferenceSteps,
-          // guidance_scale: guidanceScale,
+          height: height,
+          width: width,
+          inf_steps: inferenceSteps,
+          guidance_scale: guidanceScale,
         }),
       });
       // todo handle out of credits error
       // todo handle unknown api error
-      console.log("res", res);
       const data = await res.json();
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
       } else {
         error("Error generating image");
-        console.log(data);
+        console.error("Error caught in api route", data);
       }
 
       // clear interval
