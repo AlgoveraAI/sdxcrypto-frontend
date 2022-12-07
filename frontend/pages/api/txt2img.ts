@@ -8,25 +8,28 @@ export default async function handler(
 ) {
   try {
     console.log("got txt2img request", req.body);
-    const baseUrl = `${config.api_base_url}`;
+    const baseUrl = `${config.api_base_url}/generate/txt2img`;
     const headers = { "Content-Type": "application/json" };
     const response = await fetch(baseUrl, {
       method: "POST",
       headers: headers,
       body: req.body,
     });
-    const data = await response.json();
+    // const data = await response.json();
     if (response.ok) {
-      console.log("got txt2img response", data);
+      const job_uuid = response.headers.get("job_uuid");
+      console.log("got txt2img response", job_uuid);
       res.status(200).json({
-        jobId: data.job_uuid,
+        jobId: job_uuid,
       });
     } else {
       console.log("txt2img response not ok");
+      const data = await response.json();
       console.log(data);
       throw new Error("txt2img response not ok");
     }
   } catch (error) {
+    console.log("unexpected error", error);
     res.status(500).json({ error: error });
   }
 }

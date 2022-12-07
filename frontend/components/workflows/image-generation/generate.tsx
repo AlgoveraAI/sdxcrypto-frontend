@@ -77,6 +77,7 @@ export default function Generate({
         fontSize: ".9rem",
       },
     });
+    toast.dismiss(toastId.current);
     setLoading(false);
   };
 
@@ -110,10 +111,10 @@ export default function Generate({
       }
 
       let baseModel;
-      if (selectedModal === "SDxMJ") {
-        baseModel = "midjourney-v4";
+      if (selectedModal === "Stable Diffusion (v1.5)") {
+        baseModel = "stable diffusion v1.5";
       } else {
-        baseModel = "stable-diffusion-v1-5";
+        baseModel = "stable diffusion v2-512x512";
       }
 
       toastId.current = toast("Generating image", {
@@ -154,21 +155,22 @@ export default function Generate({
           uid: user.uid,
           prompt: prompt,
           base_model: baseModel,
-          height: height,
-          width: width,
-          inf_steps: inferenceSteps,
-          guidance_scale: guidanceScale,
+          // height: height,
+          // width: width,
+          // inf_steps: inferenceSteps,
+          // guidance_scale: guidanceScale,
         }),
       });
       // todo handle out of credits error
       // todo handle unknown api error
       console.log("res", res);
+      const data = await res.json();
       if (res.status === 200) {
-        const data = await res.json();
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
       } else {
         error("Error generating image");
+        console.log(data);
       }
 
       // clear interval
