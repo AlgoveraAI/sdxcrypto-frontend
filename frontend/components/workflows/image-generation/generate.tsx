@@ -131,13 +131,12 @@ export default function Generate({
         baseModel = "stable diffusion v2-512x512";
       }
 
-      toastId.current = toast("Generating image", {
+      toastId.current = toast("Starting job", {
         position: "bottom-left",
         autoClose: false,
         closeOnClick: true,
         theme: "dark",
         hideProgressBar: false,
-        // show spinner
         icon: <Spinner />,
       });
 
@@ -181,6 +180,15 @@ export default function Generate({
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
+
+        toastId.current = toast("Generating image", {
+          position: "bottom-left",
+          autoClose: false,
+          closeOnClick: true,
+          theme: "dark",
+          hideProgressBar: false,
+          icon: <Spinner />,
+        });
       } else {
         error("Error generating image");
         console.error("Error caught in api route", data);
