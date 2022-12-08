@@ -144,6 +144,9 @@ export default function Generate({
       let warningToastId: any = null;
 
       const checkTimeTaken = () => {
+        // once the time passes the threshold
+        // show a warning toast
+        // once it's been shown, stop checking and dont show again
         if (!warningToastId) {
           const timeTaken = Date.now() - startTime;
           console.log(timeTaken);
