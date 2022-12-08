@@ -20,10 +20,10 @@ type SignatureInfo = {
 
 const C: NextPage<PageProps> = ({
   user,
-  creatorContract,
-  creatorPassCost,
-  creatorCreditsPerMonth,
-  creatorSubscriptionLength,
+  accessContract,
+  accessPassCost,
+  accessCreditsPerMonth,
+  accessSubscriptionLength,
 }) => {
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
@@ -32,7 +32,7 @@ const C: NextPage<PageProps> = ({
   const features = [
     {
       name: "Credits",
-      description: `${creatorCreditsPerMonth} credits per month for ${creatorSubscriptionLength} months`,
+      description: `${accessCreditsPerMonth} credits per month for ${accessSubscriptionLength} months`,
     },
     {
       name: "Priority support",
@@ -49,12 +49,12 @@ const C: NextPage<PageProps> = ({
   ];
 
   const getSignature = async () => {
-    if (user.networkName && user.account && creatorContract?.address) {
+    if (user.networkName && user.account && accessContract?.address) {
       const sigDocRef = doc(
         db,
-        "creator_pass_signatures",
+        "access_pass_signatures",
         user.networkName,
-        creatorContract.address,
+        accessContract.address,
         `token_${TOKEN_ID}`,
         "wallets",
         user.account
@@ -91,10 +91,10 @@ const C: NextPage<PageProps> = ({
 
   // once we have user account and contract address, look for a signature
   useEffect(() => {
-    if (user.account && user.networkName && creatorContract?.address) {
+    if (user.account && user.networkName && accessContract?.address) {
       getSignature();
     }
-  }, [user.account, user.networkName, creatorContract?.address]);
+  }, [user.account, user.networkName, accessContract?.address]);
 
   const mint = async () => {
     const { signer, provider, account, networkName } = user;
@@ -102,18 +102,18 @@ const C: NextPage<PageProps> = ({
       error("Please connect your wallet");
       return;
     }
-    if (!creatorContract) {
-      error("Creator contract not found");
+    if (!accessContract) {
+      error("Access contract not found");
       return;
     }
-    const mintingActive = await creatorContract.mintingActive(TOKEN_ID);
+    const mintingActive = await accessContract.mintingActive(TOKEN_ID);
     if (!mintingActive) {
-      error("Creator pass minting is not active");
+      error("Access pass minting is not active");
       return;
     }
-    const balance = await creatorContract.balanceOf(account, TOKEN_ID);
+    const balance = await accessContract.balanceOf(account, TOKEN_ID);
     if (balance > 0) {
-      error("You already have a creator pass");
+      error("You already have an access pass");
       return;
     }
 
@@ -128,7 +128,7 @@ const C: NextPage<PageProps> = ({
     let sig, mintPrice;
     if (signature === null || signature.sig === "0x") {
       sig = "0x";
-      mintPrice = await creatorContract.tokenPrices(TOKEN_ID);
+      mintPrice = await accessContract.tokenPrices(TOKEN_ID);
     } else {
       sig = signature.sig;
       mintPrice = signature.price;
@@ -138,14 +138,13 @@ const C: NextPage<PageProps> = ({
     console.log("Signature:", sig);
 
     try {
-      const methodSignature =
-        await creatorContract.interface.encodeFunctionData(
-          "mint",
-          [TOKEN_ID, sig] // TODO get real signatures for approved mints
-        );
+      const methodSignature = await accessContract.interface.encodeFunctionData(
+        "mint",
+        [TOKEN_ID, sig] // TODO get real signatures for approved mints
+      );
 
       const txnParams = {
-        to: creatorContract.address,
+        to: accessContract.address,
         value: 0, // all Community art mints are free
         data: methodSignature,
         from: account,
@@ -156,7 +155,7 @@ const C: NextPage<PageProps> = ({
       // send transaction
       setStatus("Awaiting signature");
       const txn = await signer.sendTransaction({
-        to: creatorContract.address,
+        to: accessContract.address,
         value: 0, // all Community art mints are free
         data: methodSignature,
         gasLimit: gasEstimate,
@@ -177,11 +176,11 @@ const C: NextPage<PageProps> = ({
         openseaUrl = "https://testnets.opensea.io/assets/";
       }
       setOpenseaAssetUrl(
-        openseaUrl + creatorContract.address + "/" + TOKEN_ID.toString()
+        openseaUrl + accessContract.address + "/" + TOKEN_ID.toString()
       );
 
-      // mark user as creator (to trigger checkCreatorCredits)
-      user.checkIsCreator(creatorContract);
+      // mark user as access (to trigger checkAccessCredits)
+      user.checkHasAccess(accessContract);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
@@ -200,11 +199,11 @@ const C: NextPage<PageProps> = ({
           <div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-center sm:text-6xl">
-                Premium Creator Pass
+                Algovera Access Pass
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
                 Tired of buying credits? <br /> Make a one-time NFT purchase for{" "}
-                {creatorPassCost} ETH to get monthly credits and other perks.
+                {accessPassCost} ETH to get monthly credits and other perks.
               </p>
               <div className="mt-8 text-center justify-center">
                 <div

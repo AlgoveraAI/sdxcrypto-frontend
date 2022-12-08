@@ -57,7 +57,7 @@ exports.checkGiftedCredits = async function (req, res, firestore) {
         { credits: 0, nextGiftId: nextGiftId + 1 },
         { merge: true }
       );
-      // store a record of the gift (as we do for charges and creator subs)
+      // store a record of the gift (as we do for charges and access subs)
       //  as the next number (total length of existing gifts)
       const timestampStr = new Date().toUTCString();
       const giftRef = firestore
@@ -72,14 +72,14 @@ exports.checkGiftedCredits = async function (req, res, firestore) {
   }
 };
 
-exports.checkCreatorCredits = async function (
+exports.checkAccessCredits = async function (
   req,
   res,
   admin,
   firestore,
   remoteConfig
 ) {
-  const { uid, walletAddress, isCreator } = JSON.parse(req.body);
+  const { uid, walletAddress, hasAccess } = JSON.parse(req.body);
 
   // TODO check that the uid's username == the wallet
   // since username is stored as wallet address on sign-up
@@ -94,11 +94,11 @@ exports.checkCreatorCredits = async function (
   const template = await remoteConfig.getTemplate();
 
   const createSubscriptionLength = parseInt(
-    template.parameters.creator_subscription_length.defaultValue.value
+    template.parameters.access_subscription_length.defaultValue.value
   );
 
-  const creatorMonthlyCredits = parseInt(
-    template.parameters.creator_monthly_credits.defaultValue.value
+  const accessMonthlyCredits = parseInt(
+    template.parameters.access_monthly_credits.defaultValue.value
   );
 
   // get user doc
@@ -106,42 +106,42 @@ exports.checkCreatorCredits = async function (
   const userRef = firestore.collection("users").doc(uid);
   const userSnap = await userRef.get();
 
-  // check Creator Pass monthly subscription
+  // check Access Pass monthly subscription
   // if theyre in a new month, assign them their new credits
-  // subscription starts from first login as creator, not mint date
-  // this all relies on isCreator flag sent from frontend (which has checked wallet)
+  // subscription starts from first login as access, not mint date
+  // this all relies on hasAccess flag sent from frontend (which has checked wallet)
   const currentDateUTC = new Date();
   let currentMonth = currentDateUTC.getUTCMonth();
   currentMonth++; // getUTCMonth is 0-11, we want 1-12
   const currentYear = currentDateUTC.getUTCFullYear();
   let totalNewCredits = 0; // total new credits to add from each month processed
-  let processNewCreator = false; // flag to create new user doc if needed
+  let processNewAccessPass = false; // flag to create new user doc if needed
 
-  if (isCreator) {
+  if (hasAccess) {
     if (userSnap.exists) {
       const data = userSnap.data();
-      if (data.creatorStartDate) {
-        // user is already in the db and has been processed as a creator already
-        const creatorStartDate = data.creatorStartDate;
-        const creatorStartDateUTC = new Date(creatorStartDate);
-        let creatorStartMonth = creatorStartDateUTC.getUTCMonth();
-        creatorStartMonth = creatorStartMonth + 1; // indexes from 0, get as calendar month
-        const creatorStartYear = creatorStartDateUTC.getUTCFullYear();
+      if (data.accessStartDate) {
+        // user is already in the db and has been processed as a access already
+        const accessStartDate = data.accessStartDate;
+        const accessStartDateUTC = new Date(accessStartDate);
+        let accessStartMonth = accessStartDateUTC.getUTCMonth();
+        accessStartMonth = accessStartMonth + 1; // indexes from 0, get as calendar month
+        const accessStartYear = accessStartDateUTC.getUTCFullYear();
 
-        console.log("creator start date", creatorStartDate);
-        console.log("creator start month", creatorStartMonth);
-        console.log("creator start year", creatorStartYear);
+        console.log("access start date", accessStartDate);
+        console.log("access start month", accessStartMonth);
+        console.log("access start year", accessStartYear);
 
-        // for each month since the creatorStartDate, check for a receipt of credits
+        // for each month since the accessStartDate, check for a receipt of credits
         // if credits havent been received, add them
         // if credits have been received, do nothing
         // (process every month of every year, in case they didnt login for a month)
         let monthsProcessed = 0; // once this hits NUM_MONTHS, stop processing
-        for (let y = creatorStartYear; y <= currentYear; y++) {
+        for (let y = accessStartYear; y <= currentYear; y++) {
           // determine the month to start at
           let m;
-          if (y === creatorStartYear) {
-            m = creatorStartMonth;
+          if (y === accessStartYear) {
+            m = accessStartMonth;
           } else {
             m = 1; // calendar month, not index
           }
@@ -155,25 +155,25 @@ exports.checkCreatorCredits = async function (
             }
             const docId = `${y}-${m}`;
             console.log("checking", docId);
-            // const monthRef = doc(db, "users", uid, "creator_credits", docId);
+            // const monthRef = doc(db, "users", uid, "access_credits", docId);
             // const monthSnap = await getDoc(monthRef);
             const monthRef = firestore
               .collection("users")
               .doc(uid)
-              .collection("creator_credits")
+              .collection("access_credits")
               .doc(docId);
             const monthSnap = await monthRef.get();
             if (!monthSnap.exists) {
               // month doesnt exist, add it
-              console.log("adding creator month", uid, docId);
+              console.log("adding access month", uid, docId);
               await monthRef.set(
                 {
-                  credits: creatorMonthlyCredits,
+                  credits: accessMonthlyCredits,
                   receivedAt: currentDateUTC.toUTCString(),
                 },
                 { merge: true }
               );
-              totalNewCredits += creatorMonthlyCredits;
+              totalNewCredits += accessMonthlyCredits;
             }
             // increment monthsProcessed
             monthsProcessed++;
@@ -185,42 +185,42 @@ exports.checkCreatorCredits = async function (
           { merge: true }
         );
       } else {
-        // user is already in the db but hasnt been processed as a creator yet
-        processNewCreator = true;
+        // user is already in the db but hasnt been processed as a access yet
+        processNewAccessPass = true;
       }
     } else {
       // user is not in the db yet
-      processNewCreator = true;
+      processNewAccessPass = true;
     }
-    if (processNewCreator) {
-      // create a new doc for the creator this month
+    if (processNewAccessPass) {
+      // create a new doc for the access this month
       const monthRef = firestore
         .collection("users")
         .doc(uid)
-        .collection("creator_credits")
+        .collection("access_credits")
         .doc(`${currentYear}-${currentMonth}`);
 
-      console.log("adding creator first month", uid, creatorMonthlyCredits);
+      console.log("adding access first month", uid, accessMonthlyCredits);
       // create a receipt of this months payment
       await monthRef.set(
         {
-          credits: creatorMonthlyCredits,
+          credits: accessMonthlyCredits,
           receivedAt: currentDateUTC.toUTCString(),
         },
         { merge: true }
       );
       // update the users total credits
       // (they may already have some paid or gifted credits)
-      console.log("updating credits", uid, creatorMonthlyCredits);
+      console.log("updating credits", uid, accessMonthlyCredits);
       await userRef.set(
         {
-          credits: admin.firestore.FieldValue.increment(creatorMonthlyCredits),
-          creatorStartDate: currentDateUTC.toUTCString(),
+          credits: admin.firestore.FieldValue.increment(accessMonthlyCredits),
+          accessStartDate: currentDateUTC.toUTCString(),
         },
         { merge: true }
       );
     }
   } else {
-    console.log("not a creator, no credits to add");
+    console.log("no access pass, no credits to add");
   }
 };

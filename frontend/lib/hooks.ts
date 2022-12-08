@@ -38,12 +38,12 @@ export interface User {
   moralisAuth: MoralisAuth | null;
   credits: number | null;
   loading: boolean;
-  isCreator: boolean | null;
+  hasAccess: boolean | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   setCredits: React.Dispatch<React.SetStateAction<number | null>>;
   getAccount: () => Promise<void>;
-  checkIsCreator: (contract: Contract) => Promise<void>;
+  checkHasAccess: (contract: Contract) => Promise<void>;
 }
 
 export const useUser = () => {
@@ -60,7 +60,7 @@ export const useUser = () => {
   const [account, setAccount] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isCreator, setIsCreator] = useState<boolean | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   const moralisAuth = useMoralisAuth();
 
@@ -117,11 +117,11 @@ export const useUser = () => {
     }
   };
 
-  const checkIsCreator = async (contract: Contract) => {
-    // check if the user owns a token on the Creator contract
+  const checkHasAccess = async (contract: Contract) => {
+    // check if the user owns a token on the Access contract
     if (account && contract) {
-      console.log("checking if user is a creator", account, contract);
-      let isCreator = false;
+      console.log("checking if user has an access pass", account, contract);
+      let hasAccess = false;
       const tokenIds = [0]; // todo update if launch more tokens
       for (let i = 0; i < tokenIds.length; i++) {
         const tokenId = tokenIds[i];
@@ -129,12 +129,12 @@ export const useUser = () => {
         const balance = await contract.balanceOf(account, tokenId);
         console.log("balance", balance);
         if (balance.gt(0)) {
-          isCreator = true;
+          hasAccess = true;
           break;
         }
       }
-      console.log("isCreator: ", isCreator);
-      setIsCreator(isCreator);
+      console.log("hasAccess: ", hasAccess);
+      setHasAccess(hasAccess);
     }
   };
 
@@ -196,22 +196,22 @@ export const useUser = () => {
     }
   };
 
-  const checkCreatorCredits = async () => {
-    console.log("checking creator credits");
+  const checkAccessCredits = async () => {
+    console.log("checking access credits");
     const res = await fetch(
-      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkCreatorCredits",
-      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkCreatorCredits",
+      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkAccessCredits",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkAccessCredits",
       {
         method: "POST",
         body: JSON.stringify({
           uid: uid,
           walletAddress: account,
-          isCreator: isCreator,
+          hasAccess: hasAccess,
         }),
       }
     );
     if (!res.ok) {
-      console.error("error checking creator credits", res);
+      console.error("error checking access credits", res);
     }
   };
 
@@ -222,10 +222,10 @@ export const useUser = () => {
   }, [uid, account]);
 
   useEffect(() => {
-    if (uid && account && isCreator !== null) {
-      checkCreatorCredits();
+    if (uid && account && hasAccess !== null) {
+      checkAccessCredits();
     }
-  }, [uid, account, isCreator]);
+  }, [uid, account, hasAccess]);
 
   return {
     uid,
@@ -236,11 +236,11 @@ export const useUser = () => {
     moralisAuth,
     credits,
     loading,
-    isCreator,
+    hasAccess,
     signIn,
     signOut,
     setCredits,
     getAccount,
-    checkIsCreator,
+    checkHasAccess,
   };
 };
