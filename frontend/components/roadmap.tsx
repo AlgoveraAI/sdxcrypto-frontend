@@ -37,7 +37,7 @@ const features = [
   {
     name: "Collaborate with Others",
     description:
-      "Built-in collaboration and sharing capabilities, such as version control and team-based permissions",
+      "Built-in collaboration and sharing capabilities, such as version control and team-based permissions.",
   },
 ];
 
