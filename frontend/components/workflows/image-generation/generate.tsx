@@ -87,7 +87,9 @@ export default function Generate({
       },
     });
     if (dismissCurrent) {
-      toast.dismiss(toastId.current);
+      if (toastId.current) {
+        toast.dismiss(toastId.current);
+      }
       setLoading(false);
     }
   };
