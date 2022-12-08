@@ -181,6 +181,8 @@ export default function Generate({
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
 
+        // update toast from 'Starting job' to 'Generating image'
+        toast.dismiss(toastId.current);
         toastId.current = toast("Generating image", {
           position: "bottom-left",
           autoClose: false,
