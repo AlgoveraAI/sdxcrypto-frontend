@@ -23,7 +23,7 @@ const moduleExports = {
     ],
   },
   env: {
-    GIT_BRANCH: branch,
+    GIT_BRANCH: branch, // for when VERCEL_GIT_COMMIT_REF not available (local dev)
   },
 };
 
