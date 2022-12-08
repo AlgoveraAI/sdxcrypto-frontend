@@ -6,6 +6,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require("@sentry/nextjs");
+const currentGitBranchName = require("current-git-branch");
 
 const moduleExports = {
   reactStrictMode: true,
@@ -17,6 +18,9 @@ const moduleExports = {
       "firebasestorage.googleapis.com",
       "tailwindui.com",
     ],
+  },
+  env: {
+    GIT_BRANCH: currentGitBranchName(),
   },
 };
 

@@ -25,30 +25,76 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
     // "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/0xfdad2c16a5c3551856337ca415455562683e78f6c487c8046c89e350e4435828%2Fimages%2Fd9516feba65540eb9fcb8b10d0fa28f0%2Fd9516feba65540eb9fcb8b10d0fa28f0.jpg?alt=media&token=6fcb1c0d-67fa-42a5-b04f-8313ff7c8245",
   ]);
 
-  useEffect(() => {
-    if (jobId) {
-      console.log("getting images for jobId", jobId);
-      const storage = getStorage(firebaseApp);
-      const storageRef = ref(storage, `${user.uid}/images/${jobId}`);
-      listAll(storageRef)
-        .then((res) => {
-          // get img urls
-          const imgUrls = res.items.map((itemRef) => {
-            // get public url
-            return getDownloadURL(itemRef);
+  const [jobStatus, setJobStatus] = useState("");
+  const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
+
+  const checkJobStatus = async (jobId: string) => {
+    // check the status of a job
+    const res = await fetch("/api/checkJobStatus", {
+      method: "POST",
+      body: JSON.stringify({
+        job_uuid: jobId,
+      }),
+    });
+    // parse the json
+    const data = await res.json();
+    console.log("job status:", data);
+    if (res.status === 200 && data.job_status) {
+      // set job status
+      setJobStatus(data.job_status);
+      if (data.job_status === "done") {
+        // make call to firebase storage to get all images under job
+        console.log("getting images for jobId", jobId);
+        const storage = getStorage(firebaseApp);
+        const storageRef = ref(storage, `${user.uid}/images/${jobId}`);
+        listAll(storageRef)
+          .then((res) => {
+            // get img urls
+            const imgUrls = res.items.map((itemRef) => {
+              // get public url
+              return getDownloadURL(itemRef);
+            });
+            // await requests
+            Promise.all(imgUrls).then((urls) => {
+              console.log("got img urls", urls);
+              setImages(urls);
+            });
+          })
+          .catch((err) => {
+            // firebase error
+            console.log("error getting images", err);
           });
-          // await requests
-          Promise.all(imgUrls).then((urls) => {
-            console.log("got img urls", urls);
-            setImages(urls);
-          });
-        })
-        .catch((err) => {
-          // firebase error
-          console.log("error getting images", err);
-        });
+      }
+    } else {
+      // log the error and set job status to error
+      // to clear the interval
+      console.error("error getting job status", res);
+      setJobStatus("error");
     }
-  }, [jobId]);
+  };
+
+  useEffect(() => {
+    if (jobId && user.uid) {
+      // check job status on interval
+      console.log("setting jobStatus interval");
+      // reset state here in case it's already done or error
+      // so that the clear interval effect triggers
+      setJobStatus("pending");
+      // checkJobStatus(jobId);
+      const interval = setInterval(() => {
+        checkJobStatus(jobId);
+      }, 1000);
+      setJobStatusInterval(interval);
+    }
+  }, [jobId, user.uid]);
+
+  useEffect(() => {
+    // if job is done, clear interval
+    if (jobStatus === "done" || jobStatus === "error") {
+      console.log("clearing jobStatus interval:", jobStatus);
+      clearInterval(jobStatusInterval);
+    }
+  }, [jobStatus]);
 
   useEffect(() => {
     // switch to step 2 (Generate) when a model is selected
@@ -137,6 +183,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
             prompt={prompt}
             setPrompt={setPrompt}
             images={images}
+            jobStatus={jobStatus}
           />
         ) : (
           <Mint

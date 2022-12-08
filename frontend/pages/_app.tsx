@@ -20,10 +20,12 @@ import { ToastContainer } from "react-toastify";
 import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
 
-// suppress console.log when in production
-// if (process.env.NODE_ENV !== "development") {
-//   console.log = () => {};
-// }
+// suppress console.log when in prod
+if (process.env.GIT_BRANCH === "main") {
+  console.log = () => {};
+} else {
+  console.log("Logging enabled on branch:", process.env.GIT_BRANCH);
+}
 
 declare var window: any; // to avoid typescript error on window.ethereum
 

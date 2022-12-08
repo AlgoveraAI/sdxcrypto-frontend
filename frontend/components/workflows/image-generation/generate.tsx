@@ -14,6 +14,7 @@ type Props = {
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
+  jobStatus: string;
 };
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
@@ -25,6 +26,7 @@ export default function Generate({
   prompt,
   setPrompt,
   images,
+  jobStatus,
 }: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
@@ -67,7 +69,14 @@ export default function Generate({
     );
   }, []);
 
-  const error = (msg: string) => {
+  useEffect(() => {
+    // catch job status errors
+    if (jobStatus === "error") {
+      error("Error monitoring job");
+    }
+  }, [jobStatus]);
+
+  const error = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
       position: "bottom-left",
       type: "error",
@@ -77,8 +86,10 @@ export default function Generate({
         fontSize: ".9rem",
       },
     });
-    toast.dismiss(toastId.current);
-    setLoading(false);
+    if (dismissCurrent) {
+      toast.dismiss(toastId.current);
+      setLoading(false);
+    }
   };
 
   const generateImg = async () => {
@@ -106,7 +117,10 @@ export default function Generate({
       }
 
       if (loading) {
-        error("Please wait for the previous image to finish generating!");
+        error(
+          "Please wait for the previous image to finish generating!",
+          false
+        );
         return;
       }
 
@@ -117,13 +131,12 @@ export default function Generate({
         baseModel = "stable diffusion v2-512x512";
       }
 
-      toastId.current = toast("Generating image", {
+      toastId.current = toast("Starting job", {
         position: "bottom-left",
         autoClose: false,
         closeOnClick: true,
         theme: "dark",
         hideProgressBar: false,
-        // show spinner
         icon: <Spinner />,
       });
 
@@ -155,22 +168,32 @@ export default function Generate({
           uid: user.uid,
           prompt: prompt,
           base_model: baseModel,
-          // height: height,
-          // width: width,
-          // inf_steps: inferenceSteps,
-          // guidance_scale: guidanceScale,
+          height: height,
+          width: width,
+          inf_steps: inferenceSteps,
+          guidance_scale: guidanceScale,
         }),
       });
       // todo handle out of credits error
       // todo handle unknown api error
-      console.log("res", res);
       const data = await res.json();
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
+
+        // update toast from 'Starting job' to 'Generating image'
+        toast.dismiss(toastId.current);
+        toastId.current = toast("Generating image", {
+          position: "bottom-left",
+          autoClose: false,
+          closeOnClick: true,
+          theme: "dark",
+          hideProgressBar: false,
+          icon: <Spinner />,
+        });
       } else {
         error("Error generating image");
-        console.log(data);
+        console.error("Error caught in api route", data);
       }
 
       // clear interval
