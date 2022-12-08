@@ -6,7 +6,10 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require("@sentry/nextjs");
-const currentGitBranchName = require("current-git-branch");
+
+// get git branch using cli
+const { execSync } = require("child_process");
+const branch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
 
 const moduleExports = {
   reactStrictMode: true,
@@ -20,7 +23,7 @@ const moduleExports = {
     ],
   },
   env: {
-    GIT_BRANCH: currentGitBranchName(),
+    GIT_BRANCH: branch,
   },
 };
 
