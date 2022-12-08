@@ -14,6 +14,7 @@ import {
   fetchAndActivate,
   getValue,
   getRemoteConfig,
+  RemoteConfigSettings,
 } from "firebase/remote-config";
 import { ToastContainer } from "react-toastify";
 
@@ -81,30 +82,34 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [user.provider, user.networkName]);
 
   useEffect(() => {
-    // get remote config
     const remoteConfig = getRemoteConfig(firebaseApp);
+    remoteConfig.settings.minimumFetchIntervalMillis = 0; // always fetch latest
     fetchAndActivate(remoteConfig)
       .then(() => {
         // get credit cost
         const creditCost = getValue(remoteConfig, "credit_cost").asNumber();
+        console.log("creditCost:", creditCost);
         setCreditCost(creditCost);
         // get access mint pass cost
         const accessMintCost = getValue(
           remoteConfig,
           "access_mint_cost"
         ).asNumber();
+        console.log("accessMintCost:", accessMintCost);
         setAccessPassCost(accessMintCost);
         // get access credits per month
         const accessCreditsPerMonth = getValue(
           remoteConfig,
           "access_monthly_credits"
         ).asNumber();
+        console.log("accessCreditsPerMonth:", accessCreditsPerMonth);
         setAccessCreditsPerMonth(accessCreditsPerMonth);
         // get access subscription length
         const accessSubscriptionLength = getValue(
           remoteConfig,
           "access_subscription_length"
         ).asNumber();
+        console.log("accessSubscriptionLength:", accessSubscriptionLength);
         setAccessSubscriptionLength(accessSubscriptionLength);
       })
       .catch((err) => {
