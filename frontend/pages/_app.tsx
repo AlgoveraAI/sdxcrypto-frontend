@@ -17,7 +17,7 @@ import {
   RemoteConfigSettings,
 } from "firebase/remote-config";
 import { ToastContainer } from "react-toastify";
-
+import { Analytics } from "@vercel/analytics/react";
 import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
 
@@ -158,6 +158,7 @@ export default function App({ Component, pageProps }: AppProps) {
         accessCreditsPerMonth={accessCreditsPerMonth}
         accessSubscriptionLength={accessSubscriptionLength}
       />
+      <Analytics />
     </>
   );
 }
