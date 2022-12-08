@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 const config = require("../../config.json");
-import { getCurrentGitBranch } from "../../lib/utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,7 +10,8 @@ export default async function handler(
     console.log("checking status", req.body);
 
     const headers = { "Content-Type": "application/json" };
-    const branch = getCurrentGitBranch();
+    // check git branch
+    const branch = process.env.GIT_BRANCH;
 
     // get the backend for this env
     let apiBaseUrl;
