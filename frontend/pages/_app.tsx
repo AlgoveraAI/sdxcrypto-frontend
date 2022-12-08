@@ -21,8 +21,9 @@ import { ToastContainer } from "react-toastify";
 import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
 
-// suppress console.log when in prod
-if (process.env.GIT_BRANCH === "main") {
+// suppress console.log when in production on main branch
+const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
+if (branch === "main" && process.env.NODE_ENV === "production") {
   console.log = () => {};
 } else {
   console.log("Logging enabled on branch:", process.env.GIT_BRANCH);

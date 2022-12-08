@@ -11,7 +11,7 @@ export default async function handler(
 
     const headers = { "Content-Type": "application/json" };
     // check git branch
-    const branch = process.env.GIT_BRANCH;
+    const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
 
     // get the backend for this env
     let apiBaseUrl;

@@ -10,7 +10,7 @@ export default async function handler(
     console.log("got txt2img request", req.body);
 
     // check git branch
-    const branch = process.env.GIT_BRANCH;
+    const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
 
     // get the backend for this env
     let apiBaseUrl;
@@ -18,7 +18,7 @@ export default async function handler(
       console.log("using prod backend");
       apiBaseUrl = config.api_base_url;
     } else {
-      console.log("using dev backend");
+      console.log("using dev backend", branch);
       apiBaseUrl = config.api_base_url_dev;
     }
 
