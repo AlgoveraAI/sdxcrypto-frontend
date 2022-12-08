@@ -22,7 +22,10 @@ import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
 
 // suppress console.log when in prod
-if (process.env.GIT_BRANCH === "main") {
+if (
+  process.env.GIT_BRANCH === "main" &&
+  process.env.NODE_ENV === "production"
+) {
   console.log = () => {};
 } else {
   console.log("Logging enabled on branch:", process.env.GIT_BRANCH);

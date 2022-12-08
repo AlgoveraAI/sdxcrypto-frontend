@@ -18,7 +18,7 @@ export default async function handler(
       console.log("using prod backend");
       apiBaseUrl = config.api_base_url;
     } else {
-      console.log("using dev backend");
+      console.log("using dev backend", branch);
       apiBaseUrl = config.api_base_url_dev;
     }
 
