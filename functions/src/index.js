@@ -17,11 +17,11 @@ const cors = require("cors")({ origin: true });
 // credit checks
 const {
   checkGiftedCredits,
-  checkCreatorCredits,
+  checkAccessCredits,
 } = require("./credit-handling.ts");
-exports.checkCreatorCredits = functions.https.onRequest((req, res) => {
+exports.checkAccessCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkCreatorCredits(req, res, admin, firestore, remoteConfig);
+    await checkAccessCredits(req, res, admin, firestore, remoteConfig);
     res.status(200).send("OK");
   });
 });

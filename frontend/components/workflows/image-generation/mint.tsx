@@ -218,7 +218,7 @@ export default function Mint({
 
         // get opensea url
         let openseaUrl = "";
-        if (networkName === "mainnet") {
+        if (networkName === "mainnet" || networkName === "homestead") {
           openseaUrl = "https://opensea.io/assets/";
         } else {
           openseaUrl = "https://testnets.opensea.io/assets/";

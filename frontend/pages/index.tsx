@@ -12,8 +12,8 @@ const Home: NextPage<PageProps> = ({
   creditsModalTrigger,
   setCreditsModalTrigger,
   creditCost,
-  creatorPassCost,
-  creatorCreditsPerMonth,
+  accessPassCost,
+  accessCreditsPerMonth,
 }) => {
   const howitworksRef = useRef<HTMLDivElement>(null);
   const developerRef = useRef<HTMLDivElement>(null);
@@ -26,8 +26,8 @@ const Home: NextPage<PageProps> = ({
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
         creditCost={creditCost}
-        creatorPassCost={creatorPassCost}
-        creatorCreditsPerMonth={creatorCreditsPerMonth}
+        accessPassCost={accessPassCost}
+        accessCreditsPerMonth={accessCreditsPerMonth}
       />
       <DeveloperInfo developerRef={developerRef} />
       <Footer />

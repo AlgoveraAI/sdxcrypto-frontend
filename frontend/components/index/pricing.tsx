@@ -4,16 +4,16 @@ type Props = {
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   creditCost: number | null;
-  creatorPassCost: number | null;
-  creatorCreditsPerMonth: number | null;
+  accessPassCost: number | null;
+  accessCreditsPerMonth: number | null;
 };
 
 export default function Pricing({
   creditsModalTrigger,
   setCreditsModalTrigger,
   creditCost,
-  creatorPassCost,
-  creatorCreditsPerMonth,
+  accessPassCost,
+  accessCreditsPerMonth,
 }: Props) {
   const tiers = [
     {
@@ -23,10 +23,10 @@ export default function Pricing({
       description: "Pay as you go",
     },
     {
-      name: "Creator Pass",
-      priceMonthly: `${creatorPassCost} ETH`,
+      name: "Access Pass",
+      priceMonthly: `${accessPassCost} ETH`,
       priceType: "",
-      description: `${creatorCreditsPerMonth} credits per month + perks`,
+      description: `${accessCreditsPerMonth} credits per month + perks`,
     },
   ];
 
@@ -119,7 +119,7 @@ export default function Pricing({
                 </div>
                 <div className="mt-4 text-lg text-gray-600">
                   Holders of particular NFTs also have a chance to win a free
-                  Creator Pass! <br />
+                  Access Pass! <br />
                   See Discord for more details.
                 </div>
               </div>

@@ -14,6 +14,7 @@ import {
   fetchAndActivate,
   getValue,
   getRemoteConfig,
+  RemoteConfigSettings,
 } from "firebase/remote-config";
 import { ToastContainer } from "react-toastify";
 
@@ -33,79 +34,83 @@ export default function App({ Component, pageProps }: AppProps) {
   const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
   const user = useUser();
 
-  const [creatorContract, setcreatorContract] = useState<Contract | null>(null);
+  const [accessContract, setAccessContract] = useState<Contract | null>(null);
   const [creditCost, setCreditCost] = useState<number | null>(null);
-  const [creatorPassCost, setCreatorPassCost] = useState<number | null>(null);
-  const [creatorCreditsPerMonth, setCreatorCreditsPerMonth] = useState<
+  const [accessPassCost, setAccessPassCost] = useState<number | null>(null);
+  const [accessCreditsPerMonth, setAccessCreditsPerMonth] = useState<
     number | null
   >(null);
-  const [creatorSubscriptionLength, setCreatorSubscriptionLength] = useState<
+  const [accessSubscriptionLength, setAccessSubscriptionLength] = useState<
     number | null
   >(null);
 
-  const getCreatorContract = async () => {
+  const getAccessContract = async () => {
     // get contract address from firebase
-    if (user.provider && user.networkName && creatorContract === null) {
-      console.log("Getting creator contract");
+    if (user.provider && user.networkName && accessContract === null) {
+      console.log("Getting access contract");
       const docRef = doc(db, "contracts", user.networkName);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data && data.creator) {
-          let { address, abi } = JSON.parse(data.creator);
-          console.log("Connecting to creator contract:", address);
+        if (data && data.access) {
+          let { address, abi } = JSON.parse(data.access);
+          console.log("Connecting to access contract:", address);
           console.log("ABI:", abi);
           const contract = new ethers.Contract(address, abi, user.provider);
-          setcreatorContract(contract);
+          setAccessContract(contract);
         } else {
-          console.error(`No Creator contract deployed on: ${user.networkName}`);
+          console.error(`No Access contract deployed on: ${user.networkName}`);
         }
       } else {
-        console.error(`No Creator contract deployed on: ${user.networkName}`);
+        console.error(`No Access contract deployed on: ${user.networkName}`);
       }
     }
   };
 
-  // once have wallet and creator contract, run api/handleWalletConnect
+  // once have wallet and access contract, run api/handleWalletConnect
   useEffect(() => {
-    if (user.account && creatorContract) {
-      user.checkIsCreator(creatorContract);
+    if (user.account && accessContract) {
+      user.checkHasAccess(accessContract);
     }
-  }, [user.account, creatorContract]);
+  }, [user.account, accessContract]);
 
   // get current network from moralis
   useEffect(() => {
     if (user.provider) {
-      getCreatorContract();
+      getAccessContract();
     }
   }, [user.provider, user.networkName]);
 
   useEffect(() => {
-    // get remote config
     const remoteConfig = getRemoteConfig(firebaseApp);
+    remoteConfig.settings.minimumFetchIntervalMillis = 0; // always fetch latest
     fetchAndActivate(remoteConfig)
       .then(() => {
         // get credit cost
         const creditCost = getValue(remoteConfig, "credit_cost").asNumber();
+        console.log("creditCost:", creditCost);
         setCreditCost(creditCost);
-        // get creator mint pass cost
-        const creatorMintCost = getValue(
+        // get access mint pass cost
+        const accessMintCost = getValue(
           remoteConfig,
-          "creator_mint_cost"
+          "access_mint_cost"
         ).asNumber();
-        setCreatorPassCost(creatorMintCost);
-        // get creator credits per month
-        const creatorCreditsPerMonth = getValue(
+        console.log("accessMintCost:", accessMintCost);
+        setAccessPassCost(accessMintCost);
+        // get access credits per month
+        const accessCreditsPerMonth = getValue(
           remoteConfig,
-          "creator_monthly_credits"
+          "access_monthly_credits"
         ).asNumber();
-        setCreatorCreditsPerMonth(creatorCreditsPerMonth);
-        // get creator subscription length
-        const creatorSubscriptionLength = getValue(
+        console.log("accessCreditsPerMonth:", accessCreditsPerMonth);
+        setAccessCreditsPerMonth(accessCreditsPerMonth);
+        // get access subscription length
+        const accessSubscriptionLength = getValue(
           remoteConfig,
-          "creator_subscription_length"
+          "access_subscription_length"
         ).asNumber();
-        setCreatorSubscriptionLength(creatorSubscriptionLength);
+        console.log("accessSubscriptionLength:", accessSubscriptionLength);
+        setAccessSubscriptionLength(accessSubscriptionLength);
       })
       .catch((err) => {
         console.error(err);
@@ -144,13 +149,13 @@ export default function App({ Component, pageProps }: AppProps) {
       <Component
         {...pageProps}
         user={user}
-        creatorContract={creatorContract}
+        accessContract={accessContract}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
         creditCost={creditCost}
-        creatorPassCost={creatorPassCost}
-        creatorCreditsPerMonth={creatorCreditsPerMonth}
-        creatorSubscriptionLength={creatorSubscriptionLength}
+        accessPassCost={accessPassCost}
+        accessCreditsPerMonth={accessCreditsPerMonth}
+        accessSubscriptionLength={accessSubscriptionLength}
       />
     </>
   );
