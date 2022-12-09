@@ -6,6 +6,7 @@ import Mint from "../../components/workflows/image-generation/mint";
 import { PageProps } from "../../lib/types";
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { firebaseApp, auth } from "../../lib/firebase";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const steps = [
   { id: "1", name: "Select Model", href: "#" },
@@ -13,7 +14,7 @@ const steps = [
   { id: "3", name: "Mint NFT", href: "#" },
 ];
 
-const GeneratePage: NextPage<PageProps> = ({ user }) => {
+const GeneratePage: NextPage<PageProps> = () => {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
   // store params and details for each step here
@@ -27,6 +28,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
 
   const [jobStatus, setJobStatus] = useState("");
   const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
+  const { user, error, isLoading } = useUser();
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
@@ -46,7 +48,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
         // make call to firebase storage to get all images under job
         console.log("getting images for jobId", jobId);
         const storage = getStorage(firebaseApp);
-        const storageRef = ref(storage, `${user.uid}/images/${jobId}`);
+        const storageRef = ref(storage, `${user?.sub}/images/${jobId}`);
         listAll(storageRef)
           .then((res) => {
             // get img urls
@@ -74,7 +76,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
   };
 
   useEffect(() => {
-    if (jobId && user.uid) {
+    if (jobId && user?.sub) {
       // check job status on interval
       console.log("setting jobStatus interval");
       // reset state here in case it's already done or error
@@ -86,7 +88,7 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
       }, 1000);
       setJobStatusInterval(interval);
     }
-  }, [jobId, user.uid]);
+  }, [jobId, user?.sub]);
 
   useEffect(() => {
     // if job is done, clear interval
@@ -177,7 +179,6 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
           />
         ) : currentStepIdx === 1 ? (
           <Generate
-            user={user}
             selectedModal={selectedModal}
             setJobId={setJobId}
             prompt={prompt}
@@ -187,7 +188,6 @@ const GeneratePage: NextPage<PageProps> = ({ user }) => {
           />
         ) : (
           <Mint
-            user={user}
             selectedModal={selectedModal}
             jobId={jobId}
             prompt={prompt}

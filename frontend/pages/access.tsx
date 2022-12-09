@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import CreditsModal from "../components/credits-modal";
+import { Contract } from "@ethersproject/contracts";
 import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { toast } from "react-toastify";
+const { ethers } = require("ethers");
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const accessImg = require("../assets/access.png");
 
@@ -19,8 +21,6 @@ type SignatureInfo = {
 };
 
 const C: NextPage<PageProps> = ({
-  user,
-  accessContract,
   accessPassCost,
   accessCreditsPerMonth,
   accessSubscriptionLength,
@@ -28,6 +28,9 @@ const C: NextPage<PageProps> = ({
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [signature, setSignature] = useState<SignatureInfo | null>(null);
+  const [accessContract, setAccessContract] = useState<Contract | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const { user, error, isLoading } = useUser();
 
   const features = [
     {
@@ -48,36 +51,85 @@ const C: NextPage<PageProps> = ({
     },
   ];
 
-  const getSignature = async () => {
-    if (user.networkName && user.account && accessContract?.address) {
-      const sigDocRef = doc(
-        db,
-        "access_pass_signatures",
-        user.networkName,
-        accessContract.address,
-        `token_${TOKEN_ID}`,
-        "wallets",
-        user.account
-      );
-      const sigDocSnap = await getDoc(sigDocRef);
-      if (sigDocSnap.exists()) {
-        const data = sigDocSnap.data();
-        if (data) {
-          console.log("got signature", data);
-          setSignature(data as SignatureInfo);
-        }
-      } else {
-        console.log("no signature found");
-        setSignature({
-          sig: "0x",
-          price: 0, // will get below during mint()
-          tokenId: TOKEN_ID,
-        });
-      }
-    }
+  const getAccessContract = async () => {
+    // get contract address from firebase
+    // if (user?.provider && user?.networkName && accessContract === null) {
+    //   console.log("Getting access contract");
+    //   const docRef = doc(db, "contracts", user.networkName);
+    //   const docSnap = await getDoc(docRef);
+    //   if (docSnap.exists()) {
+    //     const data = docSnap.data();
+    //     if (data && data.access) {
+    //       let { address, abi } = JSON.parse(data.access);
+    //       console.log("Connecting to access contract:", address);
+    //       console.log("ABI:", abi);
+    //       const contract = new ethers.Contract(address, abi, user.provider);
+    //       setAccessContract(contract);
+    // console.log(
+    //   "checking if user has an access pass",
+    //   user?.account,
+    //   accessContract
+    // );
+    // let hasAccess = false;
+    // const tokenIds = [0]; // todo update if launch more tokens
+    // for (let i = 0; i < tokenIds.length; i++) {
+    //   const tokenId = tokenIds[i];
+    //   console.log("checking balance", tokenId);
+    //   const balance = await accessContract.balanceOf(user?.account, tokenId);
+    //   console.log("balance", balance);
+    //   if (balance.gt(0)) {
+    //     hasAccess = true;
+    //     break;
+    //   }
+    // }
+    // console.log("hasAccess: ", hasAccess);
+    // setHasAccess(hasAccess);
+    //     } else {
+    //       console.error(`No Access contract deployed on: ${user.networkName}`);
+    //     }
+    //   } else {
+    //     console.error(`No Access contract deployed on: ${user.networkName}`);
+    //   }
+    // }
   };
 
-  const error = (msg: string) => {
+  // get current network
+  useEffect(() => {
+    if (user?.provider) {
+      getAccessContract();
+    }
+  }, [user?.provider, user?.networkName]);
+
+  const getSignature = async () => {
+    // if (user?.networkName && user?.account && accessContract?.address) {
+    //   const sigDocRef = doc(
+    //     db,
+    //     "access_pass_signatures",
+    //     user.networkName,
+    //     accessContract.address,
+    //     `token_${TOKEN_ID}`,
+    //     "wallets",
+    //     user.account
+    //   );
+    //   const sigDocSnap = await getDoc(sigDocRef);
+    //   if (sigDocSnap.exists()) {
+    //     const data = sigDocSnap.data();
+    //     if (data) {
+    //       console.log("got signature", data);
+    //       setSignature(data as SignatureInfo);
+    //     }
+    //   } else {
+    //     console.log("no signature found");
+    //     setSignature({
+    //       sig: "0x",
+    //       price: 0, // will get below during mint()
+    //       tokenId: TOKEN_ID,
+    //     });
+    //   }
+    // }
+  };
+
+  const errorToast = (msg: string) => {
     toast(msg, {
       position: "bottom-left",
       type: "error",
@@ -91,106 +143,106 @@ const C: NextPage<PageProps> = ({
 
   // once we have user account and contract address, look for a signature
   useEffect(() => {
-    if (user.account && user.networkName && accessContract?.address) {
+    if (user?.account && user?.networkName && accessContract?.address) {
       getSignature();
     }
-  }, [user.account, user.networkName, accessContract?.address]);
+  }, [user?.account, user?.networkName, accessContract?.address]);
 
-  const mint = async () => {
-    const { signer, provider, account, networkName } = user;
-    if (!signer || !provider || !account || !networkName) {
-      error("Please connect your wallet");
-      return;
-    }
-    if (!accessContract) {
-      error("Access contract not found");
-      return;
-    }
-    const mintingActive = await accessContract.mintingActive(TOKEN_ID);
-    if (!mintingActive) {
-      error("Access pass minting is not active");
-      return;
-    }
-    const balance = await accessContract.balanceOf(account, TOKEN_ID);
-    if (balance > 0) {
-      error("You already have an access pass");
-      return;
-    }
+  // const mint = async () => {
+  //   const { signer, provider, account, networkName } = user;
+  //   if (!signer || !provider || !account || !networkName) {
+  //     errorToast("Please connect your wallet");
+  //     return;
+  //   }
+  //   if (!accessContract) {
+  //     errorToast("Access contract not found");
+  //     return;
+  //   }
+  //   const mintingActive = await accessContract.mintingActive(TOKEN_ID);
+  //   if (!mintingActive) {
+  //     errorToast("Access pass minting is not active");
+  //     return;
+  //   }
+  //   const balance = await accessContract.balanceOf(account, TOKEN_ID);
+  //   if (balance > 0) {
+  //     errorToast("You already have an access pass");
+  //     return;
+  //   }
 
-    setStatus("Preparing transaction");
+  //   setStatus("Preparing transaction");
 
-    if (signature === null) {
-      // should not be null (getSignature is automatically triggered)
-      // but if it is, run again before minting so we dont miss a signature
-      await getSignature();
-    }
+  //   if (signature === null) {
+  //     // should not be null (getSignature is automatically triggered)
+  //     // but if it is, run again before minting so we dont miss a signature
+  //     await getSignature();
+  //   }
 
-    let sig, mintPrice;
-    if (signature === null || signature.sig === "0x") {
-      sig = "0x";
-      mintPrice = await accessContract.tokenPrices(TOKEN_ID);
-    } else {
-      sig = signature.sig;
-      mintPrice = signature.price;
-    }
+  //   let sig, mintPrice;
+  //   if (signature === null || signature.sig === "0x") {
+  //     sig = "0x";
+  //     mintPrice = await accessContract.tokenPrices(TOKEN_ID);
+  //   } else {
+  //     sig = signature.sig;
+  //     mintPrice = signature.price;
+  //   }
 
-    console.log("Mint price:", mintPrice.toString());
-    console.log("Signature:", sig);
+  //   console.log("Mint price:", mintPrice.toString());
+  //   console.log("Signature:", sig);
 
-    try {
-      const methodSignature = await accessContract.interface.encodeFunctionData(
-        "mint",
-        [TOKEN_ID, sig] // TODO get real signatures for approved mints
-      );
+  //   try {
+  //     const methodSignature = await accessContract.interface.encodeFunctionData(
+  //       "mint",
+  //       [TOKEN_ID, sig] // TODO get real signatures for approved mints
+  //     );
 
-      const txnParams = {
-        to: accessContract.address,
-        value: 0, // all Community art mints are free
-        data: methodSignature,
-        from: account,
-      };
-      const gasEstimate = await signer.estimateGas(txnParams);
-      console.log("Gas estimate:", gasEstimate.toString());
+  //     const txnParams = {
+  //       to: accessContract.address,
+  //       value: 0, // all Community art mints are free
+  //       data: methodSignature,
+  //       from: account,
+  //     };
+  //     const gasEstimate = await signer.estimateGas(txnParams);
+  //     console.log("Gas estimate:", gasEstimate.toString());
 
-      // send transaction
-      setStatus("Awaiting signature");
-      const txn = await signer.sendTransaction({
-        to: accessContract.address,
-        value: 0, // all Community art mints are free
-        data: methodSignature,
-        gasLimit: gasEstimate,
-      });
-      console.log("Transaction:", txn);
+  //     // send transaction
+  //     setStatus("Awaiting signature");
+  //     const txn = await signer.sendTransaction({
+  //       to: accessContract.address,
+  //       value: 0, // all Community art mints are free
+  //       data: methodSignature,
+  //       gasLimit: gasEstimate,
+  //     });
+  //     console.log("Transaction:", txn);
 
-      // wait for transaction to be mined
-      setStatus("Transaction executing");
-      const receipt = await txn.wait();
-      console.log("Receipt:", receipt);
-      setStatus("Mint successful!");
+  //     // wait for transaction to be mined
+  //     setStatus("Transaction executing");
+  //     const receipt = await txn.wait();
+  //     console.log("Receipt:", receipt);
+  //     setStatus("Mint successful!");
 
-      // get opensea url
-      let openseaUrl = "";
-      if (networkName === "mainnet" || networkName === "homestead") {
-        openseaUrl = "https://opensea.io/assets/";
-      } else {
-        openseaUrl = "https://testnets.opensea.io/assets/";
-      }
-      setOpenseaAssetUrl(
-        openseaUrl + accessContract.address + "/" + TOKEN_ID.toString()
-      );
+  //     // get opensea url
+  //     let openseaUrl = "";
+  //     if (networkName === "mainnet" || networkName === "homestead") {
+  //       openseaUrl = "https://opensea.io/assets/";
+  //     } else {
+  //       openseaUrl = "https://testnets.opensea.io/assets/";
+  //     }
+  //     setOpenseaAssetUrl(
+  //       openseaUrl + accessContract.address + "/" + TOKEN_ID.toString()
+  //     );
 
-      // mark user as access (to trigger checkAccessCredits)
-      user.checkHasAccess(accessContract);
-    } catch (error: any) {
-      if (error.message?.includes("user rejected transaction")) {
-        console.error("User rejected transaction");
-        setStatus(null);
-      } else {
-        console.error(error);
-      }
-      setStatus(null);
-    }
-  };
+  //     // mark user as access (to trigger checkAccessCredits)
+  //     user.checkHasAccess(accessContract);
+  //   } catch (error: any) {
+  //     if (error.message?.includes("user rejected transaction")) {
+  //       console.error("User rejected transaction");
+  //       setStatus(null);
+  //     } else {
+  //       console.error(error);
+  //     }
+  //     setStatus(null);
+  //   }
+  // };
 
   return (
     <div>
@@ -207,7 +259,7 @@ const C: NextPage<PageProps> = ({
               </p>
               <div className="mt-8 text-center justify-center">
                 <div
-                  onClick={mint}
+                  // onClick={mint}
                   className="block rounded-lg bg-gradient-to-r from-primary to-primary-lighter mx-auto px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm  hover:bg-primary-darker w-32 text-center cursor-pointer hover:brightness-90"
                 >
                   Mint

@@ -12,13 +12,13 @@ import {
 } from "@heroicons/react/24/outline";
 import Spinner from "./spinner";
 import FeedbackModal from "./feedback-modal";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
-  user: User;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
+export default function Nav({ setCreditsModalTrigger }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
@@ -26,13 +26,26 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
     setCurrentPage(window.location.pathname);
   }, []);
 
+  const { user, error, isLoading } = useUser();
+
+  // log user details
+  useEffect(() => {
+    if (user) {
+      console.log("user name", user.name);
+      console.log("user email", user.email);
+      console.log("user id", user.sub);
+    } else {
+      console.log("user not logged in");
+    }
+  }, [user]);
+
   return (
     <Popover className="relative bg-black/[0.3]">
-      <FeedbackModal
+      {/* <FeedbackModal
         user={user}
         feedbackModalTrigger={feedbackModalTrigger}
         setFeedbackModalTrigger={setFeedbackModalTrigger}
-      />
+      /> */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -100,29 +113,33 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                         <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
                           <div
                             className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
-                            onClick={
-                              user.loading
-                                ? () => {}
-                                : user.uid
-                                ? user.signOut
-                                : user.signIn
-                            }
+                            // onClick={
+                            //   user.loading
+                            //     ? () => {}
+                            //     : user.uid
+                            //     ? user.signOut
+                            //     : user.signIn
+                            // }
                           >
                             <WalletIcon
                               className="h-6 w-6 flex-shrink-0 "
                               aria-hidden="true"
                             />
                             <div className="ml-4">
-                              {user.loading ? (
-                                <p className="text-base font-medium relative">
-                                  Signing in...
-                                </p>
-                              ) : user.uid ? (
-                                <p className="text-base font-medium ">
+                              {user?.name ? (
+                                <a
+                                  href="/api/auth/logout"
+                                  className="text-base font-medium"
+                                >
                                   Sign Out
-                                </p>
+                                </a>
                               ) : (
-                                <p className="text-base font-medium">Sign In</p>
+                                <a
+                                  href="/api/auth/login"
+                                  className="text-base font-medium"
+                                >
+                                  Sign In
+                                </a>
                               )}
                             </div>
                           </div>
@@ -166,7 +183,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
         >
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
-              {user.loading ? (
+              {/* {user.loading ? (
                 <p
                   onClick={user.signOut}
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
@@ -187,7 +204,10 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                 >
                   Sign in
                 </p>
-              )}
+              )} */}
+              <p className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5">
+                Sign in
+              </p>
               <Link
                 href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"

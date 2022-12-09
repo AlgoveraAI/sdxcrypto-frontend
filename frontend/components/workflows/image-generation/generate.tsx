@@ -6,9 +6,9 @@ import { toast } from "react-toastify";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type Props = {
-  user: User;
   selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
@@ -20,7 +20,6 @@ type Props = {
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
-  user,
   selectedModal,
   setJobId,
   prompt,
@@ -37,6 +36,9 @@ export default function Generate({
   const [width, setWidth] = useState(512);
   const [inferenceSteps, setInferenceSteps] = useState(25);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
+
+  // user
+  const { user, error, isLoading } = useUser();
 
   const imgLoaded = () => {
     setLoading(false);
@@ -72,11 +74,11 @@ export default function Generate({
   useEffect(() => {
     // catch job status errors
     if (jobStatus === "error") {
-      error("Error monitoring job");
+      errorToast("Error monitoring job");
     }
   }, [jobStatus]);
 
-  const error = (msg: string, dismissCurrent: boolean = true) => {
+  const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
       position: "bottom-left",
       type: "error",
@@ -98,28 +100,28 @@ export default function Generate({
     try {
       setLoading(true);
 
-      if (!user.uid) {
-        error("Please sign in to generate images!");
+      if (!user) {
+        errorToast("Please sign in to generate images!");
         return;
       }
 
       if (!selectedModal) {
-        error("Please select a model!");
+        errorToast("Please select a model!");
         return;
       }
 
       if (prompt === "") {
-        error("Please enter a prompt!");
+        errorToast("Please enter a prompt!");
         return;
       }
 
-      if (user.credits === null || user.credits < 1) {
-        error("You don't have enough credits!");
-        return;
-      }
+      // if (user.credits === null || user.credits < 1) {
+      //   errorToast("You don't have enough credits!");
+      //   return;
+      // }
 
       if (loading) {
-        error(
+        errorToast(
           "Please wait for the previous image to finish generating!",
           false
         );
@@ -171,7 +173,7 @@ export default function Generate({
       const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
-          uid: user.uid,
+          uid: user?.sub,
           prompt: prompt,
           base_model: baseModel,
           height: height,
@@ -199,7 +201,7 @@ export default function Generate({
           icon: <Spinner />,
         });
       } else {
-        error("Error generating image");
+        errorToast("Error generating image");
         console.error("Error caught in api route", data);
       }
 
@@ -212,7 +214,7 @@ export default function Generate({
       }
     } catch (e) {
       console.error("Erorr generating image", e);
-      error("Error generating image");
+      errorToast("Error generating image");
     }
   };
 

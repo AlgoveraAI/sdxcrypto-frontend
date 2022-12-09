@@ -5,65 +5,59 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
-import { User } from "../../../lib/hooks";
 import { toast } from "react-toastify";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type Props = {
   selectedModal: string | null;
   jobId: string | null;
   prompt: string;
-  user: User;
   images: string[];
 };
 
-export default function Mint({
-  selectedModal,
-  jobId,
-  prompt,
-  user,
-  images,
-}: Props) {
+export default function Mint({ selectedModal, jobId, prompt, images }: Props) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [contract, setContract] = useState<Contract | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [etherscanTxnUrl, setEtherscanTxnUrl] = useState<string | null>(null);
+  const { user, error, isLoading } = useUser();
 
   const getContract = async () => {
     // get contract address from firebase
-    if (user.provider && user.networkName) {
-      const docRef = doc(db, "contracts", user.networkName);
-      if (docRef) {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data && data.community) {
-            // get the latest Community.sol deployment
-            // on the conencted network
-            let { address, abi } = JSON.parse(data.community);
-            console.log("Connecting to contract:", address);
-            console.log("ABI:", abi);
-            const contract = new ethers.Contract(address, abi, user.provider);
-            setContract(contract);
-          } else {
-            console.error(
-              "No Community contract on the connected network: " +
-                user.networkName
-            );
-          }
-        }
-      } else {
-        console.error(
-          "No Community contract on the connected network: " + user.networkName
-        );
-      }
-    } else {
-      console.error("Not connected to metamask");
-    }
+    // if (user?.provider && user?.networkName) {
+    //   const docRef = doc(db, "contracts", user.networkName);
+    //   if (docRef) {
+    //     const docSnap = await getDoc(docRef);
+    //     if (docSnap.exists()) {
+    //       const data = docSnap.data();
+    //       if (data && data.community) {
+    //         // get the latest Community.sol deployment
+    //         // on the conencted network
+    //         let { address, abi } = JSON.parse(data.community);
+    //         console.log("Connecting to contract:", address);
+    //         console.log("ABI:", abi);
+    //         const contract = new ethers.Contract(address, abi, user.provider);
+    //         setContract(contract);
+    //       } else {
+    //         console.error(
+    //           "No Community contract on the connected network: " +
+    //             user.networkName
+    //         );
+    //       }
+    //     }
+    //   } else {
+    //     console.error(
+    //       "No Community contract on the connected network: " + user.networkName
+    //     );
+    //   }
+    // } else {
+    //   console.error("Not connected to metamask");
+    // }
   };
 
-  const error = (msg: string) => {
+  const errorToast = (msg: string) => {
     toast(msg, {
       position: "bottom-left",
       type: "error",
@@ -78,170 +72,159 @@ export default function Mint({
   };
 
   // get current network from moralis
-  useEffect(() => {
-    if (user.provider) {
-      getContract();
-    }
-  }, [user.provider]);
+  // useEffect(() => {
+  //   if (user.provider) {
+  //     getContract();
+  //   }
+  // }, [user.provider]);
 
   const mint = async () => {
-    try {
-      const { signer, provider, account, networkName } = user;
-
-      if (status === "Mint successful!") {
-        error("You already minted this image!");
-        return;
-      }
-
-      setLoading(true);
-      setStatus("Preparing transaction");
-      // check we have everything needed to mint
-      if (!selectedModal) {
-        error("No image to mint");
-        return;
-      }
-      if (!images.length) {
-        error("No image to mint");
-        return;
-      }
-      if (
-        networkName === null ||
-        provider === null ||
-        signer === null ||
-        account === null
-      ) {
-        error("Connect to Metamask to mint");
-        return;
-      }
-      if (contract === null) {
-        error("No contract found");
-        return;
-      }
-      // check the desired name of the NFT
-      const name = document.getElementById("name") as HTMLInputElement;
-      if (name.value === "") {
-        error("Enter a name for your NFT!");
-        return;
-      }
-      // check the desired description of the NFT
-      const description = document.getElementById(
-        "description"
-      ) as HTMLInputElement;
-      if (description.value === "") {
-        error("Enter a description for your NFT!");
-        return;
-      }
-
-      // generate a signature
-      console.log("Generating signature");
-      const balance = await contract.balanceOf(account);
-      const resp = await fetch(
-        // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
-        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            allowlistAddress: user.account,
-            contractAddress: contract.address,
-            balance: balance,
-          }),
-        }
-      );
-      // check the response is ok
-      if (!resp.ok) {
-        error("Error generating signature");
-        console.error(await resp.text());
-        return;
-      }
-      const signature = await resp.text();
-      console.log("signature:", signature);
-
-      // estimate gas
-      const methodSignature = await contract.interface.encodeFunctionData(
-        "mint",
-        [signature]
-      );
-      const txnParams = {
-        to: contract.address,
-        value: 0, // all Community art mints are free
-        data: methodSignature,
-        from: account,
-      };
-      const gasEstimate = await signer.estimateGas(txnParams);
-      console.log("Gas estimate:", gasEstimate.toString());
-
-      // send transaction
-      try {
-        setStatus("Awaiting signature");
-        const txn = await signer.sendTransaction({
-          to: contract.address,
-          value: 0, // all Community art mints are free
-          data: methodSignature,
-          gasLimit: gasEstimate,
-        });
-        console.log("Transaction:", txn);
-
-        // wait for transaction to be mined
-        setStatus("Transaction executing");
-        const receipt = await txn.wait();
-        console.log("Receipt:", receipt);
-        setStatus("Mint successful!");
-
-        // get the token id from the emitted event
-        const tokenId = parseInt(receipt.logs[0].topics[3], 16);
-        const metadata = {
-          name: name.value,
-          description: description.value,
-          image: images[selectedIdx],
-          attributes: {
-            prompt: prompt,
-            model: selectedModal,
-          },
-        };
-
-        // upload metadata to firebase
-        // add field to nft_metadata/address document
-        const docRef = doc(db, "nft_metadata", contract.address);
-        const docSnap = await getDoc(docRef);
-
-        if (!docSnap.exists()) {
-          // create doc if it doesn't exist
-          await setDoc(docRef, {
-            [tokenId]: metadata,
-          });
-        } else {
-          // update doc if it does exist
-          await updateDoc(docRef, {
-            [tokenId]: metadata,
-          });
-        }
-
-        // get opensea url
-        let openseaUrl = "";
-        if (networkName === "mainnet" || networkName === "homestead") {
-          openseaUrl = "https://opensea.io/assets/";
-        } else {
-          openseaUrl = "https://testnets.opensea.io/assets/";
-        }
-        setOpenseaAssetUrl(
-          openseaUrl + contract.address + "/" + tokenId.toString()
-        );
-
-        await setLoading(false);
-      } catch (error: any) {
-        if (error.message?.includes("user rejected transaction")) {
-          console.error("User rejected transaction");
-          setStatus(null);
-        } else {
-          console.error(error);
-        }
-        setLoading(false);
-      }
-    } catch (error: any) {
-      console.error(error);
-      setStatus(null);
-      setLoading(false);
-    }
+    // try {
+    //   const { signer, provider, account, networkName } = user;
+    //   if (status === "Mint successful!") {
+    //     errorToast("You already minted this image!");
+    //     return;
+    //   }
+    //   setLoading(true);
+    //   setStatus("Preparing transaction");
+    //   // check we have everything needed to mint
+    //   if (!selectedModal) {
+    //     errorToast("No image to mint");
+    //     return;
+    //   }
+    //   if (!images.length) {
+    //     errorToast("No image to mint");
+    //     return;
+    //   }
+    //   if (
+    //     networkName === null ||
+    //     provider === null ||
+    //     signer === null ||
+    //     account === null
+    //   ) {
+    //     errorToast("Connect to Metamask to mint");
+    //     return;
+    //   }
+    //   if (contract === null) {
+    //     errorToast("No contract found");
+    //     return;
+    //   }
+    //   // check the desired name of the NFT
+    //   const name = document.getElementById("name") as HTMLInputElement;
+    //   if (name.value === "") {
+    //     errorToast("Enter a name for your NFT!");
+    //     return;
+    //   }
+    //   // check the desired description of the NFT
+    //   const description = document.getElementById(
+    //     "description"
+    //   ) as HTMLInputElement;
+    //   if (description.value === "") {
+    //     errorToast("Enter a description for your NFT!");
+    //     return;
+    //   }
+    //   // generate a signature
+    //   console.log("Generating signature");
+    //   const balance = await contract.balanceOf(account);
+    //   const resp = await fetch(
+    //     // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
+    //     "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
+    //     {
+    //       method: "POST",
+    //       body: JSON.stringify({
+    //         allowlistAddress: user.account,
+    //         contractAddress: contract.address,
+    //         balance: balance,
+    //       }),
+    //     }
+    //   );
+    //   // check the response is ok
+    //   if (!resp.ok) {
+    //     errorToast("Error generating signature");
+    //     console.error(await resp.text());
+    //     return;
+    //   }
+    //   const signature = await resp.text();
+    //   console.log("signature:", signature);
+    //   // estimate gas
+    //   const methodSignature = await contract.interface.encodeFunctionData(
+    //     "mint",
+    //     [signature]
+    //   );
+    //   const txnParams = {
+    //     to: contract.address,
+    //     value: 0, // all Community art mints are free
+    //     data: methodSignature,
+    //     from: account,
+    //   };
+    //   const gasEstimate = await signer.estimateGas(txnParams);
+    //   console.log("Gas estimate:", gasEstimate.toString());
+    //   // send transaction
+    //   try {
+    //     setStatus("Awaiting signature");
+    //     const txn = await signer.sendTransaction({
+    //       to: contract.address,
+    //       value: 0, // all Community art mints are free
+    //       data: methodSignature,
+    //       gasLimit: gasEstimate,
+    //     });
+    //     console.log("Transaction:", txn);
+    //     // wait for transaction to be mined
+    //     setStatus("Transaction executing");
+    //     const receipt = await txn.wait();
+    //     console.log("Receipt:", receipt);
+    //     setStatus("Mint successful!");
+    //     // get the token id from the emitted event
+    //     const tokenId = parseInt(receipt.logs[0].topics[3], 16);
+    //     const metadata = {
+    //       name: name.value,
+    //       description: description.value,
+    //       image: images[selectedIdx],
+    //       attributes: {
+    //         prompt: prompt,
+    //         model: selectedModal,
+    //       },
+    //     };
+    //     // upload metadata to firebase
+    //     // add field to nft_metadata/address document
+    //     const docRef = doc(db, "nft_metadata", contract.address);
+    //     const docSnap = await getDoc(docRef);
+    //     if (!docSnap.exists()) {
+    //       // create doc if it doesn't exist
+    //       await setDoc(docRef, {
+    //         [tokenId]: metadata,
+    //       });
+    //     } else {
+    //       // update doc if it does exist
+    //       await updateDoc(docRef, {
+    //         [tokenId]: metadata,
+    //       });
+    //     }
+    //     // get opensea url
+    //     let openseaUrl = "";
+    //     if (networkName === "mainnet" || networkName === "homestead") {
+    //       openseaUrl = "https://opensea.io/assets/";
+    //     } else {
+    //       openseaUrl = "https://testnets.opensea.io/assets/";
+    //     }
+    //     setOpenseaAssetUrl(
+    //       openseaUrl + contract.address + "/" + tokenId.toString()
+    //     );
+    //     await setLoading(false);
+    //   } catch (error: any) {
+    //     if (error.message?.includes("user rejected transaction")) {
+    //       console.error("User rejected transaction");
+    //       setStatus(null);
+    //     } else {
+    //       console.error(error);
+    //     }
+    //     setLoading(false);
+    //   }
+    // } catch (error: any) {
+    //   console.error(error);
+    //   setStatus(null);
+    //   setLoading(false);
+    // }
   };
 
   return (

@@ -60,7 +60,6 @@ export const useUser = () => {
   const [account, setAccount] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   const moralisAuth = useMoralisAuth();
 
@@ -84,57 +83,6 @@ export const useUser = () => {
       }
     } else {
       console.error("MetaMask not installed");
-    }
-  };
-
-  const signIn = async () => {
-    // use this to request a signature from metamask
-    // and get the users uid from firebase
-    if (moralisAuth) {
-      console.log("signing in");
-      try {
-        setLoading(true);
-        await signInWithMoralis(moralisAuth);
-      } catch (error) {
-        // if user rejects signature request
-        console.error(error);
-        setLoading(false);
-      }
-    }
-  };
-
-  const signOut = async () => {
-    // use this when the user wants to disconnect their wallet
-    if (uid && moralisAuth) {
-      console.log("signing out");
-      await auth.signOut();
-      // set all states to null
-      setUid(null);
-      setProvider(null);
-      setSigner(null);
-      setAccount(null);
-      setNetworkName(null);
-    }
-  };
-
-  const checkHasAccess = async (contract: Contract) => {
-    // check if the user owns a token on the Access contract
-    if (account && contract) {
-      console.log("checking if user has an access pass", account, contract);
-      let hasAccess = false;
-      const tokenIds = [0]; // todo update if launch more tokens
-      for (let i = 0; i < tokenIds.length; i++) {
-        const tokenId = tokenIds[i];
-        console.log("checking balance", tokenId);
-        const balance = await contract.balanceOf(account, tokenId);
-        console.log("balance", balance);
-        if (balance.gt(0)) {
-          hasAccess = true;
-          break;
-        }
-      }
-      console.log("hasAccess: ", hasAccess);
-      setHasAccess(hasAccess);
     }
   };
 
@@ -221,12 +169,6 @@ export const useUser = () => {
     }
   }, [uid, account]);
 
-  useEffect(() => {
-    if (uid && account && hasAccess !== null) {
-      checkAccessCredits();
-    }
-  }, [uid, account, hasAccess]);
-
   return {
     uid,
     provider,
@@ -236,11 +178,7 @@ export const useUser = () => {
     moralisAuth,
     credits,
     loading,
-    hasAccess,
-    signIn,
-    signOut,
     setCredits,
     getAccount,
-    checkHasAccess,
   };
 };

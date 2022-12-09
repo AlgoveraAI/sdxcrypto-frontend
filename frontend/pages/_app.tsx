@@ -4,11 +4,9 @@ import "react-toastify/dist/ReactToastify.css";
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import type { AppProps } from "next/app";
-import { useUser } from "../lib/hooks";
+// import { useUser } from "../lib/hooks";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../lib/firebase";
-const { ethers } = require("ethers");
-import { Contract } from "@ethersproject/contracts";
 import { firebaseApp } from "../lib/firebase";
 import {
   fetchAndActivate,
@@ -20,6 +18,8 @@ import { ToastContainer } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react";
 import CreditsModal from "../components/credits-modal";
 import Nav from "../components/nav";
+import React from "react";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
 
 // suppress console.log when in production on main branch
 const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
@@ -33,9 +33,7 @@ declare var window: any; // to avoid typescript error on window.ethereum
 
 export default function App({ Component, pageProps }: AppProps) {
   const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
-  const user = useUser();
 
-  const [accessContract, setAccessContract] = useState<Contract | null>(null);
   const [creditCost, setCreditCost] = useState<number | null>(null);
   const [accessPassCost, setAccessPassCost] = useState<number | null>(null);
   const [accessCreditsPerMonth, setAccessCreditsPerMonth] = useState<
@@ -44,43 +42,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const [accessSubscriptionLength, setAccessSubscriptionLength] = useState<
     number | null
   >(null);
-
-  const getAccessContract = async () => {
-    // get contract address from firebase
-    if (user.provider && user.networkName && accessContract === null) {
-      console.log("Getting access contract");
-      const docRef = doc(db, "contracts", user.networkName);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data && data.access) {
-          let { address, abi } = JSON.parse(data.access);
-          console.log("Connecting to access contract:", address);
-          console.log("ABI:", abi);
-          const contract = new ethers.Contract(address, abi, user.provider);
-          setAccessContract(contract);
-        } else {
-          console.error(`No Access contract deployed on: ${user.networkName}`);
-        }
-      } else {
-        console.error(`No Access contract deployed on: ${user.networkName}`);
-      }
-    }
-  };
-
-  // once have wallet and access contract, run api/handleWalletConnect
-  useEffect(() => {
-    if (user.account && accessContract) {
-      user.checkHasAccess(accessContract);
-    }
-  }, [user.account, accessContract]);
-
-  // get current network from moralis
-  useEffect(() => {
-    if (user.provider) {
-      getAccessContract();
-    }
-  }, [user.provider, user.networkName]);
 
   useEffect(() => {
     const remoteConfig = getRemoteConfig(firebaseApp);
@@ -127,30 +88,26 @@ export default function App({ Component, pageProps }: AppProps) {
       // add listener for metamask account change
       window.ethereum.on("accountsChanged", () => {
         console.log("accountsChanged");
-        user.getAccount();
-        // TODO log out moralis user
+        window.location.reload();
       });
     }
   }, []);
 
   return (
-    <>
+    <UserProvider>
       <Head>
         <title>Algovera Flow</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Nav user={user} setCreditsModalTrigger={setCreditsModalTrigger} />
-      <CreditsModal
-        user={user}
+      <Nav setCreditsModalTrigger={setCreditsModalTrigger} />
+      {/* <CreditsModal
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
-      />
+      /> */}
       <ToastContainer />
       <Component
         {...pageProps}
-        user={user}
-        accessContract={accessContract}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
         creditCost={creditCost}
@@ -159,6 +116,6 @@ export default function App({ Component, pageProps }: AppProps) {
         accessSubscriptionLength={accessSubscriptionLength}
       />
       <Analytics />
-    </>
+    </UserProvider>
   );
 }
