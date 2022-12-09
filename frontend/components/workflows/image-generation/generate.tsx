@@ -149,6 +149,7 @@ export default function Generate({
         // once the time passes the threshold
         // show a warning toast
         // once it's been shown, stop checking and dont show again
+        console.log("checking time taken");
         if (!warningToastId) {
           const timeTaken = Date.now() - startTime;
           console.log(timeTaken);
@@ -179,9 +180,10 @@ export default function Generate({
           guidance_scale: guidanceScale,
         }),
       });
-      // todo handle out of credits error
-      // todo handle unknown api error
+
       const data = await res.json();
+
+      // check the response
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);

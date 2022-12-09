@@ -1,4 +1,5 @@
 {
   "api_base_url": "http://ac570639a4b9b459d9bc33b2c2c1f210-1987316171.us-east-1.elb.amazonaws.com",
-  "api_base_url_dev": "http://a636ce8f15e7c45c0b6b1e327c51c5ca-1547917486.us-east-1.elb.amazonaws.com"
+  "api_base_url_dev_old": "http://a636ce8f15e7c45c0b6b1e327c51c5ca-1547917486.us-east-1.elb.amazonaws.com",
+  "api_base_url_dev": "http://aa6fa25722b06469ba3a3e7c84047eae-2001858411.us-east-1.elb.amazonaws.com"
 }
