@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Spinner from "../../spinner";
-import { User } from "../../../lib/hooks";
 import { toast } from "react-toastify";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";

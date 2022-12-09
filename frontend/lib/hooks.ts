@@ -102,72 +102,7 @@ export const useUser = () => {
   useEffect(() => {
     // set app to poll credits if uid is found
     // triggers when user logs in or out
-    if (uid) {
-      console.log("initiating credits poll:", uid);
-
-      const checkCredits = async () => {
-        const docRef = doc(db, "users", uid);
-        getDoc(docRef).then((docSnap) => {
-          if (docSnap.exists()) {
-            setCredits(docSnap.data().credits);
-          } else {
-            console.log("User not in firestore db", uid);
-          }
-        });
-      };
-
-      checkCredits();
-      const interval = setInterval(async () => {
-        checkCredits();
-      }, 10000);
-      return () => clearInterval(interval);
-    } else {
-      setCredits(null);
-    }
   }, [uid]);
-
-  const checkGiftedCredits = async () => {
-    console.log("checking gifted credits");
-    const res = await fetch(
-      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkGiftedCredits",
-      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkGiftedCredits",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          uid: uid,
-          walletAddress: account,
-        }),
-      }
-    );
-    if (!res.ok) {
-      console.error("error checking gifted credits", res);
-    }
-  };
-
-  const checkAccessCredits = async () => {
-    console.log("checking access credits");
-    const res = await fetch(
-      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkAccessCredits",
-      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkAccessCredits",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          uid: uid,
-          walletAddress: account,
-          hasAccess: hasAccess,
-        }),
-      }
-    );
-    if (!res.ok) {
-      console.error("error checking access credits", res);
-    }
-  };
-
-  useEffect(() => {
-    if (uid && account) {
-      checkGiftedCredits();
-    }
-  }, [uid, account]);
 
   return {
     uid,

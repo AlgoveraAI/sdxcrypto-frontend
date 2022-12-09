@@ -16,9 +16,10 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  setUID: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export default function Nav({ setCreditsModalTrigger }: NavProps) {
+export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
@@ -34,6 +35,11 @@ export default function Nav({ setCreditsModalTrigger }: NavProps) {
       console.log("user name", user.name);
       console.log("user email", user.email);
       console.log("user id", user.sub);
+      if (user.sub) {
+        setUID(user.sub);
+      } else {
+        console.error("No user id in user object", user);
+      }
     } else {
       console.log("user not logged in");
     }
@@ -126,7 +132,7 @@ export default function Nav({ setCreditsModalTrigger }: NavProps) {
                               aria-hidden="true"
                             />
                             <div className="ml-4">
-                              {user?.name ? (
+                              {user?.sub ? (
                                 <a
                                   href="/api/auth/logout"
                                   className="text-base font-medium"
@@ -183,31 +189,21 @@ export default function Nav({ setCreditsModalTrigger }: NavProps) {
         >
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
-              {/* {user.loading ? (
-                <p
-                  onClick={user.signOut}
+              {user?.sub ? (
+                <a
+                  href="/api/auth/logout"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Signing in...
-                </p>
-              ) : user.uid ? (
-                <p
-                  onClick={user.signOut}
-                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                >
-                  Sign out
-                </p>
+                  Sign Out
+                </a>
               ) : (
-                <p
-                  onClick={user.signIn}
+                <a
+                  href="/api/auth/login"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Sign in
-                </p>
-              )} */}
-              <p className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5">
-                Sign in
-              </p>
+                  Sign In
+                </a>
+              )}
               <Link
                 href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
