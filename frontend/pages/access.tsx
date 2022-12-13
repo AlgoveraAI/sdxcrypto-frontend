@@ -47,7 +47,7 @@ const C: NextPage<PageProps> = ({
     },
     {
       name: "Community",
-      description: "NFT-gated Discord channel, events and rewards",
+      description: "Token-gated Discord channel, events and rewards",
     },
   ];
 
@@ -254,7 +254,7 @@ const C: NextPage<PageProps> = ({
                 Algovera Access Pass
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
-                Tired of buying credits? <br /> Make a one-time NFT purchase for{" "}
+                Tired of buying credits? <br /> Make a one-time purchase for{" "}
                 {accessPassCost} ETH to get monthly credits and other perks.
               </p>
               <div className="mt-8 text-center justify-center">

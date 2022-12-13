@@ -63,7 +63,11 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                 width={200}
                 height={100}
               />
+              {/* Beta tag */}
             </Link>
+            <span className="text-primary text-xs font-medium bg-gray-300 rounded-md px-2 ml-4 my-auto py-1 content-center inline-block align-baseline">
+              BETA
+            </span>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
             <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-50  hover:text-gray-500 focus:outline-none">
