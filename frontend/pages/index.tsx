@@ -8,7 +8,6 @@ import Pricing from "../components/index/pricing";
 import { PageProps } from "../lib/types";
 
 const Home: NextPage<PageProps> = ({
-  user,
   creditsModalTrigger,
   setCreditsModalTrigger,
   creditCost,
