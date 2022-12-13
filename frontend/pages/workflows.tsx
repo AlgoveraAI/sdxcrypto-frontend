@@ -88,7 +88,7 @@ const workflowOptions = [
   },
 ];
 
-const Workflows: NextPage<PageProps> = ({ user }) => {
+const Workflows: NextPage<PageProps> = () => {
   return (
     <div className="my-24 mx-4">
       <h2 className="mb-6 text-3xl font-bold text-center">AI Workflows</h2>
