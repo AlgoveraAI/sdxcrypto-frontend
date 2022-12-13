@@ -117,38 +117,31 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                     <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
                       <div className="overflow-hidden rounded-lg shadow-lg">
                         <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
-                          <div
-                            className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
-                            // onClick={
-                            //   user.loading
-                            //     ? () => {}
-                            //     : user.uid
-                            //     ? user.signOut
-                            //     : user.signIn
-                            // }
+                          <Link
+                            href={
+                              user?.sub ? "/api/auth/logout" : "/api/auth/login"
+                            }
+                            className="text-base font-medium"
                           >
-                            <WalletIcon
-                              className="h-6 w-6 flex-shrink-0 "
-                              aria-hidden="true"
-                            />
-                            <div className="ml-4">
-                              {user?.sub ? (
-                                <Link
-                                  href="/api/auth/logout"
-                                  className="text-base font-medium"
-                                >
-                                  Sign Out
-                                </Link>
-                              ) : (
-                                <Link
-                                  href="/api/auth/login"
-                                  className="text-base font-medium"
-                                >
-                                  Sign In
-                                </Link>
-                              )}
+                            <div
+                              className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
+                              // onClick={
+                              //   user.loading
+                              //     ? () => {}
+                              //     : user.uid
+                              //     ? user.signOut
+                              //     : user.signIn
+                              // }
+                            >
+                              <WalletIcon
+                                className="h-6 w-6 flex-shrink-0 "
+                                aria-hidden="true"
+                              />
+                              <div className="ml-4">
+                                {user?.sub ? "Sign Out" : "Sign In"}
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                           <div
                             className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
                             onClick={() => {
