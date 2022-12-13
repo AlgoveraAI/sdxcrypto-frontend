@@ -14,16 +14,11 @@ import FeedbackModal from "./feedback-modal";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
-  credits: number | null;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   setUID: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export default function Nav({
-  credits,
-  setCreditsModalTrigger,
-  setUID,
-}: NavProps) {
+export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
@@ -53,7 +48,6 @@ export default function Nav({
     <Popover className="relative bg-black/[0.3]">
       <FeedbackModal
         uid={user?.sub || null}
-        credits={credits}
         feedbackModalTrigger={feedbackModalTrigger}
         setFeedbackModalTrigger={setFeedbackModalTrigger}
       />
