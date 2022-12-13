@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { User } from "../lib/hooks";
 import {
   WalletIcon,
   UserIcon,
@@ -123,16 +122,7 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                             }
                             className="text-base font-medium"
                           >
-                            <div
-                              className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
-                              // onClick={
-                              //   user.loading
-                              //     ? () => {}
-                              //     : user.uid
-                              //     ? user.signOut
-                              //     : user.signIn
-                              // }
-                            >
+                            <div className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400">
                               <WalletIcon
                                 className="h-6 w-6 flex-shrink-0 "
                                 aria-hidden="true"
