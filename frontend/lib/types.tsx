@@ -1,6 +1,8 @@
 import { Contract } from "@ethersproject/contracts";
 
 export type PageProps = {
+  uid: string | null;
+  credits: number | null;
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   creditCost: number | null;

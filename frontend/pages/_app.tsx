@@ -89,7 +89,6 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // on user login
     if (uid) {
-      getFirebaseUser();
       checkIfWeb3User();
       // checkGiftedCredits();
       pollCredits();
@@ -109,21 +108,6 @@ export default function App({ Component, pageProps }: AppProps) {
       checkWalletAddress();
     }
   }, [walletAddress, provider]);
-
-  const getFirebaseUser = async () => {
-    // check if user has an account in firebase auth
-    // (e.g. to access images as authenticated user, etc.)
-    const url =
-      "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/getFirebaseToken";
-    // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkGiftedCredits";
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        uid,
-        // walletAddress: "0xdcc199020d8ac58339a07a37a87ad4f305e8fb15",
-      }),
-    });
-  };
 
   const checkIfWeb3User = async () => {
     // runs once a user has logged in
@@ -321,7 +305,9 @@ export default function App({ Component, pageProps }: AppProps) {
         setCreditsModalTrigger={setCreditsModalTrigger}
       /> */}
       <Component
-        {...pageProps}
+        // {...pageProps}
+        uid={uid}
+        credits={credits}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
         creditCost={creditCost}

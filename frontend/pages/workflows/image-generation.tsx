@@ -14,7 +14,9 @@ const steps = [
   { id: "3", name: "Mint NFT", href: "#" },
 ];
 
-const GeneratePage: NextPage<PageProps> = () => {
+const C: NextPage<PageProps> = ({ uid, credits }) => {
+  // define which step of the workflow the user is on
+  // (e.g. 0 = select, 1 = generate, 2 = mint)
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
   // store params and details for each step here
@@ -48,25 +50,16 @@ const GeneratePage: NextPage<PageProps> = () => {
       if (data.job_status === "done") {
         // make call to firebase storage to get all images under job
         console.log("getting images for jobId", jobId);
-        const storage = getStorage(firebaseApp);
-        const storageRef = ref(storage, `${user?.sub}/images/${jobId}`);
-        listAll(storageRef)
-          .then((res) => {
-            // get img urls
-            const imgUrls = res.items.map((itemRef) => {
-              // get public url
-              return getDownloadURL(itemRef);
-            });
-            // await requests
-            Promise.all(imgUrls).then((urls) => {
-              console.log("got img urls", urls);
-              setImages(urls);
-            });
-          })
-          .catch((err) => {
-            // firebase error
-            console.log("error getting images", err);
-          });
+        const response = await fetch("/api/getJobResult", {
+          method: "POST",
+          body: JSON.stringify({
+            jobId,
+            uid,
+            workflow: "txt2img",
+          }),
+        });
+        const { urls } = await response.json();
+        setImages(urls);
       }
     } else {
       // log the error and set job status to error
@@ -180,6 +173,7 @@ const GeneratePage: NextPage<PageProps> = () => {
           />
         ) : currentStepIdx === 1 ? (
           <Generate
+            credits={credits}
             selectedModal={selectedModal}
             setJobId={setJobId}
             prompt={prompt}
@@ -200,4 +194,4 @@ const GeneratePage: NextPage<PageProps> = () => {
   );
 };
 
-export default GeneratePage;
+export default C;

@@ -14,7 +14,7 @@ type Props = {
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
   jobStatus: string;
-  credits: number;
+  credits: number | null;
 };
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
