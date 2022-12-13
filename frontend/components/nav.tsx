@@ -133,19 +133,19 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                             />
                             <div className="ml-4">
                               {user?.sub ? (
-                                <a
+                                <Link
                                   href="/api/auth/logout"
                                   className="text-base font-medium"
                                 >
                                   Sign Out
-                                </a>
+                                </Link>
                               ) : (
-                                <a
+                                <Link
                                   href="/api/auth/login"
                                   className="text-base font-medium"
                                 >
                                   Sign In
-                                </a>
+                                </Link>
                               )}
                             </div>
                           </div>
@@ -190,19 +190,19 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
               {user?.sub ? (
-                <a
+                <Link
                   href="/api/auth/logout"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
                   Sign Out
-                </a>
+                </Link>
               ) : (
-                <a
+                <Link
                   href="/api/auth/login"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
                   Sign In
-                </a>
+                </Link>
               )}
               <Link
                 href="/workflows"

@@ -10,6 +10,7 @@ const { getValue } = require("firebase/remote-config");
 admin.initializeApp();
 const firestore = admin.firestore();
 const remoteConfig = admin.remoteConfig();
+const auth = admin.auth();
 
 // setup cors
 const cors = require("cors")({ origin: true });
@@ -63,5 +64,14 @@ exports.webhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     await webhookHandler(req, res, admin, firestore);
     return res.status(200).send("Webhook received");
+  });
+});
+
+// user management
+const { getFirebaseToken } = require("./user-management.ts");
+exports.getFirebaseUser = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const user = await getFirebaseToken(req, res, auth);
+    res.status(200).send(user);
   });
 });

@@ -14,6 +14,7 @@ type Props = {
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
   jobStatus: string;
+  credits: number;
 };
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
@@ -25,6 +26,7 @@ export default function Generate({
   setPrompt,
   images,
   jobStatus,
+  credits,
 }: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
@@ -114,10 +116,10 @@ export default function Generate({
         return;
       }
 
-      // if (user.credits === null || user.credits < 1) {
-      //   errorToast("You don't have enough credits!");
-      //   return;
-      // }
+      if (credits === null || credits < 1) {
+        errorToast("You don't have enough credits!");
+        return;
+      }
 
       if (loading) {
         errorToast(
