@@ -229,9 +229,6 @@ export default function Generate({
 
   return (
     <div className="mb-12">
-      {/* <h2 className="mb-6 text-3xl font-bold text-center">
-        {selectedModal ? selectedModal : "No model selected"}
-      </h2> */}
       <div>
         <label className="block font-medium text-gray-500">Prompt</label>
         <div className="mt-1 md:flex shadow-sm ">
@@ -283,6 +280,14 @@ export default function Generate({
         )}
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
+
+          <div className="mt-6">
+            <label className="block font-medium text-gray-500">Model</label>
+            <div className="text-white font-bold text-left">
+              {selectedModal}
+            </div>
+          </div>
+
           <div className="mt-6">
             <label className="block font-medium text-gray-500">Width</label>
 
