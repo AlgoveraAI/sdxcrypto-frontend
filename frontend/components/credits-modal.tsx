@@ -1,19 +1,20 @@
 import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
-import { User } from "../lib/hooks";
 import { toast } from "react-toastify";
 
 type Props = {
-  user: User;
+  uid: string | null;
+  credits: number | null;
   creditsModalTrigger: boolean;
   setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function CreditsModal({
+  uid,
+  credits,
   creditsModalTrigger,
   setCreditsModalTrigger,
-  user,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function CreditsModal({
   }, [creditsModalTrigger]);
 
   function openModal() {
-    if (user.uid) {
+    if (uid) {
       setOpen(true);
     } else {
       error("Please connect wallet to purchase credits");
@@ -70,7 +71,7 @@ export default function CreditsModal({
               code: "test_code",
               created_at: "test_created_at",
               metadata: {
-                uid: user.uid,
+                uid: uid,
                 credits: desiredNumCredits,
               },
             },
@@ -86,14 +87,14 @@ export default function CreditsModal({
   async function buyCredits() {
     // make call to next api
     setLoading(true);
-    console.log("buying credits", user.uid, desiredNumCredits);
+    console.log("buying credits", uid, desiredNumCredits);
     const chargeRes = await fetch(
       // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
       "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
       {
         method: "POST",
         body: JSON.stringify({
-          uid: user.uid,
+          uid: uid,
           credits: desiredNumCredits,
         }),
       }
@@ -133,8 +134,8 @@ export default function CreditsModal({
               >
                 <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
                   <div className="text-white text-3xl">
-                    You have {user.credits ? user.credits : 0}{" "}
-                    {user.credits === 1 ? "credit" : "credits"} remaining
+                    You have {credits ? credits : 0}{" "}
+                    {credits === 1 ? "credit" : "credits"} remaining
                   </div>
                   <div className="mt-6">Use credits to generate images</div>
                   {creditCost !== null ? (

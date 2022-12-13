@@ -299,11 +299,17 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ToastContainer />
-      <Nav setCreditsModalTrigger={setCreditsModalTrigger} setUID={setUID} />
-      {/* <CreditsModal
+      <Nav
+        credits={credits}
+        setCreditsModalTrigger={setCreditsModalTrigger}
+        setUID={setUID}
+      />
+      <CreditsModal
+        uid={uid}
+        credits={credits}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
-      /> */}
+      />
       <Component
         // {...pageProps}
         uid={uid}

@@ -1,17 +1,16 @@
 import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { User } from "../lib/hooks";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 type Props = {
-  user: User;
   feedbackModalTrigger: boolean;
   setFeedbackModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  uid: string | null;
 };
 
 export default function Feedback({
-  user,
+  uid,
   feedbackModalTrigger,
   setFeedbackModalTrigger,
 }: Props) {
@@ -49,7 +48,7 @@ export default function Feedback({
     const docSnap = await getDoc(docRef);
     await setDoc(docRef, {
       feedback: feedbackText,
-      user: user?.uid || "anon",
+      user: uid || "anon",
       timestamp: timestamp.toUTCString(),
     });
     setStatus("success");
