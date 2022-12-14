@@ -14,11 +14,10 @@ import FeedbackModal from "./feedback-modal";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
-  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   setUID: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
+export default function Nav({ setUID }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
@@ -144,11 +143,9 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                               </div>
                             </div>
                           </Link>
-                          <div
+                          <Link
                             className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
-                            onClick={() => {
-                              setCreditsModalTrigger(true);
-                            }}
+                            href="pricing"
                           >
                             <CurrencyDollarIcon
                               className="h-6 w-6 flex-shrink-0 "
@@ -157,7 +154,7 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                             <div className="ml-4">
                               <p className="text-base font-medium ">Credits</p>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       </div>
                     </Popover.Panel>
@@ -218,14 +215,12 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                 Pricing
               </Link>
 
-              <div
+              <Link
                 className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                onClick={() => {
-                  setCreditsModalTrigger(true);
-                }}
+                href="pricing"
               >
                 Credits
-              </div>
+              </Link>
               <span
                 onClick={() => setFeedbackModalTrigger(true)}
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"

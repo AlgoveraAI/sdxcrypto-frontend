@@ -37,7 +37,9 @@ declare var window: any; // to avoid typescript error on window.ethereum
 
 export default function App({ Component, pageProps }: AppProps) {
   // app controls
-  const [creditsModalTrigger, setCreditsModalTrigger] = useState(false);
+  const [creditsModalTrigger, setCreditsModalTrigger] = useState<
+    boolean | string
+  >(false);
 
   // config variables
   const [creditCost, setCreditCost] = useState<number | null>(null);
@@ -299,7 +301,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ToastContainer />
-      <Nav setCreditsModalTrigger={setCreditsModalTrigger} setUID={setUID} />
+      <Nav setUID={setUID} />
       <CreditsModal
         uid={uid}
         credits={credits}

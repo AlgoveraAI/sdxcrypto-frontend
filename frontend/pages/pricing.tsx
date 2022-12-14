@@ -4,11 +4,10 @@ import { PageProps } from "../lib/types";
 import Link from "next/link";
 
 const Pricing: NextPage<PageProps> = ({
-    creditsModalTrigger,
-    setCreditsModalTrigger,
-    creditCost,
-    accessPassCost,
-    accessCreditsPerMonth,
+  setCreditsModalTrigger,
+  creditCost,
+  accessPassCost,
+  accessCreditsPerMonth,
 }) => {
   const tiers = [
     {
@@ -74,21 +73,23 @@ const Pricing: NextPage<PageProps> = ({
                   <div className="flex flex-1 flex-col justify-between space-y-6 bg-gray-50 px-6 pt-6 pb-8 sm:p-10 sm:pt-6">
                     <div>
                       {tier.name === "Credits" ? (
-                        <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                        <div className="mt-3 sm:mt-0 sm:ml-3 w-full">
+                        <div className="flex">
                           <a
-                            className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-white"
+                            onClick={() => {
+                              setCreditsModalTrigger("crypto");
+                            }}
+                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-white cursor-pointer"
                           >
                             Crypto
                           </a>
-                        </div>
-                        <div className="mt-3 sm:mt-0 sm:ml-3 w-full">
                           <a
-                            className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-whites"
+                            onClick={() => {
+                              setCreditsModalTrigger("creditcard");
+                            }}
+                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-whites cursor-pointer"
                           >
                             Credit Card
                           </a>
-                        </div>
                         </div>
                       ) : (
                         <Link
