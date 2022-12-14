@@ -77,10 +77,16 @@ exports.getFirebaseUser = functions.https.onRequest((req, res) => {
 });
 
 // stripe
-const { createStripeCharge } = require("./stripe.ts");
+const { createStripeCharge, stripeWebhookHandler } = require("./stripe.ts");
 exports.createStripeCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const charge = await createStripeCharge(req, res);
     res.status(200).send(charge);
+  });
+});
+exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    await stripeWebhookHandler(req, res, admin, firestore);
+    return res.status(200).send("Webhook received");
   });
 });

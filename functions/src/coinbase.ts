@@ -1,6 +1,6 @@
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-const { updateUserCredits } = require("./utils.ts");
+import { updateUserCredits } from "./utils";
 
 // get env variables
 require("dotenv").config();
@@ -49,14 +49,14 @@ async function handleChargeEvent(event, admin, firestore) {
 
     let { uid, credits } = event.data.metadata;
     credits = parseInt(credits);
-    await updateUserCredits({
+    await updateUserCredits(
       uid,
       credits,
-      chardId: event.data.id,
-      orderId: event.data.code,
+      event.data.id,
+      event.data.code,
       firestore,
-      admin,
-    });
+      admin
+    );
   }
 
   if (event.type === "charge:failed") {
