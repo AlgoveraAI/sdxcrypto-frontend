@@ -1,20 +1,15 @@
+import { useRef, useState } from "react";
+import type { NextPage } from "next";
+import { PageProps } from "../lib/types";
 import Link from "next/link";
 
-type Props = {
-  creditsModalTrigger: boolean;
-  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  creditCost: number | null;
-  accessPassCost: number | null;
-  accessCreditsPerMonth: number | null;
-};
-
-export default function Pricing({
-  creditsModalTrigger,
-  setCreditsModalTrigger,
-  creditCost,
-  accessPassCost,
-  accessCreditsPerMonth,
-}: Props) {
+const Pricing: NextPage<PageProps> = ({
+    creditsModalTrigger,
+    setCreditsModalTrigger,
+    creditCost,
+    accessPassCost,
+    accessCreditsPerMonth,
+}) => {
   const tiers = [
     {
       name: "Credits",
@@ -139,4 +134,6 @@ export default function Pricing({
       </div>
     </div>
   );
-}
+};
+
+export default Pricing;

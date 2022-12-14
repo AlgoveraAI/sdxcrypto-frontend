@@ -92,6 +92,14 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
             >
               Access Pass
             </Link>
+            <Link
+              href="/pricing"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/pricing" ? "" : ""
+              }`}
+            >
+              Pricing
+            </Link>
             <span
               onClick={() => setFeedbackModalTrigger(true)}
               className={`text-base font-medium text-gray-50 cursor-pointer`}
@@ -202,6 +210,12 @@ export default function Nav({ setCreditsModalTrigger, setUID }: NavProps) {
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 Access Pass
+              </Link>
+              <Link
+                href="/pricing"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                Pricing
               </Link>
 
               <div
