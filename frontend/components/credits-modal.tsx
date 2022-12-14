@@ -57,7 +57,7 @@ export default function CreditsModal({
   };
 
   async function testChargeEvent() {
-    // use this instead of buyCredits to locally test the handleChargeEvent firebase function
+    // use this to locally test the handleChargeEvent firebase function
     // (it mimics the event that Coinbase sends once a txn is executed)
     // (run firebase serve in the functions folder to activate the endpoint)
     setLoading(true);
@@ -93,8 +93,8 @@ export default function CreditsModal({
 
     if (creditsModalTrigger === "crypto") {
       const chargeRes = await fetch(
-        // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
-        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
+        "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
+        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
         {
           method: "POST",
           body: JSON.stringify({
@@ -107,7 +107,19 @@ export default function CreditsModal({
       console.log("got charge data", data);
       window.open(data.hosted_url, "_blank", "noopener,noreferrer");
     } else {
-      // TODO stripe payment
+      const chargeRes = await fetch(
+        "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeCharge",
+        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeCharge",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            uid: uid,
+            credits: desiredNumCredits,
+          }),
+        }
+      );
+      const data = await chargeRes.json();
+      console.log("got charge data", data);
     }
 
     setLoading(false);

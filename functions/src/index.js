@@ -75,3 +75,12 @@ exports.getFirebaseUser = functions.https.onRequest((req, res) => {
     res.status(200).send(user);
   });
 });
+
+// stripe
+const { createStripeCharge } = require("./stripe.ts");
+exports.createStripeCharge = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const charge = await createStripeCharge(req, res);
+    res.status(200).send(charge);
+  });
+});
