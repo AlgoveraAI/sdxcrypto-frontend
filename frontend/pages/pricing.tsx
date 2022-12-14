@@ -72,21 +72,28 @@ const Pricing: NextPage<PageProps> = ({
                     </p>
                   </div>
                   <div className="flex flex-1 flex-col justify-between space-y-6 bg-gray-50 px-6 pt-6 pb-8 sm:p-10 sm:pt-6">
-                    <div className="rounded-md shadow">
+                    <div>
                       {tier.name === "Credits" ? (
-                        <a
-                          onClick={() => {
-                            setCreditsModalTrigger(true);
-                          }}
-                          className="flex items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer hover:brightness-90"
-                          aria-describedby="tier-standard"
-                        >
-                          Purchase Credits
-                        </a>
+                        <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                        <div className="mt-3 sm:mt-0 sm:ml-3 w-full">
+                          <a
+                            className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-white"
+                          >
+                            Crypto
+                          </a>
+                        </div>
+                        <div className="mt-3 sm:mt-0 sm:ml-3 w-full">
+                          <a
+                            className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-whites"
+                          >
+                            Credit Card
+                          </a>
+                        </div>
+                        </div>
                       ) : (
                         <Link
                           href="/access"
-                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90"
+                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-white"
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Read More
