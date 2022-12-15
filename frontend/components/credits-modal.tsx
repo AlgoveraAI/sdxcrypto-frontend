@@ -34,7 +34,11 @@ export default function CreditsModal({
     if (uid) {
       setOpen(true);
     } else {
-      error("Please connect wallet to purchase credits");
+      if (creditsModalTrigger === "crypto") {
+        error("Please connect wallet to purchase credits");
+      } else {
+        error("Please sign in to purchase credits");
+      }
       setCreditsModalTrigger(false);
     }
   }
