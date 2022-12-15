@@ -3,7 +3,8 @@ require("dotenv").config();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 console.log("key", stripeSecretKey);
 const stripe = require("stripe")(stripeSecretKey);
-import { updateUserCredits } from "./utils";
+// @ts-ignore
+const { updateUserCredits } = require("./utils.ts");
 
 const endpointSecret =
   "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9";

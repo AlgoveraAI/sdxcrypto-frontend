@@ -93,7 +93,7 @@ export default function CreditsModal({
 
     if (creditsModalTrigger === "crypto") {
       const chargeRes = await fetch(
-        "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
+        "http://localhost:5001/sdxcrypto-algovera/us-central1/createCoinbaseCharge",
         // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
         {
           method: "POST",
@@ -162,7 +162,7 @@ export default function CreditsModal({
                   <div className="mt-6 shadow-sm w-full mx-auto">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 text-left">
-                        Purchase Creditss
+                        Purchase Credits
                       </label>
                     </div>
                     <div className="sm:flex mt-1">

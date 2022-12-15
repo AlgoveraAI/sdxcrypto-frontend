@@ -1,6 +1,7 @@
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-import { updateUserCredits } from "./utils";
+// @ts-ignore
+const { updateUserCredits } = require("./utils.ts");
 
 // get env variables
 require("dotenv").config();
@@ -8,7 +9,7 @@ const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
 const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
 Client.init(cbApiKey);
 
-exports.createCharge = async function (request, response) {
+exports.createCoinbaseCharge = async function (request, response) {
   console.log("creating charge", request.body);
   const data = JSON.parse(request.body);
   const { uid, credits } = data;

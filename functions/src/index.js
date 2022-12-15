@@ -44,13 +44,13 @@ exports.genCommunitySignature = functions.https.onRequest((req, res) => {
 
 // coinbase handling
 const {
-  createCharge,
+  createCoinbaseCharge,
   testChargeEvent,
   webhookHandler,
 } = require("./coinbase.ts");
-exports.createCharge = functions.https.onRequest((req, res) => {
+exports.createCoinbaseCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const charge = await createCharge(req, res);
+    const charge = await createCoinbaseCharge(req, res);
     res.status(200).send(charge);
   });
 });

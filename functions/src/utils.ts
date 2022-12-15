@@ -1,6 +1,6 @@
 // const { firestore, admin } = require("./firebase");
 
-export const updateUserCredits = async function (
+exports.updateUserCredits = async function (
   uid,
   credits,
   chargeId,
