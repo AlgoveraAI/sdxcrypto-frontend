@@ -41,6 +41,7 @@ export default function CreditsModal({
 
   async function closeModal() {
     await setOpen(false);
+    setLoading(false);
     setCreditsModalTrigger(false);
   }
 
@@ -107,6 +108,7 @@ export default function CreditsModal({
       console.log("got charge data", data);
       window.open(data.hosted_url, "_blank", "noopener,noreferrer");
     } else {
+      // creditcard (stripe)
       const chargeRes = await fetch(
         "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeCharge",
         // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeCharge",
@@ -120,6 +122,7 @@ export default function CreditsModal({
       );
       const data = await chargeRes.json();
       console.log("got charge data", data);
+      window.open(data.url, "_blank", "noopener,noreferrer");
     }
 
     setLoading(false);

@@ -7,6 +7,7 @@ import { PageProps } from "../../lib/types";
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { firebaseApp, auth } from "../../lib/firebase";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { BaseProvider } from "@ethersproject/providers";
 
 const steps = [
   { id: "1", name: "Select Model", href: "#" },
@@ -14,7 +15,14 @@ const steps = [
   { id: "3", name: "Mint NFT", href: "#" },
 ];
 
-const C: NextPage<PageProps> = ({ uid, credits }) => {
+const C: NextPage<PageProps> = ({
+  uid,
+  credits,
+  provider,
+  networkName,
+  signer,
+  walletAddress,
+}) => {
   // define which step of the workflow the user is on
   // (e.g. 0 = select, 1 = generate, 2 = mint)
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
@@ -183,6 +191,10 @@ const C: NextPage<PageProps> = ({ uid, credits }) => {
           />
         ) : (
           <Mint
+            provider={provider}
+            signer={signer}
+            networkName={networkName}
+            walletAddress={walletAddress}
             selectedModal={selectedModal}
             jobId={jobId}
             prompt={prompt}

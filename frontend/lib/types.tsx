@@ -1,4 +1,6 @@
 import { Contract } from "@ethersproject/contracts";
+import { BaseProvider } from "@ethersproject/providers";
+import { Signer } from "@ethersproject/abstract-signer";
 
 export type PageProps = {
   uid: string | null;
@@ -12,4 +14,8 @@ export type PageProps = {
   accessPassCost: number | null;
   accessCreditsPerMonth: number | null;
   accessSubscriptionLength: number | null;
+  provider: BaseProvider | null;
+  signer: Signer | null;
+  networkName: string | null;
+  walletAddress: string | null;
 };

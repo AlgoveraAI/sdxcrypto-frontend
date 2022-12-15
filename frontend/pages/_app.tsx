@@ -318,6 +318,10 @@ export default function App({ Component, pageProps }: AppProps) {
         accessPassCost={accessPassCost}
         accessCreditsPerMonth={accessCreditsPerMonth}
         accessSubscriptionLength={accessSubscriptionLength}
+        provider={provider}
+        signer={signer}
+        networkName={networkName}
+        walletAddress={walletAddress}
       />
       <Analytics />
     </UserProvider>

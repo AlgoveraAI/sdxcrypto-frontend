@@ -1,19 +1,24 @@
 // get env variables
 require("dotenv").config();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-console.log("key", stripeSecretKey);
 const stripe = require("stripe")(stripeSecretKey);
 // @ts-ignore
 const { updateUserCredits } = require("./utils.ts");
 
-const endpointSecret =
-  "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9";
+// const endpointSecret =
+//   "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9";
 
 // docs
 // https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-price_data
 
 exports.createStripeCharge = async function (request, response) {
   console.log("creating stripe charge", request.body);
+  let { uid, credits } = JSON.parse(request.body);
+  // check uid and credits
+  if (!uid || !credits) {
+    return response.status(400).send("Missing uid or credits");
+  }
+  credits = parseInt(credits);
   const session = await stripe.checkout.sessions.create({
     success_url: "https://app.algovera.ai",
     cancel_url: "https://app.algovera.ai",
@@ -27,13 +32,13 @@ exports.createStripeCharge = async function (request, response) {
           },
           unit_amount: 1, // denominated in cents
         },
-        quantity: 50, // minimum charge is $0.50
+        quantity: Math.max(50, credits), // minimum charge is $0.50
       },
     ],
     mode: "payment",
     metadata: {
-      uid: request.body.uid,
-      credits: request.body.credits,
+      uid,
+      credits,
     },
   });
   return session;
@@ -52,18 +57,11 @@ exports.stripeWebhookHandler = async function (
   console.log("sig", sig);
   // reconstruct the sig
 
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      request.rawBody,
-      sig,
-      endpointSecret
-    );
-  } catch (err) {
-    console.log("error", err);
-    return;
-  }
+  let event = stripe.webhooks.constructEvent(
+    request.rawBody,
+    sig,
+    process.env.STRIPE_SIGNING_SECRET
+  );
 
   // Handle the event
   switch (event.type) {
@@ -72,7 +70,7 @@ exports.stripeWebhookHandler = async function (
       const { uid, credits } = event.data.object.metadata;
       await updateUserCredits(
         uid,
-        credits,
+        parseInt(credits),
         event.data.object.id,
         event.data.object.payment_intent,
         firestore,
