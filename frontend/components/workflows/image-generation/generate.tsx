@@ -30,6 +30,8 @@ export default function Generate({
 }: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
+  const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
+    useState<any>(null);
   const toastId = useRef<any>(null);
 
   // model params
@@ -44,6 +46,11 @@ export default function Generate({
   const imgLoaded = () => {
     setLoading(false);
     toast.dismiss(toastId.current);
+    // clear interval
+    if (checkTimeTakenInterval) {
+      clearInterval(checkTimeTakenInterval);
+      setCheckTimeTakenInteraval(null);
+    }
   };
 
   const changeSliderColor = (e: HTMLInputElement) => {
@@ -170,6 +177,7 @@ export default function Generate({
       };
 
       const interval = setInterval(checkTimeTaken, 5000);
+      setCheckTimeTakenInteraval(interval);
 
       const res = await fetch("/api/txt2img", {
         method: "POST",
@@ -202,12 +210,11 @@ export default function Generate({
           icon: <Spinner />,
         });
       } else {
-        errorToast("Error generating image");
         console.error("Error caught in api route", data);
+        errorToast("Error generating image");
+        clearInterval(interval);
+        setCheckTimeTakenInteraval(null);
       }
-
-      // clear interval
-      clearInterval(interval);
 
       // clear warning toast
       if (warningToastId) {
