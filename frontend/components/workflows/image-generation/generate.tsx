@@ -301,7 +301,7 @@ export default function Generate({
                   className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
                   min="128"
                   max="1024"
-                  step="8"
+                  step="64"
                   onChange={(e) => {
                     setWidth(parseInt(e.target.value));
                     changeSliderColor(e.target);
