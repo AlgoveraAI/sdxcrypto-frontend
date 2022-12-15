@@ -67,25 +67,6 @@ export default function App({ Component, pageProps }: AppProps) {
     loadRemoteConfig();
     checkMetamaskConnection();
     setupMetamaskListeners();
-
-    // inject a function into the window to log state
-    // useful for debugging
-    window.logState = () => {
-      console.log("state:", {
-        creditsModalTrigger,
-        creditCost,
-        accessPassCost,
-        accessCreditsPerMonth,
-        accessSubscriptionLength,
-        uid,
-        walletAddress,
-        hasAccess,
-        credits,
-        provider,
-        networkName,
-        signer,
-      });
-    };
   }, []);
 
   useEffect(() => {
