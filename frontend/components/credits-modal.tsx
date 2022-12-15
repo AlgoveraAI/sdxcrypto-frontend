@@ -94,8 +94,8 @@ export default function CreditsModal({
 
     if (creditsModalTrigger === "crypto") {
       const chargeRes = await fetch(
-        "http://localhost:5001/sdxcrypto-algovera/us-central1/createCoinbaseCharge",
-        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
+        // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCoinbaseCharge",
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
         {
           method: "POST",
           body: JSON.stringify({
@@ -110,8 +110,8 @@ export default function CreditsModal({
     } else {
       // creditcard (stripe)
       const chargeRes = await fetch(
-        "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeCharge",
-        // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeCharge",
+        // "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeCharge",
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeCharge",
         {
           method: "POST",
           body: JSON.stringify({
