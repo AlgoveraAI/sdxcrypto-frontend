@@ -48,14 +48,11 @@ exports.createApiKey = async function (request, response) {
 
 exports.deleteApiKey = async function (request, response) {
   const data = JSON.parse(request.body);
-  const { uid, apiKey } = data;
+  const { uid, apiKeyIx } = data;
   const userRef = firestore.collection("users").doc(uid);
   const userSnap = await userRef.get();
   const userData = userSnap.data();
   const apiKeys = userData.apiKeys || [];
-  const index = apiKeys.indexOf(apiKey);
-  if (index > -1) {
-    apiKeys.splice(index, 1);
-  }
+  apiKeys.splice(apiKeyIx, 1);
   await userRef.update({ apiKeys });
 };

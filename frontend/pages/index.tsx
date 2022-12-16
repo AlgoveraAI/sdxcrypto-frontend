@@ -6,13 +6,7 @@ import HowItWorks from "../components/index/how-it-works";
 import DeveloperInfo from "../components/index/developer-info";
 import { PageProps } from "../lib/types";
 
-const Home: NextPage<PageProps> = ({
-  creditsModalTrigger,
-  setCreditsModalTrigger,
-  creditCost,
-  accessPassCost,
-  accessCreditsPerMonth,
-}) => {
+const Home: NextPage<PageProps> = ({}) => {
   const howitworksRef = useRef<HTMLDivElement>(null);
   const developerRef = useRef<HTMLDivElement>(null);
 

@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 
-// local test (from /functions dir)
+// local test
 // firebase emulators:start --only functions
 
 // setup cors

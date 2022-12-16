@@ -293,6 +293,7 @@ export default function App({ Component, pageProps }: AppProps) {
         // {...pageProps}
         uid={uid}
         credits={credits}
+        hasAccess={hasAccess}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
         creditCost={creditCost}
