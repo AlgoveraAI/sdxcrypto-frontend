@@ -9,7 +9,7 @@ import Spinner from "../components/spinner";
 import { Dialog, Transition } from "@headlessui/react";
 
 type apiKey = {
-  apiKeyId: string;
+  id: string;
   createdAt: string;
   expiresAt: string;
 };
@@ -87,7 +87,7 @@ const Account: NextPage<PageProps> = ({
     setLoading(false);
   };
 
-  const deleteApiKey = async (apiKey: string) => {
+  const deleteApiKey = async (apiKey: apiKey) => {
     const res = await fetch(
       "http://localhost:5001/sdxcrypto-algovera/us-central1/deleteApiKey",
       // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createApiKey",
@@ -95,7 +95,7 @@ const Account: NextPage<PageProps> = ({
         method: "POST",
         body: JSON.stringify({
           uid,
-          apiKey,
+          id: apiKey.id,
         }),
       }
     );
@@ -168,13 +168,13 @@ const Account: NextPage<PageProps> = ({
                 </thead>
                 <tbody>
                   {apiKeys.map((apiKey) => (
-                    <tr key={apiKey.apiKeyId} className="bg-background">
-                      <td className="p-2">{apiKey.apiKeyId}</td>
+                    <tr key={apiKey.id} className="bg-background">
+                      <td className="p-2">{apiKey.id}</td>
                       <td className="p-2">{apiKey.createdAt.split("T")[0]}</td>
                       <td className="p-2">{apiKey.expiresAt.split("T")[0]}</td>
                       <td className="p-2">
                         <button
-                          onClick={() => deleteApiKey(apiKey.apiKeyId)}
+                          onClick={() => deleteApiKey(apiKey)}
                           className="text-red-500 hover:underline"
                         >
                           Delete

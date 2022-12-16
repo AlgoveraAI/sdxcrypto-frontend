@@ -29,7 +29,7 @@ exports.createApiKey = async function (request, response) {
   // generate a new api key
   const apiKey = generateApiKey();
   // get an identifier (first 8 characters)
-  const apiKeyId = apiKey.substr(0, 8);
+  const id = apiKey.substr(0, 8);
   // generate a new salt
   const salt = crypto.randomBytes(16).toString("hex");
   // hash the api key
@@ -46,19 +46,30 @@ exports.createApiKey = async function (request, response) {
   const userSnap = await userRef.get();
   const userData = userSnap.data();
   const apiKeys = userData.apiKeys || [];
-  apiKeys.push({ apiKeyId, salt, hash, createdAt, expiresAt });
+  apiKeys.push({ id, salt, hash, createdAt, expiresAt });
   await userRef.update({ apiKeys });
+
+  // also store in apiKeys collection for backend to look-up and check
+  // without needing a uid
+  const apiKeyRef = firestore.collection("apiKeys").doc(id);
+  await apiKeyRef.set({ uid, salt, hash, createdAt, expiresAt });
 
   return { apiKey };
 };
 
 exports.deleteApiKey = async function (request, response) {
   const data = JSON.parse(request.body);
-  const { uid, apiKeyIx } = data;
+  const { uid, id } = data;
+  console.log("deleteApiKey", uid, id);
+  // delete from user apiKeys
   const userRef = firestore.collection("users").doc(uid);
   const userSnap = await userRef.get();
   const userData = userSnap.data();
   const apiKeys = userData.apiKeys || [];
-  apiKeys.splice(apiKeyIx, 1);
-  await userRef.update({ apiKeys });
+  const newApiKeys = apiKeys.filter((key) => key.id !== id);
+  await userRef.update({ apiKeys: newApiKeys });
+
+  // delete from apiKeys collection
+  const apiKeyRef = firestore.collection("apiKeys").doc(id);
+  await apiKeyRef.delete();
 };
