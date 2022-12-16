@@ -1,16 +1,7 @@
-// prepare app
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const { getValue } = require("firebase/remote-config");
 
 // local test (from /functions dir)
 // firebase emulators:start --only functions
-
-// setup firebase conn
-admin.initializeApp();
-const firestore = admin.firestore();
-const remoteConfig = admin.remoteConfig();
-const auth = admin.auth();
 
 // setup cors
 const cors = require("cors")({ origin: true });
@@ -22,7 +13,7 @@ const {
 } = require("./credit-handling.ts");
 exports.checkAccessCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkAccessCredits(req, res, admin, firestore, remoteConfig);
+    await checkAccessCredits(req, res);
     res.status(200).send("OK");
   });
 });
@@ -56,23 +47,14 @@ exports.createCoinbaseCharge = functions.https.onRequest((req, res) => {
 });
 exports.testChargeEvent = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    testChargeEvent(req, res, admin, firestore);
+    testChargeEvent(req, res);
     res.status(200).send("OK");
   });
 });
 exports.webhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await webhookHandler(req, res, admin, firestore);
+    await webhookHandler(req, res);
     return res.status(200).send("Webhook received");
-  });
-});
-
-// user management
-const { getFirebaseToken } = require("./user-management.ts");
-exports.getFirebaseUser = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    const user = await getFirebaseToken(req, res, auth);
-    res.status(200).send(user);
   });
 });
 
@@ -86,7 +68,7 @@ exports.createStripeCharge = functions.https.onRequest((req, res) => {
 });
 exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await stripeWebhookHandler(req, res, admin, firestore);
+    await stripeWebhookHandler(req, res);
     return res.status(200).send("Webhook received");
   });
 });

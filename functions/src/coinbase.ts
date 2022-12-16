@@ -1,8 +1,9 @@
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-// @ts-ignore
+// @ts-ignore (block scoping errors are irrelevant)
 const { updateUserCredits } = require("./utils.ts");
-
+// @ts-ignore (block scoping errors are irrelevant)
+const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 // get env variables
 require("dotenv").config();
 const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
@@ -32,7 +33,7 @@ exports.createCoinbaseCharge = async function (request, response) {
 };
 
 // local function, not exported
-async function handleChargeEvent(event, admin, firestore) {
+async function handleChargeEvent(event) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -65,20 +66,20 @@ async function handleChargeEvent(event, admin, firestore) {
   }
 }
 
-exports.testChargeEvent = async function (request, response, admin, firestore) {
+exports.testChargeEvent = async function (request, response) {
   console.log("testing charge event", request.body);
   const data = JSON.parse(request.body);
   const event = data.event;
-  await handleChargeEvent(event, admin, firestore);
+  await handleChargeEvent(event);
 };
 
-exports.webhookHandler = async function (request, response, admin, firestore) {
+exports.webhookHandler = async function (request, response) {
   const rawBody = request.rawBody;
   const signature = request.headers["x-cc-webhook-signature"];
 
   try {
     const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
-    await handleChargeEvent(event, admin, firestore);
+    await handleChargeEvent(event);
   } catch (error) {
     console.log(error);
     response.status(400).send(`Webhook Error: ${error.message}`);

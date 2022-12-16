@@ -2,7 +2,9 @@
 require("dotenv").config();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(stripeSecretKey);
-// @ts-ignore
+// @ts-ignore (block scoping errors are irrelevant)
+const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
+// @ts-ignore (block scoping errors are irrelevant)
 const { updateUserCredits } = require("./utils.ts");
 
 // const endpointSecret =
@@ -45,12 +47,7 @@ exports.createStripeCharge = async function (request, response) {
 };
 
 // write function to listed for stripe events
-exports.stripeWebhookHandler = async function (
-  request,
-  response,
-  admin,
-  firestore
-) {
+exports.stripeWebhookHandler = async function (request, response) {
   console.log("stripe webhook");
 
   const sig = request.headers["stripe-signature"];

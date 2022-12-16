@@ -1,4 +1,7 @@
-exports.checkGiftedCredits = async function (req, res, firestore) {
+// @ts-ignore (block scoping errors are irrelevant)
+const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
+
+exports.checkGiftedCredits = async function (req, res) {
   const { uid, walletAddress } = JSON.parse(req.body);
 
   // TODO check that the uid's username == the wallet
@@ -72,13 +75,7 @@ exports.checkGiftedCredits = async function (req, res, firestore) {
   }
 };
 
-exports.checkAccessCredits = async function (
-  req,
-  res,
-  admin,
-  firestore,
-  remoteConfig
-) {
+exports.checkAccessCredits = async function (req, res) {
   const { uid, walletAddress, hasAccess } = JSON.parse(req.body);
 
   // TODO check that the uid's username == the wallet
