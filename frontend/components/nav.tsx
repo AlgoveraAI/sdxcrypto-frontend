@@ -6,8 +6,8 @@ import { Popover, Transition } from "@headlessui/react";
 import {
   WalletIcon,
   UserIcon,
+  UserCircleIcon,
   Bars3Icon,
-  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 import Spinner from "./spinner";
 import FeedbackModal from "./feedback-modal";
@@ -109,7 +109,7 @@ export default function Nav({ setUID }: NavProps) {
               {({ open }) => (
                 <>
                   <Popover.Button>
-                    <UserIcon
+                    <UserCircleIcon
                       className="h-6 w-6 flex-shrink-0 text-white bg-transparent outline-none border-none focus:outline-none"
                       aria-hidden="true"
                     />
@@ -148,15 +148,15 @@ export default function Nav({ setUID }: NavProps) {
                             user?.sub ? (
                               <Link
                                 className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
-                                href="pricing"
+                                href="/account"
                               >
-                                <CurrencyDollarIcon
+                                <UserIcon
                                   className="h-6 w-6 flex-shrink-0 "
                                   aria-hidden="true"
                                 />
                                 <div className="ml-4">
                                   <p className="text-base font-medium ">
-                                    Credits
+                                    Account
                                   </p>
                                 </div>
                               </Link>
@@ -203,6 +203,17 @@ export default function Nav({ setUID }: NavProps) {
                   Sign In
                 </Link>
               )}
+              {
+                /* only show credits button if signed in */
+                user?.sub ? (
+                  <Link
+                    href="/account"
+                    className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                  >
+                    Account
+                  </Link>
+                ) : null
+              }
               <Link
                 href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
@@ -222,17 +233,6 @@ export default function Nav({ setUID }: NavProps) {
                 Pricing
               </Link>
 
-              {
-                /* only show credits button if signed in */
-                user?.sub ? (
-                  <Link
-                    className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                    href="pricing"
-                  >
-                    Credits
-                  </Link>
-                ) : null
-              }
               <span
                 onClick={() => setFeedbackModalTrigger(true)}
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"

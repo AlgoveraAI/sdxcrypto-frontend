@@ -106,7 +106,13 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
         </div>
         <div className="mt-16">
           <div className="font-bold text-xl mb-2">Credits</div>
-          <div>{credits}</div>
+          <div className="mb-2">{credits}</div>
+          <Link
+            href="/pricing"
+            className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
+          >
+            Buy More
+          </Link>
         </div>
         <div className="mt-16">
           <div className="font-bold text-xl mb-2">API Keys</div>
@@ -141,7 +147,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           </div>
           <div
             onClick={createApiKey}
-            className="mt-2 font-medium text-white hover:underline cursor-pointer"
+            className="mt-2 font-medium text-primary-lighter underline cursor-pointer"
           >
             + Create New key{" "}
             {loading ? (
