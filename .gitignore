@@ -70,3 +70,4 @@ node_modules/
 .env.sdxcrypto-algovera
 
 python/firebase-credentials.json
+.env*

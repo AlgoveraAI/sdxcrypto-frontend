@@ -70,8 +70,8 @@ const Account: NextPage<PageProps> = ({
   const createApiKey = async () => {
     setLoading(true);
     const res = await fetch(
-      "http://localhost:5001/sdxcrypto-algovera/us-central1/createApiKey",
-      // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createApiKey",
+      // "http://localhost:5001/sdxcrypto-algovera/us-central1/createApiKey",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createApiKey",
       {
         method: "POST",
         body: JSON.stringify({
@@ -89,8 +89,8 @@ const Account: NextPage<PageProps> = ({
 
   const deleteApiKey = async (apiKey: apiKey) => {
     const res = await fetch(
-      "http://localhost:5001/sdxcrypto-algovera/us-central1/deleteApiKey",
-      // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createApiKey",
+      // "http://localhost:5001/sdxcrypto-algovera/us-central1/deleteApiKey",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/deleteApiKey",
       {
         method: "POST",
         body: JSON.stringify({
