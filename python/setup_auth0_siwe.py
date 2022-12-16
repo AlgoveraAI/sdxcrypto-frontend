@@ -2,7 +2,7 @@
 import requests
 
 base_url = "https://oidc.login.xyz/register"
-body = {"redirect_uris": ["https://dev-g8ax5qcuufebtp03.us.auth0.com/login/callback"]}
+body = {"redirect_uris": ["https://auth.algovera.ai/login/callback"]}
 headers = {"content-type": "application/json"}
 
 response = requests.post(base_url, json=body)
