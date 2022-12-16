@@ -104,11 +104,11 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
         <div className="mt-6">
           <h2 className="text-3xl font-bold text-center">Account</h2>
         </div>
-        <div className="mt-8">
+        <div className="mt-16">
           <div className="font-bold text-xl mb-2">Credits</div>
           <div>{credits}</div>
         </div>
-        <div className="mt-8">
+        <div className="mt-16">
           <div className="font-bold text-xl mb-2">API Keys</div>
           <div>
             <table className="w-full">
@@ -152,7 +152,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-16">
           <div className="font-bold text-xl mb-2">Account Management</div>
           <button
             onClick={createApiKey}
