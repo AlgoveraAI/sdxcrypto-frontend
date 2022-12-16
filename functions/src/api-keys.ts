@@ -35,12 +35,18 @@ exports.createApiKey = async function (request, response) {
   // get an identifier (first 8 characters of the hash)
   const apiKeyId = hash.substr(0, 8);
 
+  // created
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(
+    Date.now() + 1000 * 60 * 60 * 24 * 365
+  ).toISOString();
+
   // write to firestore users under the 'apiKeys' field
   const userRef = firestore.collection("users").doc(uid);
   const userSnap = await userRef.get();
   const userData = userSnap.data();
   const apiKeys = userData.apiKeys || [];
-  apiKeys.push({ apiKeyId, salt, hash });
+  apiKeys.push({ apiKeyId, salt, hash, createdAt, expiresAt });
   await userRef.update({ apiKeys });
 
   return { apiKey };

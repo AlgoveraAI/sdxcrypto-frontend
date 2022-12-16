@@ -8,9 +8,15 @@ import { db, auth } from "../lib/firebase";
 import Spinner from "../components/spinner";
 import { Dialog, Transition } from "@headlessui/react";
 
+type apiKey = {
+  apiKeyId: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
 const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
   const toastId = useRef<any>(null);
-  const [apiKeys, setApiKeys] = useState<string[]>([]);
+  const [apiKeys, setApiKeys] = useState<apiKey[]>([]);
   const [loading, setLoading] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -45,10 +51,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
       const docRef = doc(db, "users", uid);
       getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-          const keyInfo = docSnap.data().apiKeys;
-          // get apiKeyId from each key in keyInfo
-          const apiKeyIds = keyInfo.map((key: any) => key.apiKeyId);
-          setApiKeys(apiKeyIds);
+          setApiKeys(docSnap.data().apiKeys);
         }
       });
     }
@@ -106,19 +109,35 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           <div>{credits}</div>
         </div>
         <div className="mt-8">
-          <div className="font-bold text-xl mb-2">API Key IDs</div>
+          <div className="font-bold text-xl mb-2">API Keys</div>
           <div>
-            {apiKeys.map((apiKey) => (
-              <div key={apiKey} className="bg-background px-4 py-2 mb-1">
-                <span className="inline-block w-1/4 mr-8">{apiKey}</span>
-                <span
-                  onClick={() => deleteApiKey(apiKey)}
-                  className="font-medium text-red-500 hover:underline float-right cursor-pointer"
-                >
-                  Delete
-                </span>
-              </div>
-            ))}
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="text-left p-2">ID</th>
+                  <th className="text-left p-2">Created</th>
+                  <th className="text-left p-2">Expires</th>
+                  <th className="text-left p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {apiKeys.map((apiKey) => (
+                  <tr key={apiKey.apiKeyId} className="bg-background">
+                    <td className="p-2">{apiKey.apiKeyId}</td>
+                    <td className="p-2">{apiKey.createdAt.split("T")[0]}</td>
+                    <td className="p-2">{apiKey.expiresAt.split("T")[0]}</td>
+                    <td className="p-2">
+                      <button
+                        onClick={() => deleteApiKey(apiKey.apiKeyId)}
+                        className="text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <div
             onClick={createApiKey}
