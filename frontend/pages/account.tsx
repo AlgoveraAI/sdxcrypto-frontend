@@ -99,7 +99,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
   };
 
   return (
-    <div className="bg-background">
+    <div>
       <div className="max-w-5xl mx-auto mt-16 p-10 rounded-lg shadow-lg bg-background-darker">
         <div className="mt-6">
           <h2 className="text-3xl font-bold text-center">Account</h2>
@@ -114,10 +114,10 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
             <table className="w-full">
               <thead>
                 <tr>
-                  <th className="text-left p-2">ID</th>
-                  <th className="text-left p-2">Created</th>
-                  <th className="text-left p-2">Expires</th>
-                  <th className="text-left p-2">Actions</th>
+                  <th className="text-left p-2 text-gray-400">ID</th>
+                  <th className="text-left p-2 text-gray-400">Created</th>
+                  <th className="text-left p-2 text-gray-400">Expires</th>
+                  <th className="text-left p-2 text-gray-400">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,7 +129,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
                     <td className="p-2">
                       <button
                         onClick={() => deleteApiKey(apiKey.apiKeyId)}
-                        className="text-red-500"
+                        className="text-red-500 hover:underline"
                       >
                         Delete
                       </button>
@@ -156,7 +156,7 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           <div className="font-bold text-xl mb-2">Account Management</div>
           <button
             onClick={createApiKey}
-            className="flex items-center justify-center rounded-md px-8 py-2 text-sm font-medium text-white border border-red-500"
+            className="flex items-center justify-center rounded-md px-8 py-2 text-sm font-medium text-white border border-red-500 hover:text-red-500"
           >
             Delete Account
           </button>
