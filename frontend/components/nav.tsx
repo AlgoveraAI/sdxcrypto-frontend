@@ -143,18 +143,25 @@ export default function Nav({ setUID }: NavProps) {
                               </div>
                             </div>
                           </Link>
-                          <Link
-                            className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
-                            href="pricing"
-                          >
-                            <CurrencyDollarIcon
-                              className="h-6 w-6 flex-shrink-0 "
-                              aria-hidden="true"
-                            />
-                            <div className="ml-4">
-                              <p className="text-base font-medium ">Credits</p>
-                            </div>
-                          </Link>
+                          {
+                            /* only show credits button if signed in */
+                            user?.sub ? (
+                              <Link
+                                className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
+                                href="pricing"
+                              >
+                                <CurrencyDollarIcon
+                                  className="h-6 w-6 flex-shrink-0 "
+                                  aria-hidden="true"
+                                />
+                                <div className="ml-4">
+                                  <p className="text-base font-medium ">
+                                    Credits
+                                  </p>
+                                </div>
+                              </Link>
+                            ) : null
+                          }
                         </div>
                       </div>
                     </Popover.Panel>
@@ -215,12 +222,17 @@ export default function Nav({ setUID }: NavProps) {
                 Pricing
               </Link>
 
-              <Link
-                className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                href="pricing"
-              >
-                Credits
-              </Link>
+              {
+                /* only show credits button if signed in */
+                user?.sub ? (
+                  <Link
+                    className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                    href="pricing"
+                  >
+                    Credits
+                  </Link>
+                ) : null
+              }
               <span
                 onClick={() => setFeedbackModalTrigger(true)}
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
