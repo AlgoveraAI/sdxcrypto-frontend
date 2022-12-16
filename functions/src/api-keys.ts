@@ -28,14 +28,14 @@ exports.createApiKey = async function (request, response) {
 
   // generate a new api key
   const apiKey = generateApiKey();
+  // get an identifier (first 8 characters)
+  const apiKeyId = apiKey.substr(0, 8);
   // generate a new salt
   const salt = crypto.randomBytes(16).toString("hex");
   // hash the api key
   const hash = hashApiKey(apiKey, salt);
-  // get an identifier (first 8 characters of the hash)
-  const apiKeyId = hash.substr(0, 8);
 
-  // created
+  // dates
   const createdAt = new Date().toISOString();
   const expiresAt = new Date(
     Date.now() + 1000 * 60 * 60 * 24 * 365

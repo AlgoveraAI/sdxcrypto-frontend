@@ -14,7 +14,12 @@ type apiKey = {
   expiresAt: string;
 };
 
-const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
+const Account: NextPage<PageProps> = ({
+  uid,
+  credits,
+  hasAccess,
+  walletAddress,
+}) => {
   const toastId = useRef<any>(null);
   const [apiKeys, setApiKeys] = useState<apiKey[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,7 +56,12 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
       const docRef = doc(db, "users", uid);
       getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
-          setApiKeys(docSnap.data().apiKeys);
+          const data = docSnap.data();
+          if (data?.apiKeys) {
+            setApiKeys(data.apiKeys);
+          } else {
+            console.log("No API keys");
+          }
         }
       });
     }
@@ -105,6 +115,10 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           <h2 className="text-3xl font-bold text-center">Account</h2>
         </div>
         <div className="mt-16">
+          <div className="font-bold text-xl mb-2">Connected Wallet</div>
+          <div className="mb-2">{walletAddress}</div>
+        </div>
+        <div className="mt-16">
           <div className="font-bold text-xl mb-2">Credits</div>
           <div className="mb-2">{credits}</div>
           <Link
@@ -115,41 +129,70 @@ const Account: NextPage<PageProps> = ({ uid, credits, hasAccess }) => {
           </Link>
         </div>
         <div className="mt-16">
+          <div className="font-bold text-xl mb-2">Access Pass</div>
+
+          {hasAccess ? (
+            <div>
+              <div className="mb-2">Active</div>
+              <Link
+                href="/access"
+                className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
+              >
+                View Perks
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <div className="mb-2">N/A</div>
+              <Link
+                href="/access"
+                className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
+              >
+                Purchase
+              </Link>
+            </div>
+          )}
+        </div>
+        <div className="mt-16">
           <div className="font-bold text-xl mb-2">API Keys</div>
           <div>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-left p-2 text-gray-400">ID</th>
-                  <th className="text-left p-2 text-gray-400">Created</th>
-                  <th className="text-left p-2 text-gray-400">Expires</th>
-                  <th className="text-left p-2 text-gray-400">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {apiKeys.map((apiKey) => (
-                  <tr key={apiKey.apiKeyId} className="bg-background">
-                    <td className="p-2">{apiKey.apiKeyId}</td>
-                    <td className="p-2">{apiKey.createdAt.split("T")[0]}</td>
-                    <td className="p-2">{apiKey.expiresAt.split("T")[0]}</td>
-                    <td className="p-2">
-                      <button
-                        onClick={() => deleteApiKey(apiKey.apiKeyId)}
-                        className="text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
+            {apiKeys.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left p-2 text-gray-400">ID</th>
+                    <th className="text-left p-2 text-gray-400">Created</th>
+                    <th className="text-left p-2 text-gray-400">Expires</th>
+                    <th className="text-left p-2 text-gray-400">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {apiKeys.map((apiKey) => (
+                    <tr key={apiKey.apiKeyId} className="bg-background">
+                      <td className="p-2">{apiKey.apiKeyId}</td>
+                      <td className="p-2">{apiKey.createdAt.split("T")[0]}</td>
+                      <td className="p-2">{apiKey.expiresAt.split("T")[0]}</td>
+                      <td className="p-2">
+                        <button
+                          onClick={() => deleteApiKey(apiKey.apiKeyId)}
+                          className="text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="mb-2">No API keys</div>
+            )}
           </div>
           <div
             onClick={createApiKey}
             className="mt-2 font-medium text-primary-lighter underline cursor-pointer"
           >
-            + Create New key{" "}
+            Create new key{" "}
             {loading ? (
               <span className="relative ml-6">
                 <Spinner />
