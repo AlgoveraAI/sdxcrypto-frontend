@@ -72,3 +72,19 @@ exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
     return res.status(200).send("Webhook received");
   });
 });
+
+// api key mgmt
+const { createApiKey, deleteApiKey } = require("./api-keys.ts");
+exports.createApiKey = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const key = await createApiKey(req, res);
+    res.status(200).send(key);
+  });
+});
+
+exports.deleteApiKey = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    await deleteApiKey(req, res);
+    res.status(200).send("OK");
+  });
+});

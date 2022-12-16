@@ -7,9 +7,6 @@ const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 // @ts-ignore (block scoping errors are irrelevant)
 const { updateUserCredits } = require("./utils.ts");
 
-// const endpointSecret =
-//   "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9";
-
 // docs
 // https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-price_data
 
