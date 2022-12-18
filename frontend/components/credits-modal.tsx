@@ -96,6 +96,13 @@ export default function CreditsModal({
     setLoading(true);
     console.log("buying credits", creditsModalTrigger, uid, desiredNumCredits);
 
+    if (desiredNumCredits < 50) {
+      error("Minimum purchase is 50 credits");
+      setDesiredNumCredits(50);
+      setLoading(false);
+      return;
+    }
+
     if (creditsModalTrigger === "crypto") {
       const chargeRes = await fetch(
         // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCoinbaseCharge",
@@ -175,15 +182,16 @@ export default function CreditsModal({
                     <div className="sm:flex mt-1">
                       <div className="relative flex flex-grow items-stretch focus-within:z-10">
                         <input
-                          id="prompt"
+                          id="credits-modal"
                           value={desiredNumCredits}
                           type="number"
+                          min="50"
                           onChange={(e) =>
                             setDesiredNumCredits(parseInt(e.target.value))
                           }
                           data-lpignore="true"
                           className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
-                          placeholder="Abstract 3D octane render, trending on artstation..."
+                          placeholder="Amount (min 50)"
                         />
                       </div>
                       <button
