@@ -7,6 +7,7 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "../lib/firebase";
 import Spinner from "../components/spinner";
 import { Dialog, Transition } from "@headlessui/react";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type apiKey = {
   id: string;
@@ -25,6 +26,8 @@ const Account: NextPage<PageProps> = ({
   const [loading, setLoading] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  const { user, error, isLoading } = useUser();
 
   useEffect(() => {
     getApiKeys();
@@ -115,8 +118,12 @@ const Account: NextPage<PageProps> = ({
           <h2 className="text-3xl font-bold text-center">Account</h2>
         </div>
         <div className="mt-16">
-          <div className="font-bold text-xl mb-2">Connected Wallet</div>
-          <div className="mb-2">{walletAddress}</div>
+          <div className="font-bold text-xl mb-2">
+            {uid?.includes("|siwe|") ? "Wallet Address" : "Email"}
+          </div>
+          <div className="mb-2">
+            {uid?.includes("|siwe|") ? walletAddress : user?.email}
+          </div>
         </div>
         <div className="mt-16">
           <div className="font-bold text-xl mb-2">Credits</div>
