@@ -1,19 +1,22 @@
 import { useState, useEffect, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Spinner from "./spinner";
-import { User } from "../lib/hooks";
 import { toast } from "react-toastify";
 
 type Props = {
-  user: User;
-  creditsModalTrigger: boolean;
-  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  uid: string | null;
+  credits: number | null;
+  creditsModalTrigger: boolean | string;
+  setCreditsModalTrigger: React.Dispatch<
+    React.SetStateAction<boolean | string>
+  >;
 };
 
 export default function CreditsModal({
+  uid,
+  credits,
   creditsModalTrigger,
   setCreditsModalTrigger,
-  user,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,16 +31,21 @@ export default function CreditsModal({
   }, [creditsModalTrigger]);
 
   function openModal() {
-    if (user.uid) {
+    if (uid) {
       setOpen(true);
     } else {
-      error("Please connect wallet to purchase credits");
+      if (creditsModalTrigger === "crypto") {
+        error("Please connect wallet to purchase credits");
+      } else {
+        error("Please sign in to purchase credits");
+      }
       setCreditsModalTrigger(false);
     }
   }
 
-  function closeModal() {
-    setOpen(false);
+  async function closeModal() {
+    await setOpen(false);
+    setLoading(false);
     setCreditsModalTrigger(false);
   }
 
@@ -54,7 +62,7 @@ export default function CreditsModal({
   };
 
   async function testChargeEvent() {
-    // use this instead of buyCredits to locally test the handleChargeEvent firebase function
+    // use this to locally test the handleChargeEvent firebase function
     // (it mimics the event that Coinbase sends once a txn is executed)
     // (run firebase serve in the functions folder to activate the endpoint)
     setLoading(true);
@@ -70,7 +78,7 @@ export default function CreditsModal({
               code: "test_code",
               created_at: "test_created_at",
               metadata: {
-                uid: user.uid,
+                uid: uid,
                 credits: desiredNumCredits,
               },
             },
@@ -86,21 +94,48 @@ export default function CreditsModal({
   async function buyCredits() {
     // make call to next api
     setLoading(true);
-    console.log("buying credits", user.uid, desiredNumCredits);
-    const chargeRes = await fetch(
-      // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCharge",
-      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCharge",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          uid: user.uid,
-          credits: desiredNumCredits,
-        }),
-      }
-    );
-    const data = await chargeRes.json();
-    console.log("got charge data", data);
-    window.open(data.hosted_url, "_blank", "noopener,noreferrer");
+    console.log("buying credits", creditsModalTrigger, uid, desiredNumCredits);
+
+    if (desiredNumCredits < 50) {
+      error("Minimum purchase is 50 credits");
+      setDesiredNumCredits(50);
+      setLoading(false);
+      return;
+    }
+
+    if (creditsModalTrigger === "crypto") {
+      const chargeRes = await fetch(
+        // "http://localhost:5001/sdxcrypto-algovera/us-central1/createCoinbaseCharge",
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createCoinbaseCharge",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            uid: uid,
+            credits: desiredNumCredits,
+          }),
+        }
+      );
+      const data = await chargeRes.json();
+      console.log("got charge data", data);
+      window.open(data.hosted_url, "_blank", "noopener,noreferrer");
+    } else {
+      // creditcard (stripe)
+      const chargeRes = await fetch(
+        // "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeCharge",
+        "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeCharge",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            uid: uid,
+            credits: desiredNumCredits,
+          }),
+        }
+      );
+      const data = await chargeRes.json();
+      console.log("got charge data", data);
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    }
+
     setLoading(false);
   }
 
@@ -119,7 +154,6 @@ export default function CreditsModal({
           >
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
-
           <div className="fixed inset-0 z-10 overflow-y-auto">
             <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0 ">
               <Transition.Child
@@ -133,31 +167,31 @@ export default function CreditsModal({
               >
                 <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
                   <div className="text-white text-3xl">
-                    You have {user.credits ? user.credits : 0}{" "}
-                    {user.credits === 1 ? "credit" : "credits"} remaining
+                    You have {credits ? credits : 0}{" "}
+                    {credits === 1 ? "credit" : "credits"} remaining
                   </div>
-                  <div className="mt-6">Use credits to generate images</div>
                   {creditCost !== null ? (
                     <div>100 credits costs ${creditCost * 100} USD</div>
                   ) : null}
                   <div className="mt-6 shadow-sm w-full mx-auto">
                     <div>
                       <label className="block text-sm font-medium text-gray-500 text-left">
-                        Credits
+                        Purchase Credits
                       </label>
                     </div>
-                    <div className="sm:flex">
+                    <div className="sm:flex mt-1">
                       <div className="relative flex flex-grow items-stretch focus-within:z-10">
                         <input
-                          id="prompt"
+                          id="credits-modal"
                           value={desiredNumCredits}
                           type="number"
+                          min="50"
                           onChange={(e) =>
                             setDesiredNumCredits(parseInt(e.target.value))
                           }
                           data-lpignore="true"
                           className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
-                          placeholder="Abstract 3D octane render, trending on artstation..."
+                          placeholder="Amount (min 50)"
                         />
                       </div>
                       <button
@@ -168,7 +202,9 @@ export default function CreditsModal({
                       >
                         {/* keep text here when loading to maintain same width */}
                         <span className={loading ? "text-transparent" : ""}>
-                          Buy
+                          {creditsModalTrigger === "crypto"
+                            ? "Pay with Crypto"
+                            : "Pay with Credit Card"}
                         </span>
                         <span className={loading ? "" : "hidden"}>
                           <Spinner />
@@ -178,14 +214,25 @@ export default function CreditsModal({
                   </div>
                   <div className="text-center italic text-gray-500 mt-6">
                     Powered by{" "}
-                    <a
-                      className="underline"
-                      href="https://commerce.coinbase.com/"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Coinbase Commerce
-                    </a>
+                    {creditsModalTrigger === "crypto" ? (
+                      <a
+                        className="underline"
+                        href="https://commerce.coinbase.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Coinbase Commerce
+                      </a>
+                    ) : (
+                      <a
+                        className="underline"
+                        href="https://stripe.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Stripe
+                      </a>
+                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

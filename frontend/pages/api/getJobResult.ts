@@ -1,6 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 const config = require("../../config.json");
+import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
+import { db, auth, firebaseApp } from "../../lib/firebase";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,27 +26,22 @@ export default async function handler(
     }
     const url = `${apiBaseUrl}/generate/status`;
     const paramUrl = new URL(url);
-    const reqBody = JSON.parse(req.body);
-    for (const key in reqBody) {
-      paramUrl.searchParams.append(key, reqBody[key]);
-    }
-    const response = await fetch(paramUrl, {
-      method: "GET",
-      headers: headers,
-    });
-    // const response = await fetch(url, {
-    //   method: "POST",
-    //   headers: headers,
-    //   body: req.body,
-    // });
-    if (response.ok) {
-      const data = await response.json();
-      res.status(200).json(data);
+    const { workflow, jobId, uid } = JSON.parse(req.body);
+
+    const storage = getStorage(firebaseApp);
+
+    if (workflow === "txt2img") {
+      // get and return image url from firebase storage
+      const jobDir = `${uid}/images/${jobId}`;
+      // list urls in jobDir
+      const listResult = await listAll(ref(storage, jobDir));
+      const urls = listResult.items.map((item) => getDownloadURL(item));
+      Promise.all(urls).then((values) => {
+        console.log("urls", values);
+        res.status(200).json({ urls: values });
+      });
     } else {
-      console.log("status response not ok");
-      const data = await response.json();
-      console.log(data);
-      throw new Error("status response not ok");
+      throw new Error("unknown workflow", workflow);
     }
   } catch (error: any) {
     console.log("unexpected error", error);

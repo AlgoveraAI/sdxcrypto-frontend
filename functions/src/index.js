@@ -1,15 +1,7 @@
-// prepare app
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const { getValue } = require("firebase/remote-config");
 
-// local test (from /functions dir)
+// local test
 // firebase emulators:start --only functions
-
-// setup firebase conn
-admin.initializeApp();
-const firestore = admin.firestore();
-const remoteConfig = admin.remoteConfig();
 
 // setup cors
 const cors = require("cors")({ origin: true });
@@ -21,7 +13,7 @@ const {
 } = require("./credit-handling.ts");
 exports.checkAccessCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkAccessCredits(req, res, admin, firestore, remoteConfig);
+    await checkAccessCredits(req, res);
     res.status(200).send("OK");
   });
 });
@@ -43,25 +35,56 @@ exports.genCommunitySignature = functions.https.onRequest((req, res) => {
 
 // coinbase handling
 const {
-  createCharge,
+  createCoinbaseCharge,
   testChargeEvent,
   webhookHandler,
 } = require("./coinbase.ts");
-exports.createCharge = functions.https.onRequest((req, res) => {
+exports.createCoinbaseCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const charge = await createCharge(req, res);
+    const charge = await createCoinbaseCharge(req, res);
     res.status(200).send(charge);
   });
 });
 exports.testChargeEvent = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    testChargeEvent(req, res, admin, firestore);
+    testChargeEvent(req, res);
     res.status(200).send("OK");
   });
 });
 exports.webhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await webhookHandler(req, res, admin, firestore);
+    await webhookHandler(req, res);
     return res.status(200).send("Webhook received");
+  });
+});
+
+// stripe
+const { createStripeCharge, stripeWebhookHandler } = require("./stripe.ts");
+exports.createStripeCharge = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const charge = await createStripeCharge(req, res);
+    res.status(200).send(charge);
+  });
+});
+exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    await stripeWebhookHandler(req, res);
+    return res.status(200).send("Webhook received");
+  });
+});
+
+// api key mgmt
+const { createApiKey, deleteApiKey } = require("./api-keys.ts");
+exports.createApiKey = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const key = await createApiKey(req, res);
+    res.status(200).send(key);
+  });
+});
+
+exports.deleteApiKey = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    await deleteApiKey(req, res);
+    res.status(200).send("OK");
   });
 });

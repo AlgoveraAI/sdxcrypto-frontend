@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import CreditsModal from "../components/credits-modal";
+import { Contract } from "@ethersproject/contracts";
 import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { toast } from "react-toastify";
+const { ethers } = require("ethers");
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const accessImg = require("../assets/access.png");
 
@@ -19,15 +21,21 @@ type SignatureInfo = {
 };
 
 const C: NextPage<PageProps> = ({
-  user,
-  accessContract,
+  uid,
   accessPassCost,
   accessCreditsPerMonth,
   accessSubscriptionLength,
+  provider,
+  networkName,
+  signer,
+  walletAddress,
 }) => {
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [signature, setSignature] = useState<SignatureInfo | null>(null);
+  const [accessContract, setAccessContract] = useState<Contract | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const { user, error, isLoading } = useUser();
 
   const features = [
     {
@@ -44,20 +52,78 @@ const C: NextPage<PageProps> = ({
     },
     {
       name: "Community",
-      description: "NFT-gated Discord channel, events and rewards",
+      description: "Token-gated Discord channel, events and rewards",
     },
   ];
 
+  const getAccessContract = async () => {
+    // get contract address from firebase
+    if (provider && networkName && !accessContract) {
+      console.log("Getting access contract");
+      const docRef = doc(db, "contracts", networkName);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && data.access) {
+          let { address, abi } = JSON.parse(data.access);
+          console.log("Connecting to access contract:", address);
+          console.log("ABI:", abi);
+          const accessContract = new ethers.Contract(address, abi, provider);
+          setAccessContract(accessContract);
+          console.log(
+            "checking if user has an access pass",
+            walletAddress,
+            accessContract
+          );
+        } else {
+          console.error(`No Access contract deployed on: ${networkName}`);
+        }
+      } else {
+        console.error(`No Access contract deployed on: ${networkName}`);
+      }
+    }
+  };
+
+  // get current network
+  useEffect(() => {
+    if (provider) {
+      getAccessContract();
+    }
+  }, [provider, networkName]);
+
+  useEffect(() => {
+    checkHasAccess();
+  }, [walletAddress, accessContract]);
+
+  const checkHasAccess = async () => {
+    if (walletAddress && accessContract) {
+      let hasAccess = false;
+      const tokenIds = [0]; // todo update if launch more tokens
+      for (let i = 0; i < tokenIds.length; i++) {
+        const tokenId = tokenIds[i];
+        console.log("checking balance", tokenId);
+        const balance = await accessContract.balanceOf(walletAddress, tokenId);
+        console.log("balance", balance);
+        if (balance.gt(0)) {
+          hasAccess = true;
+          break;
+        }
+      }
+      console.log("hasAccess: ", hasAccess);
+      setHasAccess(hasAccess);
+    }
+  };
+
   const getSignature = async () => {
-    if (user.networkName && user.account && accessContract?.address) {
+    if (networkName && walletAddress && accessContract?.address) {
       const sigDocRef = doc(
         db,
         "access_pass_signatures",
-        user.networkName,
+        networkName,
         accessContract.address,
         `token_${TOKEN_ID}`,
         "wallets",
-        user.account
+        walletAddress
       );
       const sigDocSnap = await getDoc(sigDocRef);
       if (sigDocSnap.exists()) {
@@ -77,7 +143,7 @@ const C: NextPage<PageProps> = ({
     }
   };
 
-  const error = (msg: string) => {
+  const errorToast = (msg: string) => {
     toast(msg, {
       position: "bottom-left",
       type: "error",
@@ -91,29 +157,32 @@ const C: NextPage<PageProps> = ({
 
   // once we have user account and contract address, look for a signature
   useEffect(() => {
-    if (user.account && user.networkName && accessContract?.address) {
+    if (walletAddress && networkName && accessContract?.address) {
       getSignature();
     }
-  }, [user.account, user.networkName, accessContract?.address]);
+  }, [walletAddress, networkName, accessContract?.address]);
 
   const mint = async () => {
-    const { signer, provider, account, networkName } = user;
-    if (!signer || !provider || !account || !networkName) {
-      error("Please connect your wallet");
+    if (!signer || !provider || !walletAddress || !networkName) {
+      errorToast("Please connect your wallet");
       return;
     }
     if (!accessContract) {
-      error("Access contract not found");
+      if (!uid || !provider) {
+        errorToast("Please connect your wallet to mint");
+      } else {
+        errorToast("Access contract not found on network " + networkName);
+      }
       return;
     }
     const mintingActive = await accessContract.mintingActive(TOKEN_ID);
     if (!mintingActive) {
-      error("Access pass minting is not active");
+      errorToast("Access pass minting is not active");
       return;
     }
-    const balance = await accessContract.balanceOf(account, TOKEN_ID);
+    const balance = await accessContract.balanceOf(walletAddress, TOKEN_ID);
     if (balance > 0) {
-      error("You already have an access pass");
+      errorToast("You already have an access pass");
       return;
     }
 
@@ -145,9 +214,9 @@ const C: NextPage<PageProps> = ({
 
       const txnParams = {
         to: accessContract.address,
-        value: 0, // all Community art mints are free
+        value: mintPrice, // all Community art mints are free
         data: methodSignature,
-        from: account,
+        from: walletAddress,
       };
       const gasEstimate = await signer.estimateGas(txnParams);
       console.log("Gas estimate:", gasEstimate.toString());
@@ -156,7 +225,7 @@ const C: NextPage<PageProps> = ({
       setStatus("Awaiting signature");
       const txn = await signer.sendTransaction({
         to: accessContract.address,
-        value: 0, // all Community art mints are free
+        value: mintPrice, // all Community art mints are free
         data: methodSignature,
         gasLimit: gasEstimate,
       });
@@ -180,7 +249,7 @@ const C: NextPage<PageProps> = ({
       );
 
       // mark user as access (to trigger checkAccessCredits)
-      user.checkHasAccess(accessContract);
+      setHasAccess(true);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
@@ -202,7 +271,7 @@ const C: NextPage<PageProps> = ({
                 Algovera Access Pass
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
-                Tired of buying credits? <br /> Make a one-time NFT purchase for{" "}
+                Tired of buying credits? <br /> Make a one-time purchase for{" "}
                 {accessPassCost} ETH to get monthly credits and other perks.
               </p>
               <div className="mt-8 text-center justify-center">

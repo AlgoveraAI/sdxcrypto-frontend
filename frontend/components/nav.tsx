@@ -3,22 +3,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { User } from "../lib/hooks";
 import {
   WalletIcon,
   UserIcon,
+  UserCircleIcon,
   Bars3Icon,
-  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 import Spinner from "./spinner";
 import FeedbackModal from "./feedback-modal";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
-  user: User;
-  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
+  setUID: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
+export default function Nav({ setUID }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
@@ -26,10 +25,28 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
     setCurrentPage(window.location.pathname);
   }, []);
 
+  const { user, error, isLoading } = useUser();
+
+  // log user details
+  useEffect(() => {
+    if (user) {
+      console.log("user name", user.name);
+      console.log("user email", user.email);
+      console.log("user id", user.sub);
+      if (user.sub) {
+        setUID(user.sub);
+      } else {
+        console.error("No user id in user object", user);
+      }
+    } else {
+      console.log("user not logged in");
+    }
+  }, [user]);
+
   return (
     <Popover className="relative bg-black/[0.3]">
       <FeedbackModal
-        user={user}
+        uid={user?.sub || null}
         feedbackModalTrigger={feedbackModalTrigger}
         setFeedbackModalTrigger={setFeedbackModalTrigger}
       />
@@ -45,7 +62,11 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                 width={200}
                 height={100}
               />
+              {/* Beta tag */}
             </Link>
+            <span className="text-primary text-xs font-medium bg-gray-300 rounded-md px-2 ml-4 my-auto py-1 content-center inline-block align-baseline">
+              BETA
+            </span>
           </div>
           <div className="-my-2 -mr-2 md:hidden">
             <Popover.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-50  hover:text-gray-500 focus:outline-none">
@@ -70,6 +91,14 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
             >
               Access Pass
             </Link>
+            <Link
+              href="/pricing"
+              className={`text-base font-medium text-gray-50  ${
+                currentPage === "/pricing" ? "" : ""
+              }`}
+            >
+              Pricing
+            </Link>
             <span
               onClick={() => setFeedbackModalTrigger(true)}
               className={`text-base font-medium text-gray-50 cursor-pointer`}
@@ -80,7 +109,7 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
               {({ open }) => (
                 <>
                   <Popover.Button>
-                    <UserIcon
+                    <UserCircleIcon
                       className="h-6 w-6 flex-shrink-0 text-white bg-transparent outline-none border-none focus:outline-none"
                       aria-hidden="true"
                     />
@@ -98,48 +127,41 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
                     <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
                       <div className="overflow-hidden rounded-lg shadow-lg">
                         <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
-                          <div
-                            className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400"
-                            onClick={
-                              user.loading
-                                ? () => {}
-                                : user.uid
-                                ? user.signOut
-                                : user.signIn
+                          <Link
+                            href={
+                              user?.sub ? "/api/auth/logout" : "/api/auth/login"
                             }
+                            className="text-base font-medium"
                           >
-                            <WalletIcon
-                              className="h-6 w-6 flex-shrink-0 "
-                              aria-hidden="true"
-                            />
-                            <div className="ml-4">
-                              {user.loading ? (
-                                <p className="text-base font-medium relative">
-                                  Signing in...
-                                </p>
-                              ) : user.uid ? (
-                                <p className="text-base font-medium ">
-                                  Sign Out
-                                </p>
-                              ) : (
-                                <p className="text-base font-medium">Sign In</p>
-                              )}
+                            <div className="-m-3 flex items-start rounded-lg p-3 cursor-pointer text-white hover:text-gray-400">
+                              <WalletIcon
+                                className="h-6 w-6 flex-shrink-0 "
+                                aria-hidden="true"
+                              />
+                              <div className="ml-4">
+                                {user?.sub ? "Sign Out" : "Sign In"}
+                              </div>
                             </div>
-                          </div>
-                          <div
-                            className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
-                            onClick={() => {
-                              setCreditsModalTrigger(true);
-                            }}
-                          >
-                            <CurrencyDollarIcon
-                              className="h-6 w-6 flex-shrink-0 "
-                              aria-hidden="true"
-                            />
-                            <div className="ml-4">
-                              <p className="text-base font-medium ">Credits</p>
-                            </div>
-                          </div>
+                          </Link>
+                          {
+                            /* only show credits button if signed in */
+                            user?.sub ? (
+                              <Link
+                                className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
+                                href="/account"
+                              >
+                                <UserIcon
+                                  className="h-6 w-6 flex-shrink-0 "
+                                  aria-hidden="true"
+                                />
+                                <div className="ml-4">
+                                  <p className="text-base font-medium ">
+                                    Account
+                                  </p>
+                                </div>
+                              </Link>
+                            ) : null
+                          }
                         </div>
                       </div>
                     </Popover.Panel>
@@ -166,28 +188,32 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
         >
           <div className="divide-y-0 divide-gray-50 text-center rounded-lg bg-gray-900 text-white shadow-lg">
             <div className="space-y-5 py-5 px-5">
-              {user.loading ? (
-                <p
-                  onClick={user.signOut}
+              {user?.sub ? (
+                <Link
+                  href="/api/auth/logout"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Signing in...
-                </p>
-              ) : user.uid ? (
-                <p
-                  onClick={user.signOut}
-                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                >
-                  Sign out
-                </p>
+                  Sign Out
+                </Link>
               ) : (
-                <p
-                  onClick={user.signIn}
+                <Link
+                  href="/api/auth/login"
                   className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
                 >
-                  Sign in
-                </p>
+                  Sign In
+                </Link>
               )}
+              {
+                /* only show credits button if signed in */
+                user?.sub ? (
+                  <Link
+                    href="/account"
+                    className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                  >
+                    Account
+                  </Link>
+                ) : null
+              }
               <Link
                 href="/workflows"
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
@@ -200,15 +226,13 @@ export default function Nav({ user, setCreditsModalTrigger }: NavProps) {
               >
                 Access Pass
               </Link>
-
-              <div
-                className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-                onClick={() => {
-                  setCreditsModalTrigger(true);
-                }}
+              <Link
+                href="/pricing"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
-                Credits
-              </div>
+                Pricing
+              </Link>
+
               <span
                 onClick={() => setFeedbackModalTrigger(true)}
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"

@@ -2,6 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const config = require("../../config.json");
 
+// TODO protect API route:
+// https://github.com/auth0/nextjs-auth0/blob/main/EXAMPLES.md#protect-an-api-route
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse

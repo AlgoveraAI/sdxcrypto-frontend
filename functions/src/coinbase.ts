@@ -1,13 +1,16 @@
 const { Client, resources, Webhook } = require("coinbase-commerce-node");
 const { Charge } = resources;
-
+// @ts-ignore (block scoping errors are irrelevant)
+const { updateUserCredits } = require("./utils.ts");
+// @ts-ignore (block scoping errors are irrelevant)
+const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 // get env variables
 require("dotenv").config();
 const cbApiKey = process.env.COINBASE_COMMERCE_API_KEY;
 const cbWebhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
 Client.init(cbApiKey);
 
-exports.createCharge = async function (request, response) {
+exports.createCoinbaseCharge = async function (request, response) {
   console.log("creating charge", request.body);
   const data = JSON.parse(request.body);
   const { uid, credits } = data;
@@ -30,7 +33,7 @@ exports.createCharge = async function (request, response) {
 };
 
 // local function, not exported
-async function handleChargeEvent(event, admin, firestore) {
+async function handleChargeEvent(event) {
   console.log("charge event:", {
     id: event.data.id,
     status: event.type,
@@ -48,63 +51,14 @@ async function handleChargeEvent(event, admin, firestore) {
 
     let { uid, credits } = event.data.metadata;
     credits = parseInt(credits);
-
-    // prepare a batch update
-    let batch = firestore.batch();
-
-    // check if the user has a doc in the users collection
-    console.log("Checking user doc");
-    const userRef = firestore.collection("users").doc(uid);
-    const userDoc = await userRef.get();
-    console.log("Got user doc. exists =", userDoc.exists);
-    if (userDoc.exists) {
-      // update the user's credits
-      console.log("Updating user's credits");
-      batch.update(firestore.collection("users").doc(uid), {
-        credits: admin.firestore.FieldValue.increment(credits),
-      });
-    } else {
-      console.log("Creating user's doc");
-      batch.set(firestore.collection("users").doc(uid), {
-        // create the user doc with the credits
-        credits: credits,
-      });
-    }
-
-    // get a ref to the charge
-    console.log("Checking charge doc");
-    const chargeRef = firestore
-      .collection("users")
-      .doc(uid)
-      .collection("charges")
-      .doc(event.data.id);
-
-    // check if this charge has already been processed
-    const chargeDoc = await chargeRef.get();
-    if (chargeDoc.exists) {
-      console.log("Charge already exists");
-    } else {
-      // store the charge as a doc within the charges subcollection
-      console.log("Storing charge");
-      batch.set(
-        firestore
-          .collection("users")
-          .doc(uid)
-          .collection("charges")
-          .doc(event.data.id),
-        {
-          credits: credits,
-          order: event.data.code,
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        }
-      );
-    }
-
-    // commit the batch
-    console.log("Committing batch");
-    return batch.commit().then(function () {
-      console.log("Firestore updated");
-    });
+    await updateUserCredits(
+      uid,
+      credits,
+      event.data.id,
+      event.data.code,
+      firestore,
+      admin
+    );
   }
 
   if (event.type === "charge:failed") {
@@ -112,20 +66,20 @@ async function handleChargeEvent(event, admin, firestore) {
   }
 }
 
-exports.testChargeEvent = async function (request, response, admin, firestore) {
+exports.testChargeEvent = async function (request, response) {
   console.log("testing charge event", request.body);
   const data = JSON.parse(request.body);
   const event = data.event;
-  await handleChargeEvent(event, admin, firestore);
+  await handleChargeEvent(event);
 };
 
-exports.webhookHandler = async function (request, response, admin, firestore) {
+exports.webhookHandler = async function (request, response) {
   const rawBody = request.rawBody;
   const signature = request.headers["x-cc-webhook-signature"];
 
   try {
     const event = Webhook.verifyEventBody(rawBody, signature, cbWebhookSecret);
-    await handleChargeEvent(event, admin, firestore);
+    await handleChargeEvent(event);
   } catch (error) {
     console.log(error);
     response.status(400).send(`Webhook Error: ${error.message}`);

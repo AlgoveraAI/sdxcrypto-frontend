@@ -1,20 +1,14 @@
+import { useRef, useState } from "react";
+import type { NextPage } from "next";
+import { PageProps } from "../lib/types";
 import Link from "next/link";
 
-type Props = {
-  creditsModalTrigger: boolean;
-  setCreditsModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
-  creditCost: number | null;
-  accessPassCost: number | null;
-  accessCreditsPerMonth: number | null;
-};
-
-export default function Pricing({
-  creditsModalTrigger,
+const Pricing: NextPage<PageProps> = ({
   setCreditsModalTrigger,
   creditCost,
   accessPassCost,
   accessCreditsPerMonth,
-}: Props) {
+}) => {
   const tiers = [
     {
       name: "Credits",
@@ -77,21 +71,30 @@ export default function Pricing({
                     </p>
                   </div>
                   <div className="flex flex-1 flex-col justify-between space-y-6 bg-gray-50 px-6 pt-6 pb-8 sm:p-10 sm:pt-6">
-                    <div className="rounded-md shadow">
+                    <div>
                       {tier.name === "Credits" ? (
-                        <a
-                          onClick={() => {
-                            setCreditsModalTrigger(true);
-                          }}
-                          className="flex items-center justify-center rounded-md shadow-md  bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker cursor-pointer hover:brightness-90"
-                          aria-describedby="tier-standard"
-                        >
-                          Purchase Credits
-                        </a>
+                        <div className="flex">
+                          <a
+                            onClick={() => {
+                              setCreditsModalTrigger("crypto");
+                            }}
+                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-white cursor-pointer"
+                          >
+                            Crypto
+                          </a>
+                          <a
+                            onClick={() => {
+                              setCreditsModalTrigger("creditcard");
+                            }}
+                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-whites cursor-pointer"
+                          >
+                            Credit Card
+                          </a>
+                        </div>
                       ) : (
                         <Link
                           href="/access"
-                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90"
+                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-white"
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Read More
@@ -139,4 +142,6 @@ export default function Pricing({
       </div>
     </div>
   );
-}
+};
+
+export default Pricing;

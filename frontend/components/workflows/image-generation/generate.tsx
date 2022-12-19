@@ -1,35 +1,37 @@
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Spinner from "../../spinner";
-import { User } from "../../../lib/hooks";
 import { toast } from "react-toastify";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 type Props = {
-  user: User;
   selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
   images: string[];
   jobStatus: string;
+  credits: number | null;
 };
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
-  user,
   selectedModal,
   setJobId,
   prompt,
   setPrompt,
   images,
   jobStatus,
+  credits,
 }: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
+  const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
+    useState<any>(null);
   const toastId = useRef<any>(null);
 
   // model params
@@ -38,9 +40,17 @@ export default function Generate({
   const [inferenceSteps, setInferenceSteps] = useState(25);
   const [guidanceScale, setGuidanceScale] = useState(7.5);
 
+  // user
+  const { user, error, isLoading } = useUser();
+
   const imgLoaded = () => {
     setLoading(false);
     toast.dismiss(toastId.current);
+    // clear interval
+    if (checkTimeTakenInterval) {
+      clearInterval(checkTimeTakenInterval);
+      setCheckTimeTakenInteraval(null);
+    }
   };
 
   const changeSliderColor = (e: HTMLInputElement) => {
@@ -72,11 +82,11 @@ export default function Generate({
   useEffect(() => {
     // catch job status errors
     if (jobStatus === "error") {
-      error("Error monitoring job");
+      errorToast("Error monitoring job");
     }
   }, [jobStatus]);
 
-  const error = (msg: string, dismissCurrent: boolean = true) => {
+  const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
       position: "bottom-left",
       type: "error",
@@ -98,28 +108,28 @@ export default function Generate({
     try {
       setLoading(true);
 
-      if (!user.uid) {
-        error("Please sign in to generate images!");
+      if (!user) {
+        errorToast("Please sign in to generate images!");
         return;
       }
 
       if (!selectedModal) {
-        error("Please select a model!");
+        errorToast("Please select a model!");
         return;
       }
 
       if (prompt === "") {
-        error("Please enter a prompt!");
+        errorToast("Please enter a prompt!");
         return;
       }
 
-      if (user.credits === null || user.credits < 1) {
-        error("You don't have enough credits!");
+      if (credits === null || credits < 1) {
+        errorToast("You don't have enough credits!");
         return;
       }
 
       if (loading) {
-        error(
+        errorToast(
           "Please wait for the previous image to finish generating!",
           false
         );
@@ -149,6 +159,7 @@ export default function Generate({
         // once the time passes the threshold
         // show a warning toast
         // once it's been shown, stop checking and dont show again
+        console.log("checking time taken");
         if (!warningToastId) {
           const timeTaken = Date.now() - startTime;
           console.log(timeTaken);
@@ -166,11 +177,12 @@ export default function Generate({
       };
 
       const interval = setInterval(checkTimeTaken, 5000);
+      setCheckTimeTakenInteraval(interval);
 
       const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
-          uid: user.uid,
+          uid: user?.sub,
           prompt: prompt,
           base_model: baseModel,
           height: height,
@@ -179,9 +191,10 @@ export default function Generate({
           guidance_scale: guidanceScale,
         }),
       });
-      // todo handle out of credits error
-      // todo handle unknown api error
+
       const data = await res.json();
+
+      // check the response
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
         setJobId(data.jobId);
@@ -197,12 +210,11 @@ export default function Generate({
           icon: <Spinner />,
         });
       } else {
-        error("Error generating image");
         console.error("Error caught in api route", data);
+        errorToast("Error generating image");
+        clearInterval(interval);
+        setCheckTimeTakenInteraval(null);
       }
-
-      // clear interval
-      clearInterval(interval);
 
       // clear warning toast
       if (warningToastId) {
@@ -210,7 +222,7 @@ export default function Generate({
       }
     } catch (e) {
       console.error("Erorr generating image", e);
-      error("Error generating image");
+      errorToast("Error generating image");
     }
   };
 
@@ -224,9 +236,6 @@ export default function Generate({
 
   return (
     <div className="mb-12">
-      {/* <h2 className="mb-6 text-3xl font-bold text-center">
-        {selectedModal ? selectedModal : "No model selected"}
-      </h2> */}
       <div>
         <label className="block font-medium text-gray-500">Prompt</label>
         <div className="mt-1 md:flex shadow-sm ">
@@ -278,6 +287,14 @@ export default function Generate({
         )}
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
+
+          <div className="mt-6">
+            <label className="block font-medium text-gray-500">Model</label>
+            <div className="text-white font-bold text-left">
+              {selectedModal}
+            </div>
+          </div>
+
           <div className="mt-6">
             <label className="block font-medium text-gray-500">Width</label>
 
@@ -291,7 +308,7 @@ export default function Generate({
                   className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
                   min="128"
                   max="1024"
-                  step="8"
+                  step="64"
                   onChange={(e) => {
                     setWidth(parseInt(e.target.value));
                     changeSliderColor(e.target);
