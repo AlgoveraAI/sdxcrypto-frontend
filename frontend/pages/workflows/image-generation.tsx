@@ -9,6 +9,7 @@ import { firebaseApp, auth } from "../../lib/firebase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { BaseProvider } from "@ethersproject/providers";
 import FeedbackButton from "../../components/feedback-button";
+import { models } from "../../components/workflows/image-generation/models";
 
 const steps = [
   { id: "1", name: "Select Model", href: "#" },

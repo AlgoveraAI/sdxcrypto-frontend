@@ -1,41 +1,18 @@
 import Image from "next/image";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-
-import stabilityLogo from "../../../assets/workflows/stability.jpeg";
-import openaiLogo from "../../../assets/workflows/openai.jpg";
-
-const models = [
-  {
-    name: "Stable Diffusion",
-    id: "stable",
-    description:
-      "A latent text-to-image diffusion model capable of generating photo-realistic images given any text input, cultivates autonomous freedom to produce incredible imagery, empowers billions of people to create stunning art within seconds.",
-    website: "https://github.com/CompVis/stable-diffusion",
-    image: stabilityLogo,
-    credits_per_use: 2,
-  },
-  {
-    name: "DALL·E 2",
-    id: "dalle",
-    description:
-      "DALL·E 2 is a new AI system that can create realistic images and art from a description in natural language.",
-    website: "https://openai.com/dall-e-2/",
-    image: openaiLogo,
-    credits_per_use: 2,
-  },
-];
-
+import { models } from "./models";
 type Props = {
   selectedModal: string | null;
   setSelectedModal: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export default function Select({ selectedModal, setSelectedModal }: Props) {
+  const entries = Object.entries(models);
   return (
     <>
       {/* <h2 className="mb-6 text-3xl font-bold text-center">Select a Model</h2> */}
       <div className="grid grid-cols-1 gap-4">
-        {models.map((model) => (
+        {entries.map(([modelId, model]) => (
           <div
             key={model.name}
             className={`relative flex items-center space-x-3 rounded-lg px-6 py-5 shadow-sm bg-black/[0.3] border-none text-white`}
@@ -61,7 +38,7 @@ export default function Select({ selectedModal, setSelectedModal }: Props) {
                 <button
                   type="button"
                   className="text-sm inline-flex items-center rounded-md border border-primary bg-gradient-to-r from-primary to-primary-lighter px-5 py-1 font-medium text-white hover:primary-darker cursor-pointer hover:bg-primary-darker hover:brightness-90"
-                  onClick={() => setSelectedModal(model.name)}
+                  onClick={() => setSelectedModal(modelId)}
                 >
                   Select Model
                 </button>

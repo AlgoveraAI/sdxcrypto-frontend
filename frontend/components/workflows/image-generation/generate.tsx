@@ -6,8 +6,10 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { models } from "./models";
 
 type Props = {
+  // selectedModal type is one of the keys in models
   selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
@@ -136,13 +138,6 @@ export default function Generate({
         return;
       }
 
-      let baseModel;
-      if (selectedModal === "Stable Diffusion (v1.5)") {
-        baseModel = "stable diffusion v1.5";
-      } else {
-        baseModel = "stable diffusion v2-512x512";
-      }
-
       toastId.current = toast("Starting job", {
         position: "bottom-left",
         autoClose: false,
@@ -184,7 +179,7 @@ export default function Generate({
         body: JSON.stringify({
           uid: user?.sub,
           prompt: prompt,
-          base_model: baseModel,
+          base_model: selectedModal, // the modelId (key of models)
           height: height,
           width: width,
           inf_steps: inferenceSteps,
@@ -291,7 +286,11 @@ export default function Generate({
           <div className="mt-6">
             <label className="block font-medium text-gray-500">Model</label>
             <div className="text-white font-bold text-left">
-              {selectedModal}
+              {
+                // check if selectedModal is a valid key in models
+                // if not, show 'Not selected'
+                selectedModal ? models[selectedModal].name : "Not selected"
+              }
             </div>
           </div>
 
