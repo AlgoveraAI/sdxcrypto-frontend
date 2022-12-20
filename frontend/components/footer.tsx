@@ -6,6 +6,7 @@ const navigation = {
     { name: "Home", href: "/" },
     { name: "Workflows", href: "/workflows" },
     { name: "Access Pass", href: "/access" },
+    { name: "Pricing", href: "/pricing" },
   ],
   community: [
     { name: "Discord", href: "https://discord.gg/e65RuHSDS5" },

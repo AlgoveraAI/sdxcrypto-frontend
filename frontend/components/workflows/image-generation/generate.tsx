@@ -259,7 +259,7 @@ export default function Generate({
         </div>
         {credits === 0 ? (
           <div className="mt-2 text-sm text-red-600 italic">
-            You're out of credits,{" "}
+            {"You're out of credits, "}
             <Link className="underline" href="/pricing">
               buy more here
             </Link>{" "}
