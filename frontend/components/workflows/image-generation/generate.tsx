@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Spinner from "../../spinner";
 import { toast } from "react-toastify";
@@ -256,6 +257,15 @@ export default function Generate({
             <span>Generate</span>
           </button>
         </div>
+        {credits === 0 ? (
+          <div className="mt-2 text-sm text-red-600 italic">
+            You're out of credits,{" "}
+            <Link className="underline" href="/pricing">
+              buy more here
+            </Link>{" "}
+            to use the AI.
+          </div>
+        ) : null}
       </div>
       {/* TODO display all images */}
 
