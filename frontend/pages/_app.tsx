@@ -285,7 +285,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ToastContainer />
-      <Nav setUID={setUID} />
+      <Nav setUID={setUID} setFeedbackModalTrigger={setFeedbackModalTrigger} />
       <CreditsModal
         uid={uid}
         credits={credits}

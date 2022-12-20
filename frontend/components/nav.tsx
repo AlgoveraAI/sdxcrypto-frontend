@@ -8,15 +8,16 @@ import {
   UserIcon,
   UserCircleIcon,
   Bars3Icon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import Spinner from "./spinner";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
   setUID: React.Dispatch<React.SetStateAction<string | null>>;
+  setFeedbackModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Nav({ setUID }: NavProps) {
+export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
 
   useEffect(() => {
@@ -149,6 +150,18 @@ export default function Nav({ setUID }: NavProps) {
                               </Link>
                             ) : null
                           }
+                          <a
+                            className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
+                            onClick={() => setFeedbackModalTrigger(true)}
+                          >
+                            <PencilSquareIcon
+                              className="h-6 w-6 flex-shrink-0 "
+                              aria-hidden="true"
+                            />
+                            <div className="ml-4">
+                              <p className="text-base font-medium ">Feedback</p>
+                            </div>
+                          </a>
                         </div>
                       </div>
                     </Popover.Panel>
@@ -159,6 +172,8 @@ export default function Nav({ setUID }: NavProps) {
           </Popover.Group>
         </div>
       </div>
+
+      {/* MOBILE */}
 
       <Transition
         as={Fragment}
@@ -219,6 +234,12 @@ export default function Nav({ setUID }: NavProps) {
               >
                 Pricing
               </Link>
+              <a
+                onClick={() => setFeedbackModalTrigger(true)}
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+              >
+                Feedback
+              </a>
             </div>
           </div>
         </Popover.Panel>
