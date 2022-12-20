@@ -24,6 +24,7 @@ import { BaseProvider } from "@ethersproject/providers";
 import { Signer } from "@ethersproject/abstract-signer";
 const { ethers } = require("ethers");
 import { toast } from "react-toastify";
+import FeedbackModal from "../components/feedback-modal";
 
 // suppress console.log when in production on main branch
 const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
@@ -40,6 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [creditsModalTrigger, setCreditsModalTrigger] = useState<
     boolean | string
   >(false);
+  const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
   // config variables
   const [creditCost, setCreditCost] = useState<number | null>(null);
@@ -52,6 +54,7 @@ export default function App({ Component, pageProps }: AppProps) {
   >(null);
 
   // user variables
+  // (cant use useUser hook here because it's not a page)
   const [uid, setUID] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
@@ -289,6 +292,11 @@ export default function App({ Component, pageProps }: AppProps) {
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
       />
+      <FeedbackModal
+        uid={uid || null}
+        feedbackModalTrigger={feedbackModalTrigger}
+        setFeedbackModalTrigger={setFeedbackModalTrigger}
+      />
       <Component
         // {...pageProps}
         uid={uid}
@@ -296,6 +304,7 @@ export default function App({ Component, pageProps }: AppProps) {
         hasAccess={hasAccess}
         creditsModalTrigger={creditsModalTrigger}
         setCreditsModalTrigger={setCreditsModalTrigger}
+        setFeedbackModalTrigger={setFeedbackModalTrigger}
         creditCost={creditCost}
         accessPassCost={accessPassCost}
         accessCreditsPerMonth={accessCreditsPerMonth}

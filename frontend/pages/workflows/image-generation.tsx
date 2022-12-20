@@ -8,6 +8,7 @@ import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { firebaseApp, auth } from "../../lib/firebase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { BaseProvider } from "@ethersproject/providers";
+import FeedbackButton from "../../components/feedback-button";
 
 const steps = [
   { id: "1", name: "Select Model", href: "#" },
@@ -22,6 +23,7 @@ const C: NextPage<PageProps> = ({
   networkName,
   signer,
   walletAddress,
+  setFeedbackModalTrigger,
 }) => {
   // define which step of the workflow the user is on
   // (e.g. 0 = select, 1 = generate, 2 = mint)
@@ -202,6 +204,7 @@ const C: NextPage<PageProps> = ({
           />
         )}
       </div>
+      <FeedbackButton setFeedbackModalTrigger={setFeedbackModalTrigger} />
     </div>
   );
 };

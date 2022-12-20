@@ -10,6 +10,7 @@ export type PageProps = {
   setCreditsModalTrigger: React.Dispatch<
     React.SetStateAction<boolean | string>
   >;
+  setFeedbackModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   creditCost: number | null;
   accessContract: Contract | null;
   accessPassCost: number | null;

@@ -10,7 +10,6 @@ import {
   Bars3Icon,
 } from "@heroicons/react/24/outline";
 import Spinner from "./spinner";
-import FeedbackModal from "./feedback-modal";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
@@ -19,7 +18,6 @@ type NavProps = {
 
 export default function Nav({ setUID }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
-  const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
   useEffect(() => {
     setCurrentPage(window.location.pathname);
@@ -45,11 +43,6 @@ export default function Nav({ setUID }: NavProps) {
 
   return (
     <Popover className="relative bg-black/[0.3]">
-      <FeedbackModal
-        uid={user?.sub || null}
-        feedbackModalTrigger={feedbackModalTrigger}
-        setFeedbackModalTrigger={setFeedbackModalTrigger}
-      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -99,12 +92,6 @@ export default function Nav({ setUID }: NavProps) {
             >
               Pricing
             </Link>
-            <span
-              onClick={() => setFeedbackModalTrigger(true)}
-              className={`text-base font-medium text-gray-50 cursor-pointer`}
-            >
-              Feedback
-            </span>
             <Popover className="relative">
               {({ open }) => (
                 <>
@@ -232,13 +219,6 @@ export default function Nav({ setUID }: NavProps) {
               >
                 Pricing
               </Link>
-
-              <span
-                onClick={() => setFeedbackModalTrigger(true)}
-                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-              >
-                Feedback
-              </span>
             </div>
           </div>
         </Popover.Panel>
