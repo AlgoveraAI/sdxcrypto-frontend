@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { Contract } from "@ethersproject/contracts";
 import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
@@ -29,12 +28,13 @@ const C: NextPage<PageProps> = ({
   networkName,
   signer,
   walletAddress,
+  accessContract,
+  setHasAccess,
 }) => {
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [signature, setSignature] = useState<SignatureInfo | null>(null);
-  const [accessContract, setAccessContract] = useState<Contract | null>(null);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
   const { user, error, isLoading } = useUser();
 
   const features = [
@@ -55,64 +55,6 @@ const C: NextPage<PageProps> = ({
       description: "Token-gated Discord channel, events and rewards",
     },
   ];
-
-  const getAccessContract = async () => {
-    // get contract address from firebase
-    if (provider && networkName && !accessContract) {
-      console.log("Getting access contract");
-      const docRef = doc(db, "contracts", networkName);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data && data.access) {
-          let { address, abi } = JSON.parse(data.access);
-          console.log("Connecting to access contract:", address);
-          console.log("ABI:", abi);
-          const accessContract = new ethers.Contract(address, abi, provider);
-          setAccessContract(accessContract);
-          console.log(
-            "checking if user has an access pass",
-            walletAddress,
-            accessContract
-          );
-        } else {
-          console.error(`No Access contract deployed on: ${networkName}`);
-        }
-      } else {
-        console.error(`No Access contract deployed on: ${networkName}`);
-      }
-    }
-  };
-
-  // get current network
-  useEffect(() => {
-    if (provider) {
-      getAccessContract();
-    }
-  }, [provider, networkName]);
-
-  useEffect(() => {
-    checkHasAccess();
-  }, [walletAddress, accessContract]);
-
-  const checkHasAccess = async () => {
-    if (walletAddress && accessContract) {
-      let hasAccess = false;
-      const tokenIds = [0]; // todo update if launch more tokens
-      for (let i = 0; i < tokenIds.length; i++) {
-        const tokenId = tokenIds[i];
-        console.log("checking balance", tokenId);
-        const balance = await accessContract.balanceOf(walletAddress, tokenId);
-        console.log("balance", balance);
-        if (balance.gt(0)) {
-          hasAccess = true;
-          break;
-        }
-      }
-      console.log("hasAccess: ", hasAccess);
-      setHasAccess(hasAccess);
-    }
-  };
 
   const getSignature = async () => {
     if (networkName && walletAddress && accessContract?.address) {

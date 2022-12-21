@@ -25,6 +25,7 @@ import { Signer } from "@ethersproject/abstract-signer";
 const { ethers } = require("ethers");
 import { toast } from "react-toastify";
 import FeedbackModal from "../components/feedback-modal";
+import { Contract } from "@ethersproject/contracts";
 
 // suppress console.log when in production on main branch
 const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
@@ -57,13 +58,14 @@ export default function App({ Component, pageProps }: AppProps) {
   // (cant use useUser hook here because it's not a page)
   const [uid, setUID] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
 
   // web3 stuff
   const [provider, setProvider] = useState<BaseProvider | null>(null);
   const [networkName, setNetworkName] = useState<string | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
+  const [accessContract, setAccessContract] = useState<Contract | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
   useEffect(() => {
     // on mount
@@ -76,15 +78,21 @@ export default function App({ Component, pageProps }: AppProps) {
     // on user login
     if (uid) {
       checkIfWeb3User();
-      // checkGiftedCredits();
       pollCredits();
     }
   }, [uid]);
 
   useEffect(() => {
+    // on user login
+    if (uid && walletAddress) {
+      checkGiftedCredits();
+    }
+  }, [uid, walletAddress]);
+
+  useEffect(() => {
     // on user login and access pass check
     if (uid && hasAccess) {
-      // checkAccessCredits();
+      checkAccessCredits();
     }
   }, [uid, hasAccess]);
 
@@ -94,6 +102,63 @@ export default function App({ Component, pageProps }: AppProps) {
       checkWalletAddress();
     }
   }, [walletAddress, provider]);
+
+  useEffect(() => {
+    if (provider) {
+      getAccessContract();
+    }
+  }, [provider, networkName]);
+
+  useEffect(() => {
+    checkHasAccess();
+  }, [walletAddress, accessContract]);
+
+  const getAccessContract = async () => {
+    // get contract address from firebase
+    if (provider && networkName && !accessContract) {
+      console.log("Getting access contract");
+      const docRef = doc(db, "contracts", networkName);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && data.access) {
+          let { address, abi } = JSON.parse(data.access);
+          console.log("Connecting to access contract:", address);
+          console.log("ABI:", abi);
+          const accessContract = new ethers.Contract(address, abi, provider);
+          setAccessContract(accessContract);
+          console.log(
+            "checking if user has an access pass",
+            walletAddress,
+            accessContract
+          );
+        } else {
+          console.error(`No Access contract deployed on: ${networkName}`);
+        }
+      } else {
+        console.error(`No Access contract deployed on: ${networkName}`);
+      }
+    }
+  };
+
+  const checkHasAccess = async () => {
+    if (walletAddress && accessContract) {
+      let hasAccess = false;
+      const tokenIds = [0]; // todo update if launch more tokens
+      for (let i = 0; i < tokenIds.length; i++) {
+        const tokenId = tokenIds[i];
+        console.log("checking balance", tokenId);
+        const balance = await accessContract.balanceOf(walletAddress, tokenId);
+        console.log("balance", balance);
+        if (balance.gt(0)) {
+          hasAccess = true;
+          break;
+        }
+      }
+      console.log("hasAccess: ", hasAccess);
+      setHasAccess(hasAccess);
+    }
+  };
 
   const checkIfWeb3User = async () => {
     // runs once a user has logged in
@@ -313,6 +378,7 @@ export default function App({ Component, pageProps }: AppProps) {
         signer={signer}
         networkName={networkName}
         walletAddress={walletAddress}
+        setHasAccess={setHasAccess}
       />
       <Analytics />
     </UserProvider>
