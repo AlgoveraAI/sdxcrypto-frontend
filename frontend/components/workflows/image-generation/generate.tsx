@@ -281,6 +281,7 @@ export default function Generate({
                   label={input.label}
                   type={input.type}
                   params={input.params}
+                  info={input.info}
                   value={
                     params[input.id] ? params[input.id] : input.defaultValue
                   }

@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { InputProps, RangeProps, OptionsProps } from "../../lib/types";
+import Popup from "reactjs-popup";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 const Range: React.FC<RangeProps> = ({
   min,
@@ -20,6 +22,7 @@ const Range: React.FC<RangeProps> = ({
     }
   };
   useEffect(() => {
+    // set the initial colors on load
     changeSliderColor(document.getElementById(id) as HTMLInputElement);
   }, []);
   return (
@@ -49,7 +52,11 @@ const Options: React.FC<OptionsProps> = ({ options, value, onChange }) => {
         <button
           key={option}
           onClick={() => onChange(option)}
-          className={option === value ? "active" : ""}
+          className={`${
+            value === option
+              ? "bg-primary-lighter text-white"
+              : "bg-background-darker text-gray-500"
+          } w-[80px] px-4 py-2 mr-2 text-sm font-medium rounded-md hover:bg-primary-lighter hover:text-white`}
         >
           {option}
         </button>
@@ -59,27 +66,44 @@ const Options: React.FC<OptionsProps> = ({ options, value, onChange }) => {
 };
 
 export default function Input(props: InputProps) {
-  const { params } = props;
+  const { params, value, setValue, info, type, id, label } = props;
+  console.log("INPUT", props);
   return (
     <div className="mt-6">
-      <label className="block font-medium text-gray-500">{props.label}</label>
+      <label className="block font-medium text-gray-500">
+        {label}
+        {info ? (
+          <Popup
+            trigger={
+              <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
+            }
+            position="right center"
+            on="hover"
+            {...{ contentStyle: { background: "black" } }}
+          >
+            <div className="text-sm text-gray-300">{info}</div>
+          </Popup>
+        ) : null}
+      </label>
+
       <div className="mt-2 shadow-sm ">
-        {props.type === "range" && (
+        {type === "range" && (
           <Range
-            // todo: unsure how to handle type error on params.min
-            id={props.id}
+            // todo: unsure if this is best way
+            // to handle type error on params.min
+            id={id}
             min={(params as RangeProps).min}
             max={(params as RangeProps).max}
             step={(params as RangeProps).step}
-            value={props.value}
-            onChange={props.setValue}
+            value={value}
+            onChange={setValue}
           />
         )}
-        {props.type === "options" && (
+        {type === "options" && (
           <Options
             options={(params as OptionsProps).options}
-            value={props.value}
-            onChange={props.setValue}
+            value={value}
+            onChange={setValue}
           />
         )}
       </div>

@@ -13,33 +13,24 @@ export const models: Models = {
     credits_per_use: 2,
     inputs: [
       {
-        id: "width",
-        label: "Width",
-        // type: "options",
-        // options: [256, 512, 1024],
-        // default: 512,
-        type: "range",
-        defaultValue: 512,
+        id: "resolution",
+        label: "Resolution",
+        type: "options",
         params: {
-          min: 128,
-          max: 1024,
-          step: 8,
+          options: [256, 512, 1024],
         },
-      },
-      {
-        id: "height",
-        label: "Height",
-        // type: "options",
-        // options: [256, 512, 1024],
-        // default: 512,
-        type: "range",
         defaultValue: 512,
-        params: {
-          min: 128,
-          max: 1024,
-          step: 8,
-        },
+        info: "The height and width of the image in pixels (DALLE images must be a square)",
       },
+      // {
+      //   id: "height",
+      //   label: "Height",
+      //   type: "options",
+      //   params: {
+      //     options: [256, 512, 1024],
+      //   },
+      //   defaultValue: 512,
+      // },
     ],
   },
   stable: {
