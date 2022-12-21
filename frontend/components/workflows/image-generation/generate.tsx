@@ -8,6 +8,7 @@ import "reactjs-popup/dist/index.css";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { models } from "./models";
+import Input from "../input";
 
 type Props = {
   // selectedModal type is one of the keys in models
@@ -37,11 +38,8 @@ export default function Generate({
     useState<any>(null);
   const toastId = useRef<any>(null);
 
-  // model params
-  const [height, setHeight] = useState(512);
-  const [width, setWidth] = useState(512);
-  const [inferenceSteps, setInferenceSteps] = useState(25);
-  const [guidanceScale, setGuidanceScale] = useState(7.5);
+  // model params (object with string keys and number values)
+  const [params, setParams] = useState<{ [key: string]: number }>({});
 
   // user
   const { user, error, isLoading } = useUser();
@@ -55,32 +53,6 @@ export default function Generate({
       setCheckTimeTakenInteraval(null);
     }
   };
-
-  const changeSliderColor = (e: HTMLInputElement) => {
-    if (e.value) {
-      const value = parseInt(e.value);
-      const min = parseInt(e.min);
-      const max = parseInt(e.max);
-      const percent = ((value - min) / (max - min)) * 100;
-      const bg = `linear-gradient(90deg, #1937D6 ${percent}%, #0A101D ${
-        // const bg = `linear-gradient(90deg, #5771f2 ${percent * 100}%, #1937D6 ${
-        percent
-      }%)`;
-      e.style.background = bg;
-    }
-  };
-
-  useEffect(() => {
-    // set bg colors on load
-    changeSliderColor(document.getElementById("width") as HTMLInputElement);
-    changeSliderColor(document.getElementById("height") as HTMLInputElement);
-    changeSliderColor(
-      document.getElementById("inferenceSteps") as HTMLInputElement
-    );
-    changeSliderColor(
-      document.getElementById("guidanceScale") as HTMLInputElement
-    );
-  }, []);
 
   useEffect(() => {
     // catch job status errors
@@ -181,10 +153,7 @@ export default function Generate({
           uid: user?.sub,
           prompt: prompt,
           base_model: selectedModal, // the modelId (key of models)
-          height: height,
-          width: width,
-          inf_steps: inferenceSteps,
-          guidance_scale: guidanceScale,
+          ...params, // the model params
         }),
       });
 
@@ -304,128 +273,26 @@ export default function Generate({
             </div>
           </div>
 
-          <div className="mt-6">
-            <label className="block font-medium text-gray-500">Width</label>
-
-            <div className="mt-2 shadow-sm ">
-              <div className="text-white font-bold text-left">{width}</div>
-              <div>
-                <input
-                  id="width"
-                  type="range"
-                  value={width}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
-                  min="128"
-                  max="1024"
-                  step="64"
-                  onChange={(e) => {
-                    setWidth(parseInt(e.target.value));
-                    changeSliderColor(e.target);
+          {selectedModal
+            ? models[selectedModal].inputs.map((input) => (
+                <Input
+                  key={input.id}
+                  id={input.id}
+                  label={input.label}
+                  type={input.type}
+                  params={input.params}
+                  value={
+                    params[input.id] ? params[input.id] : input.defaultValue
+                  }
+                  setValue={(e) => {
+                    setParams({
+                      ...params,
+                      [input.id]: e,
+                    });
                   }}
                 />
-              </div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <label className="block font-medium text-gray-500">Height</label>
-
-            <div className="mt-2 shadow-sm ">
-              <div className="text-white font-bold text-left">{height}</div>
-              <div>
-                <input
-                  id="height"
-                  type="range"
-                  value={height}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary-lighter"
-                  min="128"
-                  max="1024"
-                  step="8"
-                  onChange={(e) => {
-                    setHeight(parseInt(e.target.value));
-                    changeSliderColor(e.target);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Inference Steps
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">
-                  How many steps to spend generating your image
-                </div>
-              </Popup>
-            </label>
-            <div className="mt-2 shadow-sm ">
-              <div className="text-white font-bold text-left">
-                {inferenceSteps}
-              </div>
-              <div>
-                <input
-                  id="inferenceSteps"
-                  type="range"
-                  value={inferenceSteps}
-                  className="w-full h-2  rounded-lg appearance-none cursor-pointer bg-primary-lighter"
-                  min="1"
-                  max="100"
-                  step="1"
-                  onChange={(e) => {
-                    setInferenceSteps(parseInt(e.target.value));
-                    changeSliderColor(e.target);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <label className="block font-medium text-gray-500">
-              Guidance Scale
-              <Popup
-                trigger={
-                  <InformationCircleIcon className="inline-block w-4 h-4 ml-1 text-gray-400" />
-                }
-                position="right center"
-                on="hover"
-                {...{ contentStyle: { background: "black" } }}
-              >
-                <div className="text-sm text-gray-300">
-                  Adjust how much the image will be like your prompt
-                </div>
-              </Popup>
-            </label>
-            <div className="mt-2 shadow-sm ">
-              <div className="text-white font-bold text-left">
-                {guidanceScale}
-              </div>
-              <div>
-                <input
-                  id="guidanceScale"
-                  type="range"
-                  value={guidanceScale}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-primary"
-                  min="1"
-                  max="50"
-                  step="1"
-                  onChange={(e) => {
-                    setGuidanceScale(parseInt(e.target.value));
-                    changeSliderColor(e.target);
-                  }}
-                />
-              </div>
-              <div className="flex justify-between w-full mt-2 text-sm font-medium text-gray-500">
-                {/* <span>1</span>
-                <span>50</span> */}
-              </div>
-            </div>
-          </div>
+              ))
+            : null}
         </div>
       </div>
     </div>

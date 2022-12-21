@@ -1,19 +1,6 @@
 import stabilityLogo from "../../../assets/workflows/stability.jpeg";
 import openaiLogo from "../../../assets/workflows/openai.jpg";
-import { StaticImageData } from "next/image";
-
-export type Model = {
-  name: string;
-  id: string;
-  description: string;
-  website: string;
-  image: StaticImageData;
-  credits_per_use: number;
-};
-
-export type Models = {
-  [key: string]: Model;
-};
+import { Models } from "../../../lib/types";
 
 export const models: Models = {
   dalle: {
@@ -24,6 +11,36 @@ export const models: Models = {
     website: "https://openai.com/dall-e-2/",
     image: openaiLogo,
     credits_per_use: 2,
+    inputs: [
+      {
+        id: "width",
+        label: "Width",
+        // type: "options",
+        // options: [256, 512, 1024],
+        // default: 512,
+        type: "range",
+        defaultValue: 512,
+        params: {
+          min: 128,
+          max: 1024,
+          step: 8,
+        },
+      },
+      {
+        id: "height",
+        label: "Height",
+        // type: "options",
+        // options: [256, 512, 1024],
+        // default: 512,
+        type: "range",
+        defaultValue: 512,
+        params: {
+          min: 128,
+          max: 1024,
+          step: 8,
+        },
+      },
+    ],
   },
   stable: {
     name: "Stable Diffusion",
@@ -33,5 +50,53 @@ export const models: Models = {
     website: "https://github.com/CompVis/stable-diffusion",
     image: stabilityLogo,
     credits_per_use: 2,
+    inputs: [
+      {
+        id: "width",
+        label: "Width",
+        type: "range",
+        params: {
+          min: 128,
+          max: 1024,
+          step: 8,
+        },
+        defaultValue: 512,
+      },
+      {
+        id: "height",
+        label: "Height",
+        type: "range",
+        params: {
+          min: 128,
+          max: 1024,
+          step: 8,
+        },
+        defaultValue: 512,
+      },
+      {
+        id: "inferenceSteps",
+        label: "Inference Steps",
+        type: "range",
+        params: {
+          min: 0,
+          max: 50,
+          step: 1,
+        },
+        defaultValue: 25,
+        info: "How many steps to spend generating your image",
+      },
+      {
+        id: "guidanceScale",
+        label: "Guidance Scale",
+        type: "range",
+        params: {
+          min: 0,
+          max: 50,
+          step: 0.5,
+        },
+        defaultValue: 7.5,
+        info: "How much the image will be like your prompt",
+      },
+    ],
   },
 };
