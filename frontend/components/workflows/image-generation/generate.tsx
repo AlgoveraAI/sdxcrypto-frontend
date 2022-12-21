@@ -255,7 +255,7 @@ export default function Generate({
         ) : (
           <div
             className={`mt-6 md:mt-12 grid-col bg-background-darker shadow
-              w-full h-auto
+              w-full aspect-square
             `}
           />
         )}
