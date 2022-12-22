@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Spinner from "../../spinner";
 import { models } from "../image-generation/models";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+
 type ImgResult = {
   urls: string[];
   settings: any;
@@ -45,7 +47,7 @@ export default function Images({ uid }: { uid: string | null }) {
           <ChevronRightIcon className="inline ml-4 mb-1 h-8 w-8" />
         )}
       </div>
-      {jobResults !== null && show ? (
+      {jobResults !== null && jobResults.length > 0 && show ? (
         <ul
           role="list"
           className="space-y-12 sm:space-y-0 sm:divide-y sm:divide-gray-200 lg:gap-x-8 lg:space-y-0"
@@ -109,11 +111,22 @@ export default function Images({ uid }: { uid: string | null }) {
             </li>
           ))}
         </ul>
-      ) : show ? (
+      ) : jobResults === null ? (
         <div className="w-full py-24 relative">
           <Spinner />
         </div>
-      ) : null}
+      ) : (
+        <div>
+          You have no image generations yet. Head to the{" "}
+          <Link
+            className="underline cursor-pointer"
+            href="/workflows/image-generation"
+          >
+            Image Generation Workflow
+          </Link>{" "}
+          to get started.
+        </div>
+      )}
     </div>
   );
 }
