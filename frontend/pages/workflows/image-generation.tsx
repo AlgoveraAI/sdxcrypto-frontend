@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
+import Link from "next/link";
 import Select from "../../components/workflows/image-generation/select";
 import Generate from "../../components/workflows/image-generation/generate";
 import Mint from "../../components/workflows/image-generation/mint";
 import { PageProps } from "../../lib/types";
-import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
-import { firebaseApp, auth } from "../../lib/firebase";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { BaseProvider } from "@ethersproject/providers";
-import { models } from "../../components/workflows/image-generation/models";
 
 const steps = [
   { id: "1", name: "Select Model", href: "#" },
@@ -111,8 +108,15 @@ const C: NextPage<PageProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto md:px-24 px-6">
-      <h1 className="text-3xl font-bold text-center my-12">Image Generation</h1>
-
+      <h1 className="text-3xl font-bold text-center mt-12">Image Generation</h1>
+      <div className="text-center mt-2">
+        <Link
+          href="/workflows/outputs"
+          className="mx-auto text-center text-sm underline text-gray-400"
+        >
+          View your outputs
+        </Link>
+      </div>
       <nav aria-label="Progress">
         <ol
           role="list"
