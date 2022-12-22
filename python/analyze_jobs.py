@@ -56,6 +56,9 @@ def analyze():
         x = [use["time_created"] for use in model_uses]
         y = [i for i in range(len(model_uses))]
 
+        # make it cumulative
+        y = [sum(y[:i]) for i in range(len(y))]
+
         plt.plot(x, y, label=base_model)
 
     # add label to legend outside the plot area
