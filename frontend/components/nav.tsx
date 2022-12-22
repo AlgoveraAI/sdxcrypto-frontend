@@ -112,9 +112,9 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                   >
-                    <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
+                    <Popover.Panel className="absolute right-0 z-10 mt-3 px-2 sm:px-0">
                       <div className="overflow-hidden rounded-lg shadow-lg">
-                        <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
+                        <div className="relative grid gap-6 bg-gray-900 px-10 py-6 sm:gap-8 sm:px-12">
                           <Link
                             href={
                               user?.sub ? "/api/auth/logout" : "/api/auth/login"

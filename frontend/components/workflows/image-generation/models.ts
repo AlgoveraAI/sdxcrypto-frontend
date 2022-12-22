@@ -22,15 +22,6 @@ export const models: Models = {
         defaultValue: 512,
         info: "The height and width of the image in pixels (DALLE images must be a square)",
       },
-      // {
-      //   id: "height",
-      //   label: "Height",
-      //   type: "options",
-      //   params: {
-      //     options: [256, 512, 1024],
-      //   },
-      //   defaultValue: 512,
-      // },
     ],
   },
   stable: {
