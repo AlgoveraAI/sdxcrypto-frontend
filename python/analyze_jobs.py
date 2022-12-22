@@ -3,6 +3,8 @@ import requests
 from tqdm import tqdm
 from firebase_admin import db, initialize_app, firestore, credentials
 from dotenv import load_dotenv
+from matplotlib import pyplot as plt
+import datetime as dt
 
 load_dotenv(os.getcwd() + "/python/.env")
 
@@ -34,12 +36,30 @@ def analyze():
         print(f"{base_model}: {count}")
 
     # plot the use of each model over time
-    # TODO jobs need timestamps
     uses = []
     for job in jobs:
-        uses.append(
-            {
-                "base_model": job["base_model"],
-                "timestamp": job["timestamp"],
-            }
-        )
+        if "time_created" in job:
+            # convert timestampt in format 'xxxx.xxxxx' to datetime string
+            timestamp = job["time_created"].split(".")[0]
+            timestamp = dt.datetime.fromtimestamp(int(timestamp))
+            uses.append(
+                {
+                    "base_model": job["base_model"],
+                    "time_created": timestamp,
+                }
+            )
+
+    # plot the number of uses of each model over time
+    for base_model in unique_base_models:
+        model_uses = [use for use in uses if use["base_model"] == base_model]
+        model_uses = sorted(model_uses, key=lambda x: x["time_created"])
+        x = [use["time_created"] for use in model_uses]
+        y = [i for i in range(len(model_uses))]
+
+        plt.plot(x, y, label=base_model)
+
+    # add label to legend outside the plot area
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0.0)
+
+    # rotate xticks to make them readable
+    plt.xticks(rotation=45)
