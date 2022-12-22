@@ -115,7 +115,7 @@ export default function Images({ uid }: { uid: string | null }) {
         <div className="w-full py-24 relative">
           <Spinner />
         </div>
-      ) : (
+      ) : jobResults.length === 0 ? (
         <div>
           You have no image generations yet. Head to the{" "}
           <Link
@@ -126,7 +126,7 @@ export default function Images({ uid }: { uid: string | null }) {
           </Link>{" "}
           to get started.
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
