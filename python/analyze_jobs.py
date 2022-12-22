@@ -8,14 +8,13 @@ import datetime as dt
 
 load_dotenv(os.getcwd() + "/python/.env")
 
-creds = credentials.Certificate(os.getenv("FIREBASE_CREDS"))
-app = initialize_app(creds, name="sdxcrypto-algovera")
-db = firestore.client(app=app)
-
-
 def analyze():
     # get all the jobs with outputs on firebase
     # return info on how many times each job was run
+
+    creds = credentials.Certificate(os.getenv("FIREBASE_CREDS"))
+    app = initialize_app(creds, name="sdxcrypto-algovera")
+    db = firestore.client(app=app)
 
     jobs_ref = db.collection("jobs")
     jobs = jobs_ref.stream()
