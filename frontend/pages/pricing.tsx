@@ -9,44 +9,84 @@ const Pricing: NextPage<PageProps> = ({
   accessPassCost,
   accessCreditsPerMonth,
 }) => {
-  const tiers = [
-    {
-      name: "Credits",
-      priceMonthly: `${creditCost} USD`,
-      priceType: "per-credit",
-      description: "Pay as you go",
-    },
-    {
-      name: "Access Pass",
-      priceMonthly: `${accessPassCost} ETH`,
-      priceType: "",
-      description: `${accessCreditsPerMonth} credits per month + perks`,
-    },
-  ];
+  const paymentOptions = {
+    fiat: [
+      {
+        name: "Pay as you go",
+        priceMonthly: `${creditCost} USD`,
+        priceType: "per-credit",
+        description: "Pay as you go",
+      },
+      {
+        name: "Subscription",
+        priceMonthly: `${accessPassCost} USD`,
+        priceType: "",
+        description: `${accessCreditsPerMonth} credits per month + perks`,
+      },
+    ],
+    crypto: [
+      {
+        name: "Pay as you go",
+        priceMonthly: `${creditCost} USDC`,
+        priceType: "per-credit",
+        description: "Pay as you go",
+      },
+      {
+        name: "Subscription",
+        priceMonthly: `${accessPassCost} ETH`,
+        priceType: "",
+        description: `${accessCreditsPerMonth} credits per month + perks`,
+      },
+    ],
+  };
+
+  const [paymentType, setPaymentType] = useState<"fiat" | "crypto">("fiat");
 
   return (
     <div className="bg-background">
       <div className="pt-12 sm:pt-16 lg:pt-24">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-            <h2 className="text-xl font-semibold leading-6 text-gray-300">
-              {/* Pricing */}
-            </h2>
             <p className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Flexible plans for any budget and need
-            </p>
-            <p className="text-xl text-gray-300">
-              Pay as you go, or get a monthly subscription
             </p>
           </div>
         </div>
       </div>
-      <div className="mt-8 bg-gray-50 pb-12 sm:mt-12 sm:pb-16 lg:mt-16 lg:pb-24">
-        <div className="relative">
+      <div className="mt-8 pb-12 sm:mt-12 sm:pb-16 lg:mt-16 lg:pb-24">
+        <div id="paymentOptions" className="">
+          <div className="flex w-1/2 text-center mx-auto">
+            <a
+              onClick={() => {
+                setPaymentType("fiat");
+              }}
+              className={`flex w-full items-center justify-center rounded-md shadow-md border border-primary mx-2 py-3 text-base font-medium text-whites  ${
+                paymentType === "fiat"
+                  ? "bg-gradient-to-r from-primary to-primary-lighter"
+                  : "bg-background-darker hover:bg-primary hover:text-white cursor-pointer "
+              }`}
+            >
+              Credit Card
+            </a>
+            <a
+              onClick={() => {
+                setPaymentType("crypto");
+              }}
+              className={`flex w-full items-center justify-center rounded-md shadow-md border border-primary mx-2 py-3 text-base font-medium text-whites ${
+                paymentType === "crypto"
+                  ? "bg-gradient-to-r from-primary to-primary-lighter"
+                  : "bg-background-darker hover:bg-primary hover:text-white cursor-pointer "
+              }`}
+            >
+              Crypto
+            </a>
+          </div>
+        </div>
+        <div className="relative mt-12">
           <div className="absolute inset-0 h-3/4 bg-gray-900" />
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-5xl lg:grid-cols-2 lg:gap-5 lg:space-y-0">
-              {tiers.map((tier) => (
+              {paymentOptions[paymentType].map((tier) => (
                 <div
                   key={tier.name}
                   className="flex flex-col overflow-hidden rounded-lg shadow-lg"
@@ -72,23 +112,19 @@ const Pricing: NextPage<PageProps> = ({
                   </div>
                   <div className="flex flex-1 flex-col justify-between space-y-6 bg-gray-50 px-6 pt-6 pb-8 sm:p-10 sm:pt-6">
                     <div>
-                      {tier.name === "Credits" ? (
+                      {tier.name === "Pay as you go" ? (
                         <div className="flex">
                           <a
                             onClick={() => {
-                              setCreditsModalTrigger("crypto");
+                              if (paymentType === "fiat") {
+                                setCreditsModalTrigger("creditcard");
+                              } else {
+                                setCreditsModalTrigger("crypto");
+                              }
                             }}
                             className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-white cursor-pointer"
                           >
-                            Crypto
-                          </a>
-                          <a
-                            onClick={() => {
-                              setCreditsModalTrigger("creditcard");
-                            }}
-                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-whites cursor-pointer"
-                          >
-                            Credit Card
+                            Purchase
                           </a>
                         </div>
                       ) : (
