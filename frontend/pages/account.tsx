@@ -117,146 +117,166 @@ const Account: NextPage<PageProps> = ({
         <div className="mt-6">
           <h2 className="text-3xl font-bold text-center">Account</h2>
         </div>
-        <div className="mt-16">
-          <div className="font-bold text-xl mb-2">
-            {uid?.includes("|siwe|") ? "Wallet Address" : "Email"}
-          </div>
-          <div className="mb-2">
-            {uid?.includes("|siwe|") ? walletAddress : user?.email}
-          </div>
-        </div>
-        <div className="mt-16">
-          <div className="font-bold text-xl mb-2">Credits</div>
-          <div className="mb-2">{credits}</div>
-          <Link
-            href="/pricing"
-            className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
-          >
-            Buy More
-          </Link>
-        </div>
-        <div className="mt-16">
-          <div className="font-bold text-xl mb-2">Access Pass</div>
-
-          {hasAccess ? (
-            <div>
-              <div className="mb-2">Active</div>
+        {uid ? (
+          <>
+            <div className="mt-16">
+              <div className="font-bold text-xl mb-2">
+                {uid?.includes("|siwe|") ? "Wallet Address" : "Email"}
+              </div>
+              <div className="mb-2">
+                {uid?.includes("|siwe|") ? walletAddress : user?.email}
+              </div>
+            </div>
+            <div className="mt-16">
+              <div className="font-bold text-xl mb-2">Credits</div>
+              <div className="mb-2">{credits}</div>
               <Link
-                href="/access"
+                href="/pricing"
                 className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
               >
-                View Perks
+                Buy More
               </Link>
             </div>
-          ) : (
-            <div>
-              <div className="mb-2">N/A</div>
-              <Link
-                href="/access"
-                className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
-              >
-                Purchase
-              </Link>
-            </div>
-          )}
-        </div>
-        <div className="mt-16">
-          <div className="font-bold text-xl mb-2">API Keys</div>
-          <div>
-            {apiKeys.length > 0 ? (
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="text-left p-2 text-gray-400">ID</th>
-                    <th className="text-left p-2 text-gray-400">Created</th>
-                    <th className="text-left p-2 text-gray-400">Expires</th>
-                    <th className="text-left p-2 text-gray-400">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiKeys.map((apiKey) => (
-                    <tr key={apiKey.id} className="bg-background">
-                      <td className="p-2">{apiKey.id}</td>
-                      <td className="p-2">{apiKey.createdAt.split("T")[0]}</td>
-                      <td className="p-2">{apiKey.expiresAt.split("T")[0]}</td>
-                      <td className="p-2">
-                        <button
-                          onClick={() => deleteApiKey(apiKey)}
-                          className="text-red-500 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className="mb-2">No API keys</div>
-            )}
-          </div>
-          <div
-            onClick={createApiKey}
-            className="mt-2 font-medium text-primary-lighter underline cursor-pointer"
-          >
-            Create new key{" "}
-            {loading ? (
-              <span className="relative ml-6">
-                <Spinner />
-              </span>
-            ) : null}
-          </div>
-        </div>
-      </div>
+            <div className="mt-16">
+              <div className="font-bold text-xl mb-2">Access Pass</div>
 
-      <Transition.Root show={showModal} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0 ">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
-                  <div className="mt-8">
-                    <div className="text-xl mb-2">Your New API Key</div>
-                    <div className="bg-background-darker mt-8 font-bold px-4 py-2 text-center text-xl">
-                      {newKey}
-                    </div>
-                  </div>
-                  <div className="mt-8">
-                    You can only see this key once. Please save it somewhere
-                    securely.
-                  </div>
-
-                  <button
-                    className="mt-8 py-2 px-8 border border-primary-lighter rounded-md"
-                    onClick={closeModal}
+              {hasAccess ? (
+                <div>
+                  <div className="mb-2">Active</div>
+                  <Link
+                    href="/access"
+                    className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
                   >
-                    Got it!
-                  </button>
-                </Dialog.Panel>
-              </Transition.Child>
+                    View Perks
+                  </Link>
+                </div>
+              ) : (
+                <div>
+                  <div className="mb-2">N/A</div>
+                  <Link
+                    href="/access"
+                    className="font-medium text-primary-lighter hover:underline cursor-pointer underline"
+                  >
+                    Purchase
+                  </Link>
+                </div>
+              )}
+            </div>
+            <div className="mt-16">
+              <div className="font-bold text-xl mb-2">API Keys</div>
+              <div>
+                {apiKeys.length > 0 ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="text-left p-2 text-gray-400">ID</th>
+                        <th className="text-left p-2 text-gray-400">Created</th>
+                        <th className="text-left p-2 text-gray-400">Expires</th>
+                        <th className="text-left p-2 text-gray-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {apiKeys.map((apiKey) => (
+                        <tr key={apiKey.id} className="bg-background">
+                          <td className="p-2">{apiKey.id}</td>
+                          <td className="p-2">
+                            {apiKey.createdAt.split("T")[0]}
+                          </td>
+                          <td className="p-2">
+                            {apiKey.expiresAt.split("T")[0]}
+                          </td>
+                          <td className="p-2">
+                            <button
+                              onClick={() => deleteApiKey(apiKey)}
+                              className="text-red-500 hover:underline"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="mb-2">No API keys</div>
+                )}
+              </div>
+              <div
+                onClick={createApiKey}
+                className="mt-2 font-medium text-primary-lighter underline cursor-pointer"
+              >
+                Create new key{" "}
+                {loading ? (
+                  <span className="relative ml-6">
+                    <Spinner />
+                  </span>
+                ) : null}
+              </div>
+            </div>
+            <Transition.Root show={showModal} as={Fragment}>
+              <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                </Transition.Child>
+                <div className="fixed inset-0 z-10 overflow-y-auto">
+                  <div className="flex min-h-full justify-center p-4 text-center items-center sm:p-0 ">
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                      enterTo="opacity-100 translate-y-0 sm:scale-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                      leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                      <Dialog.Panel className="text-gray-300 rounded-lg bg-background focus:outline-none p-12 sm:p-24">
+                        <div className="mt-8">
+                          <div className="text-xl mb-2">Your New API Key</div>
+                          <div className="bg-background-darker mt-8 font-bold px-4 py-2 text-center text-xl">
+                            {newKey}
+                          </div>
+                        </div>
+                        <div className="mt-8">
+                          You can only see this key once. Please save it
+                          somewhere securely.
+                        </div>
+
+                        <button
+                          className="mt-8 py-2 px-8 border border-primary-lighter rounded-md"
+                          onClick={closeModal}
+                        >
+                          Got it!
+                        </button>
+                      </Dialog.Panel>
+                    </Transition.Child>
+                  </div>
+                </div>
+              </Dialog>
+            </Transition.Root>
+          </>
+        ) : (
+          <div>
+            <div className="text-xl mt-16">
+              Sign in to view your account details
+            </div>
+            <div className="mt-8">
+              <Link href="/api/auth/login">
+                <button className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-none bg-gradient-to-r from-primary to-primary-lighter text-white hover:brightness-90 rounded-md">
+                  Sign In
+                </button>
+              </Link>
             </div>
           </div>
-        </Dialog>
-      </Transition.Root>
+        )}
+      </div>
     </div>
   );
 };
