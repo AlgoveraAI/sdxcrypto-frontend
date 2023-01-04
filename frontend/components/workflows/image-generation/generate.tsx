@@ -9,6 +9,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { models } from "./models";
 import Input from "../input";
+import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
   // selectedModal type is one of the keys in models
@@ -37,6 +38,7 @@ export default function Generate({
   const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
     useState<any>(null);
   const toastId = useRef<any>(null);
+  const [imgHovered, setImgHovered] = useState(false);
 
   // model params (object with string keys and number values)
   const [params, setParams] = useState<{ [key: string]: number }>({});
@@ -52,6 +54,13 @@ export default function Generate({
       clearInterval(checkTimeTakenInterval);
       setCheckTimeTakenInteraval(null);
     }
+  };
+
+  const downloadImage = (img: string) => {
+    // open image in new tab
+    // so the raw img can be downloaded in full-res
+    // (as downloading the next/image will get a compressed .webp)
+    window.open(img, "_blank");
   };
 
   useEffect(() => {
@@ -241,17 +250,33 @@ export default function Generate({
       {
         // 2 column flex that goes to rows on small screens
       }
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {images.length ? (
-          <Image
-            className="mt-6 md:mt-12 max-w-2/3 h-auto grid-col shadow"
-            src={images[0]}
-            alt="Generated Image"
-            width={512}
-            height={512}
-            onLoadedData={imgLoaded}
-            onLoad={imgLoaded}
-          />
+          <div
+            className="relative mt-6 md:mt-12 max-w-2/3 grid-col shadow"
+            onMouseEnter={() => {
+              setImgHovered(true);
+            }}
+            onMouseLeave={() => {
+              setImgHovered(false);
+            }}
+          >
+            <Image
+              className="h-auto"
+              src={images[0]}
+              alt="Generated Image"
+              fill
+              onLoadedData={imgLoaded}
+              onLoad={imgLoaded}
+            />
+            <ArrowDownCircleIcon
+              className={`absolute top-0 right-0 m-4 text-white cursor-pointer w-8 h-8 hover:brightness-50
+               ${imgHovered ? "opacity-100" : "opacity-0"}`}
+              onClick={() => {
+                downloadImage(images[0]);
+              }}
+            />
+          </div>
         ) : (
           <div
             className={`mt-6 md:mt-12 grid-col bg-background-darker shadow

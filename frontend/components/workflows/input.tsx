@@ -67,7 +67,6 @@ const Options: React.FC<OptionsProps> = ({ options, value, onChange }) => {
 
 export default function Input(props: InputProps) {
   const { params, value, setValue, info, type, id, label } = props;
-  console.log("INPUT", props);
   return (
     <div className="mt-6">
       <label className="block font-medium text-gray-500">
