@@ -207,16 +207,6 @@ const Account: NextPage<PageProps> = ({
             ) : null}
           </div>
         </div>
-
-        <div className="mt-16">
-          <div className="font-bold text-xl mb-2">Account Management</div>
-          <button
-            onClick={createApiKey}
-            className="flex items-center justify-center rounded-md px-8 py-2 text-sm font-medium text-white border border-red-500 hover:text-red-500"
-          >
-            Delete Account
-          </button>
-        </div>
       </div>
 
       <Transition.Root show={showModal} as={Fragment}>

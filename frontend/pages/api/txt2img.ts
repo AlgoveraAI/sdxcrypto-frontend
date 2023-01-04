@@ -47,9 +47,18 @@ export default async function handler(
       });
     } else {
       console.log("txt2img response not ok");
-      const data = await response.json();
-      console.log(data);
-      throw new Error("txt2img response not ok");
+      console.log(response.status);
+      console.log(response.statusText);
+      try {
+        const data = await response.json();
+        console.log(data);
+        res.status(500).json({ error: data });
+      } catch {
+        console.log("no json response");
+        res
+          .status(500)
+          .json({ error: `${response.status} (${response.statusText})` });
+      }
     }
   } catch (error) {
     console.log("unexpected error", error);

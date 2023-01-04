@@ -8,18 +8,17 @@ import {
   UserIcon,
   UserCircleIcon,
   Bars3Icon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-import Spinner from "./spinner";
-import FeedbackModal from "./feedback-modal";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 type NavProps = {
   setUID: React.Dispatch<React.SetStateAction<string | null>>;
+  setFeedbackModalTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Nav({ setUID }: NavProps) {
+export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
   const [currentPage, setCurrentPage] = useState<null | string>(null);
-  const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
 
   useEffect(() => {
     setCurrentPage(window.location.pathname);
@@ -45,11 +44,6 @@ export default function Nav({ setUID }: NavProps) {
 
   return (
     <Popover className="relative bg-black/[0.3]">
-      <FeedbackModal
-        uid={user?.sub || null}
-        feedbackModalTrigger={feedbackModalTrigger}
-        setFeedbackModalTrigger={setFeedbackModalTrigger}
-      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -99,12 +93,6 @@ export default function Nav({ setUID }: NavProps) {
             >
               Pricing
             </Link>
-            <span
-              onClick={() => setFeedbackModalTrigger(true)}
-              className={`text-base font-medium text-gray-50 cursor-pointer`}
-            >
-              Feedback
-            </span>
             <Popover className="relative">
               {({ open }) => (
                 <>
@@ -124,9 +112,9 @@ export default function Nav({ setUID }: NavProps) {
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                   >
-                    <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0">
+                    <Popover.Panel className="absolute right-0 z-10 mt-3 px-2 sm:px-0">
                       <div className="overflow-hidden rounded-lg shadow-lg">
-                        <div className="relative grid gap-6 bg-gray-900 px-5 py-6 sm:gap-8 sm:p-8">
+                        <div className="relative grid gap-6 bg-gray-900 px-10 py-6 sm:gap-8 sm:px-12">
                           <Link
                             href={
                               user?.sub ? "/api/auth/logout" : "/api/auth/login"
@@ -162,6 +150,18 @@ export default function Nav({ setUID }: NavProps) {
                               </Link>
                             ) : null
                           }
+                          <a
+                            className="-m-3 flex items-start rounded-lg p-3 text-white hover:text-gray-400 cursor-pointer"
+                            onClick={() => setFeedbackModalTrigger(true)}
+                          >
+                            <PencilSquareIcon
+                              className="h-6 w-6 flex-shrink-0 "
+                              aria-hidden="true"
+                            />
+                            <div className="ml-4">
+                              <p className="text-base font-medium ">Feedback</p>
+                            </div>
+                          </a>
                         </div>
                       </div>
                     </Popover.Panel>
@@ -172,6 +172,8 @@ export default function Nav({ setUID }: NavProps) {
           </Popover.Group>
         </div>
       </div>
+
+      {/* MOBILE */}
 
       <Transition
         as={Fragment}
@@ -232,13 +234,12 @@ export default function Nav({ setUID }: NavProps) {
               >
                 Pricing
               </Link>
-
-              <span
+              <a
                 onClick={() => setFeedbackModalTrigger(true)}
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 Feedback
-              </span>
+              </a>
             </div>
           </div>
         </Popover.Panel>

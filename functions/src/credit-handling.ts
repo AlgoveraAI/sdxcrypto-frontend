@@ -3,6 +3,7 @@ const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 
 exports.checkGiftedCredits = async function (req, res) {
   const { uid, walletAddress } = JSON.parse(req.body);
+  console.log("checking gifted credits", uid, walletAddress);
 
   // TODO check that the uid's username == the wallet
   // since username is stored as wallet address on sign-up

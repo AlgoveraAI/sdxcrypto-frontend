@@ -19,7 +19,7 @@ exports.checkAccessCredits = functions.https.onRequest((req, res) => {
 });
 exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkGiftedCredits(req, res, firestore);
+    await checkGiftedCredits(req, res);
     res.status(200).send("OK");
   });
 });

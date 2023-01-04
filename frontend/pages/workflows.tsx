@@ -91,7 +91,15 @@ const workflowOptions = [
 const Workflows: NextPage<PageProps> = () => {
   return (
     <div className="my-24 mx-4">
-      <h2 className="mb-6 text-3xl font-bold text-center">AI Workflows</h2>
+      <h2 className="mb-4 text-3xl font-bold text-center">AI Workflows</h2>
+      <div className="text-center mt-2">
+        <Link
+          href="/workflows/outputs"
+          className="mx-auto text-center text-sm underline text-gray-400"
+        >
+          View your outputs
+        </Link>
+      </div>
       <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto">
         <ul
           role="list"

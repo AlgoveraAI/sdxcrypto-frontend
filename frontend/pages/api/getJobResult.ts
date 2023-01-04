@@ -24,8 +24,6 @@ export default async function handler(
       console.log("using dev backend");
       apiBaseUrl = config.api_base_url_dev;
     }
-    const url = `${apiBaseUrl}/generate/status`;
-    const paramUrl = new URL(url);
     const { workflow, jobId, uid } = JSON.parse(req.body);
 
     const storage = getStorage(firebaseApp);
