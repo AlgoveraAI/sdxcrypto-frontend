@@ -229,7 +229,7 @@ export default function Generate({
           <button
             onClick={generateImg}
             type="button"
-            className="relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium  hover:bg-primary-darker focus:outline-non text-white bg-gradient-to-r from-primary to-blue-500 hover:brightness-90"
+            className="primary-button relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium"
           >
             {/* keep text here when loading to maintain same width */}
             <span>Generate</span>

@@ -26,11 +26,16 @@ const C: NextPage<PageProps> = ({
   // (e.g. 0 = select, 1 = generate, 2 = mint)
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
+  // store the job id
+  const [jobId, setJobId] = useState<string | null>(null);
+
+  // store the name of the workflow (indicated by the url)
+  const [workflowName, setWorkflowName] = useState<string | null>(null);
+
   // store params and details for each step here
   // so that we can pass them to the next step and store them
   const [selectedModal, setSelectedModal] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
-  const [jobId, setJobId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([
     // TEST img for if API is down
     // "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/0xfdad2c16a5c3551856337ca415455562683e78f6c487c8046c89e350e4435828%2Fimages%2Fd9516feba65540eb9fcb8b10d0fa28f0%2Fd9516feba65540eb9fcb8b10d0fa28f0.jpg?alt=media&token=6fcb1c0d-67fa-42a5-b04f-8313ff7c8245",
@@ -39,6 +44,23 @@ const C: NextPage<PageProps> = ({
   const [jobStatus, setJobStatus] = useState("");
   const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
   const { user, error, isLoading } = useUser();
+
+  useEffect(() => {
+    // get the workflow name from the url param 'name'
+    const params = new URLSearchParams(window.location.search);
+    const workflowName = params.get("name");
+    if (workflowName) {
+      console.log("workflowName: ", workflowName);
+      setWorkflowName(workflowName);
+    }
+  }, []);
+
+  useEffect(() => {
+    // get info about the workflow from the db
+    // TODO
+    if (workflowName) {
+    }
+  }, [workflowName]);
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job

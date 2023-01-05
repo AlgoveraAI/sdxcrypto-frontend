@@ -17,7 +17,7 @@ const workflowOptions = [
   {
     id: "1",
     name: "Image Generation",
-    href: "/workflows/image-generation",
+    href: "/workflows/view?name=dalle-image-gen",
     available: true,
     author: "Algovera",
     description: "Generate images from text prompts",
@@ -169,7 +169,7 @@ const Workflows: NextPage<PageProps> = () => {
             </div>
             <Link
               href="https://docs.algovera.ai/docs/developer/flow%20developers/"
-              className="bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 text-white font-bold py-2 px-4 rounded mt-8 mx-auto block w-1/2 sm:w-1/4"
+              className="primary-button font-bold py-2 px-4 rounded mt-8 mx-auto block w-1/2 sm:w-1/4"
               target={"_blank"}
             >
               Read the Docs

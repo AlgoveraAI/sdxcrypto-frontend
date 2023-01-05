@@ -57,7 +57,7 @@ export default function Hero({
                 <div className="rounded-md shadow">
                   <Link
                     href="/workflows"
-                    className="flex w-full items-center justify-center rounded-md border-none px-8 py-3 text-base font-medium text-white bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 md:py-4 md:px-10 md:text-lg"
+                    className="flex primary-button w-full items-center justify-center rounded-md border-none px-8 py-3 text-base font-medium md:py-4 md:px-10 md:text-lg"
                   >
                     Start Using AI
                   </Link>

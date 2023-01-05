@@ -87,7 +87,7 @@ export default function HowItWorks({ howitworksRef }: Props) {
       <div className="w-full text-center mt-24">
         <Link
           href="/workflows/image-generation"
-          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter px-5 py-3 text-base font-medium text-white hover:bg-primary-darker hover:brightness-90 w-1/3 mx-auto"
+          className="primary-button flex items-center justify-center rounded-md shadow-md  px-5 py-3 text-base font-medium w-1/3 mx-auto"
           aria-describedby="tier-standard cursor-pointer"
         >
           Try it now!

@@ -62,7 +62,7 @@ const Pricing: NextPage<PageProps> = ({
               }}
               className={`flex w-full items-center justify-center rounded-md shadow-md border border-primary mx-2 py-3 text-base font-medium text-whites  ${
                 paymentType === "fiat"
-                  ? "bg-gradient-to-r from-primary to-primary-lighter"
+                  ? "primary-button"
                   : "bg-background-darker hover:bg-primary hover:text-white cursor-pointer "
               }`}
             >
@@ -74,7 +74,7 @@ const Pricing: NextPage<PageProps> = ({
               }}
               className={`flex w-full items-center justify-center rounded-md shadow-md border border-primary mx-2 py-3 text-base font-medium text-whites ${
                 paymentType === "crypto"
-                  ? "bg-gradient-to-r from-primary to-primary-lighter"
+                  ? "primary-button"
                   : "bg-background-darker hover:bg-primary hover:text-white cursor-pointer "
               }`}
             >
@@ -122,7 +122,7 @@ const Pricing: NextPage<PageProps> = ({
                                 setCreditsModalTrigger("crypto");
                               }
                             }}
-                            className="flex w-full items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 mx-2 py-3 text-base font-medium text-white cursor-pointer"
+                            className="flex primary-button w-full items-center justify-center rounded-md shadow-md mx-2 py-3 text-base font-medium cursor-pointer"
                           >
                             Purchase
                           </a>
@@ -130,7 +130,7 @@ const Pricing: NextPage<PageProps> = ({
                       ) : (
                         <Link
                           href="/access"
-                          className="flex items-center justify-center rounded-md shadow-md bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 px-5 py-3 text-base font-medium text-white"
+                          className="flex primary-button items-center justify-center rounded-md shadow-md hover:brightness-90 px-5 py-3 text-base font-medium "
                           aria-describedby="tier-standard cursor-pointer"
                         >
                           Read More

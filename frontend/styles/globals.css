@@ -52,3 +52,16 @@ table {
   border-collapse: collapse;
   border-spacing: 0.5rem;
 }
+
+.primary-button {
+  /* text-white bg-gradient-to-r from-primary to-primary-lighter hover:brightness-90 */
+  background: linear-gradient(90deg, #1937D6 0%, #3b82f6 100%);
+  color: white;
+  border: none;
+  outline: none;
+  focus: none;
+}
+
+.primary-button:hover {
+  filter: brightness(90%);
+}
