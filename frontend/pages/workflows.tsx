@@ -13,79 +13,82 @@ import discourseBotImage from "../assets/workflows/discourse-bot.png";
 import notionImage from "../assets/workflows/notion.png";
 import gifImage from "../assets/workflows/gif.gif";
 
+const { WORKFLOWS } = require("../lib/config");
+
 const workflowOptions = [
   {
     id: "1",
     name: "Image Generation",
-    href: "/workflows/view?name=dalle-image-gen",
+    href: "/workflows/view?id=dalle-image-gen",
     available: true,
     author: "Algovera",
     description: "Generate images from text prompts",
     image: imageGenerationImage,
+    blockIcons: [],
   },
-  {
-    id: "2",
-    name: "Text Summarization",
-    href: "/workflows/text-summarization",
-    available: false,
-    author: "Algovera",
-    description: "Summarize text",
-    image: textSummarizationImage,
-  },
-  {
-    id: "3",
-    name: "Image Captioning",
-    href: "/workflows/image-captioning",
-    available: false,
-    author: "Algovera",
-    description: "Generate captions for images",
-    image: imageCaptioningImage,
-  },
-  {
-    id: "4",
-    name: "Image to Image",
-    href: "/workflows/image-to-image",
-    available: false,
-    author: "Algovera",
-    description: "Generate images from images",
-    image: imageTranslationImage,
-  },
-  {
-    id: "5",
-    name: "Animation Generation",
-    href: "/workflows/animation-generation",
-    available: false,
-    author: "Algovera",
-    description: "Generate animations from text prompts",
-    image: gifImage,
-  },
-  {
-    id: "6",
-    name: "Discord Integration",
-    href: "/workflows/animation-generation",
-    available: false,
-    author: "Algovera",
-    description: "Image generation via a Discord bot",
-    image: discordBotImage,
-  },
-  {
-    id: "7",
-    name: "Notion Integration",
-    href: "/workflows/animation-generation",
-    available: false,
-    author: "Algovera",
-    description: "Store text summarisation of Discord chat on Notion",
-    image: notionImage,
-  },
-  {
-    id: "8",
-    name: "Discourse Integration",
-    href: "/workflows/animation-generation",
-    available: false,
-    author: "Algovera",
-    description: "Generate image from a discourse post",
-    image: discourseBotImage,
-  },
+  // {
+  //   id: "2",
+  //   name: "Text Summarization",
+  //   href: "/workflows/text-summarization",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Summarize text",
+  //   image: textSummarizationImage,
+  // },
+  // {
+  //   id: "3",
+  //   name: "Image Captioning",
+  //   href: "/workflows/image-captioning",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Generate captions for images",
+  //   image: imageCaptioningImage,
+  // },
+  // {
+  //   id: "4",
+  //   name: "Image to Image",
+  //   href: "/workflows/image-to-image",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Generate images from images",
+  //   image: imageTranslationImage,
+  // },
+  // {
+  //   id: "5",
+  //   name: "Animation Generation",
+  //   href: "/workflows/animation-generation",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Generate animations from text prompts",
+  //   image: gifImage,
+  // },
+  // {
+  //   id: "6",
+  //   name: "Discord Integration",
+  //   href: "/workflows/animation-generation",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Image generation via a Discord bot",
+  //   image: discordBotImage,
+  // },
+  // {
+  //   id: "7",
+  //   name: "Notion Integration",
+  //   href: "/workflows/animation-generation",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Store text summarisation of Discord chat on Notion",
+  //   image: notionImage,
+  // },
+  // {
+  //   id: "8",
+  //   name: "Discourse Integration",
+  //   href: "/workflows/animation-generation",
+  //   available: false,
+  //   author: "Algovera",
+  //   description: "Generate image from a discourse post",
+  //   image: discourseBotImage,
+  // },
 ];
 
 const Workflows: NextPage<PageProps> = () => {
@@ -105,13 +108,13 @@ const Workflows: NextPage<PageProps> = () => {
           role="list"
           className="grid grid-cols-1 gap-12 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 mt-12"
         >
-          {workflowOptions.map((workflow) => (
+          {Object.entries(WORKFLOWS).map(([id, workflow]: [string, any]) => (
             <li
-              key={workflow.id}
+              key={id}
               className={`col-span-1 flex flex-col w-full divide-y divide-gray-200 rounded-lg bg-background-darker text-center shadow-md`}
             >
               <Link
-                href={workflow.available ? workflow.href : ""}
+                href={workflow.available ? "/workflows/view?id=" + id : ""}
                 className={`${
                   workflow.available
                     ? "cursor-pointer hover:brightness-110"
@@ -125,20 +128,19 @@ const Workflows: NextPage<PageProps> = () => {
                 }}
               >
                 <div className="flex flex-1 flex-col p-8 hover:">
-                  <Image
-                    className="mx-auto w-1/2 h-auto flex-shrink-0"
-                    // src={require(workflow.image)}
-                    src={workflow.image}
-                    alt=""
-                    width={512}
-                    height={512}
-                  />
+                  <div>
+                    {workflow.blocks.map((block: any, ix: number) => (
+                      <div key={ix} className="relative inline-block w-16 h-16">
+                        <Image src={block.icon} fill alt={block.name} />
+                      </div>
+                    ))}
+                  </div>
                   <h3 className="mt-6 font-bold text-gray-50">
                     {workflow.name}
                   </h3>
                   <dl className="mt-1 flex flex-grow flex-col justify-between">
                     <dd className="text-sm text-gray-500">
-                      {workflow.description}
+                      {workflow.short_desc}
                     </dd>
                     <dt className="sr-only">
                       {workflow.available ? "Live" : "Coming Soon"}

@@ -6,24 +6,24 @@ import Link from "next/link";
 import { ChevronRightIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 const C: NextPage<PageProps> = ({ uid }) => {
-  const [workflowName, setWorkflowName] = useState<string | null>(null);
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowInfo, setWorkflowInfo] = useState<any | null>(null);
 
   useEffect(() => {
     // get the workflow name from the url param 'name'
     const params = new URLSearchParams(window.location.search);
-    const workflowName = params.get("name");
-    if (workflowName) {
-      console.log("workflowName: ", workflowName);
-      setWorkflowName(workflowName);
+    const workflowId = params.get("id");
+    if (workflowId) {
+      console.log("workflowId: ", workflowId);
+      setWorkflowId(workflowId);
     } else {
-      setWorkflowName("Workflow not found");
+      setWorkflowId("Workflow not found");
     }
   }, []);
 
   useEffect(() => {
     // get info about the workflow from the db
-    if (workflowName) {
+    if (workflowId) {
       // todo - get workflow info from db
       const workflowInfo = {
         id: "dalle-image-gen",
@@ -48,7 +48,7 @@ const C: NextPage<PageProps> = ({ uid }) => {
       };
       setWorkflowInfo(workflowInfo);
     }
-  }, [workflowName]);
+  }, [workflowId]);
 
   return (
     <div className="mt-12 max-w-5xl mx-auto px-12">
@@ -88,7 +88,7 @@ const C: NextPage<PageProps> = ({ uid }) => {
             <div className="absolute bottom-0 right-0 m-4">
               <Link
                 className="primary-button font-bold py-2 px-8 rounded"
-                href={`/workflows/run?name=${workflowInfo.id}`}
+                href={`/workflows/run?name=${workflowId}`}
               >
                 <ChevronRightIcon className="h-5 w-5 inline mr-1" />
                 Run
@@ -103,7 +103,6 @@ const C: NextPage<PageProps> = ({ uid }) => {
       ) : (
         <>
           {/* workflowInfo still loading or not found */}
-          <h1 className="text-4xl font-bold mb-16">{workflowName}</h1>
           <p className="text-xl">Loading workflow info...</p>
         </>
       )}
