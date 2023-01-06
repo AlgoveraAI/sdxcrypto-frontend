@@ -4,92 +4,10 @@ import { PageProps } from "../lib/types";
 import Image from "next/image";
 import Link from "next/link";
 
-import imageGenerationImage from "../assets/workflows/image-generation.png";
-import textSummarizationImage from "../assets/workflows/text-summarization.png";
-import imageCaptioningImage from "../assets/workflows/image-captioning.png";
-import imageTranslationImage from "../assets/workflows/image-to-image.png";
-import discordBotImage from "../assets/workflows/discord-bot.png";
-import discourseBotImage from "../assets/workflows/discourse-bot.png";
-import notionImage from "../assets/workflows/notion.png";
-import gifImage from "../assets/workflows/gif.gif";
-
 const { WORKFLOWS } = require("../lib/config");
-
-const workflowOptions = [
-  {
-    id: "1",
-    name: "Image Generation",
-    href: "/workflows/view?id=dalle-image-gen",
-    available: true,
-    author: "Algovera",
-    description: "Generate images from text prompts",
-    image: imageGenerationImage,
-    blockIcons: [],
-  },
-  // {
-  //   id: "2",
-  //   name: "Text Summarization",
-  //   href: "/workflows/text-summarization",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Summarize text",
-  //   image: textSummarizationImage,
-  // },
-  // {
-  //   id: "3",
-  //   name: "Image Captioning",
-  //   href: "/workflows/image-captioning",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Generate captions for images",
-  //   image: imageCaptioningImage,
-  // },
-  // {
-  //   id: "4",
-  //   name: "Image to Image",
-  //   href: "/workflows/image-to-image",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Generate images from images",
-  //   image: imageTranslationImage,
-  // },
-  // {
-  //   id: "5",
-  //   name: "Animation Generation",
-  //   href: "/workflows/animation-generation",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Generate animations from text prompts",
-  //   image: gifImage,
-  // },
-  // {
-  //   id: "6",
-  //   name: "Discord Integration",
-  //   href: "/workflows/animation-generation",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Image generation via a Discord bot",
-  //   image: discordBotImage,
-  // },
-  // {
-  //   id: "7",
-  //   name: "Notion Integration",
-  //   href: "/workflows/animation-generation",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Store text summarisation of Discord chat on Notion",
-  //   image: notionImage,
-  // },
-  // {
-  //   id: "8",
-  //   name: "Discourse Integration",
-  //   href: "/workflows/animation-generation",
-  //   available: false,
-  //   author: "Algovera",
-  //   description: "Generate image from a discourse post",
-  //   image: discourseBotImage,
-  // },
-];
+const iconUrlPrefix =
+  "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/frontend%2Fassets%2Ficons%2F";
+const iconUrlSuffix = "?alt=media";
 
 const Workflows: NextPage<PageProps> = () => {
   return (
@@ -131,7 +49,15 @@ const Workflows: NextPage<PageProps> = () => {
                   <div>
                     {workflow.blocks.map((block: any, ix: number) => (
                       <div key={ix} className="relative inline-block w-16 h-16">
-                        <Image src={block.icon} fill alt={block.name} />
+                        <Image
+                          src={
+                            block.light_icon.startsWith("http")
+                              ? block.light_icon
+                              : iconUrlPrefix + block.light_icon + iconUrlSuffix
+                          }
+                          fill
+                          alt={block.name}
+                        />
                       </div>
                     ))}
                   </div>
