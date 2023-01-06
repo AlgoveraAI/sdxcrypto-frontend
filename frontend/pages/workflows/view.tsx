@@ -5,7 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRightIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
+const { WORKFLOWS, iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
+
 const C: NextPage<PageProps> = ({ uid }) => {
+  // workflowId is one of the keys in WORKFLOWS or null
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowInfo, setWorkflowInfo] = useState<any | null>(null);
 
@@ -25,27 +28,8 @@ const C: NextPage<PageProps> = ({ uid }) => {
     // get info about the workflow from the db
     if (workflowId) {
       // todo - get workflow info from db
-      const workflowInfo = {
-        id: "dalle-image-gen",
-        name: "Image Generation",
-        short_desc: "Generate images using a GAN model.",
-        long_desc: `Generate images using transformers and GANs to create images of your choice.
-          You can choose from a variety of models and styles to generate images from.
-          Once you have generated an image, you can mint it as an NFT on the blockchain.
-          `,
-        blocks: [
-          {
-            name: "DALLE-2",
-            desc: "Generate an image",
-            icon: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
-          },
-          {
-            name: "Mint NFT",
-            desc: "Mint the image on Ethereum.",
-            icon: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg",
-          },
-        ],
-      };
+      // @ts-ignore
+      const workflowInfo = WORKFLOWS[workflowId];
       setWorkflowInfo(workflowInfo);
     }
   }, [workflowId]);
@@ -65,7 +49,11 @@ const C: NextPage<PageProps> = ({ uid }) => {
                       <div className="relative h-16 w-16 mx-auto">
                         <Image
                           className="mx-auto"
-                          src={block.icon}
+                          src={
+                            block.dark_icon.startsWith("http")
+                              ? block.dark_icon
+                              : iconUrlPrefix + block.dark_icon + iconUrlSuffix
+                          }
                           alt={block.name}
                           fill
                         />

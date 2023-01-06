@@ -10,7 +10,6 @@ import Input from "../input";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
-  // selectedModal type is one of the keys in models
   selectedModal: string | null;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;

@@ -6,10 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Popup from "reactjs-popup";
 
-const { WORKFLOWS } = require("../lib/config");
-const iconUrlPrefix =
-  "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/frontend%2Fassets%2Ficons%2F";
-const iconUrlSuffix = "?alt=media";
+const { WORKFLOWS, iconUrlPrefix, iconUrlSuffix } = require("../lib/config");
 
 const Workflows: NextPage<PageProps> = () => {
   return (
