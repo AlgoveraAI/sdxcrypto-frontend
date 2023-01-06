@@ -10,7 +10,7 @@ import Input from "../input";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
-  selectedModal: string | null;
+  modelName: string;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
@@ -22,7 +22,7 @@ type Props = {
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
-  selectedModal,
+  modelName,
   setJobId,
   prompt,
   setPrompt,
@@ -94,11 +94,6 @@ export default function Generate({
         return;
       }
 
-      if (!selectedModal) {
-        errorToast("Please select a model!");
-        return;
-      }
-
       if (prompt === "") {
         errorToast("Please enter a prompt!");
         return;
@@ -158,7 +153,7 @@ export default function Generate({
         body: JSON.stringify({
           uid: user?.sub,
           prompt: prompt,
-          base_model: selectedModal, // the modelId (key of models)
+          base_model: modelName, // the modelId (key of models)
           ...params, // the model params
         }),
       });
@@ -204,6 +199,8 @@ export default function Generate({
       generateImg();
     }
   };
+
+  console.log("MODEL NAME", modelName);
 
   return (
     <div className="mb-12">
@@ -284,7 +281,7 @@ export default function Generate({
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
 
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <label className="block font-medium text-gray-500">Model</label>
             <div className="text-white font-bold text-left">
               {
@@ -293,10 +290,10 @@ export default function Generate({
                 selectedModal ? models[selectedModal].name : "Not selected"
               }
             </div>
-          </div>
+          </div> */}
 
-          {selectedModal
-            ? models[selectedModal].inputs.map((input) => (
+          {modelName
+            ? models[modelName].inputs.map((input) => (
                 <Input
                   key={input.id}
                   id={input.id}

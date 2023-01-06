@@ -11,6 +11,7 @@ export const WORKFLOWS = {
     blocks: [
       {
         name: "DALLE-2",
+        modelName: "dalle",
         desc: "Generate an image",
         light_icon: "openai-white.png",
         dark_icon: "openai-black.png",
@@ -27,6 +28,7 @@ export const WORKFLOWS = {
   },
   "sd-image-gen": {
     name: "Stable Diffusion",
+    modelName: "stable",
     available: true,
     author: "Algovera",
     short_desc: "Generate images and optionally mint them as NFTs",

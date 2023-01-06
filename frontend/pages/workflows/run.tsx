@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Link from "next/link";
-import Select from "../../components/workflows/image-generation/select";
-import Generate from "../../components/workflows/image-generation/generate";
-import Mint from "../../components/workflows/image-generation/mint";
+import Select from "../../components/workflows/blocks/select";
+import GenerateImage from "../../components/workflows/blocks/generate-image";
+import MintImage from "../../components/workflows/blocks/mint-image";
 import { PageProps } from "../../lib/types";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
+const { WORKFLOWS, iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
+
 const steps = [
-  { id: "1", name: "Select Model", href: "#" },
-  { id: "2", name: "Generate Image", href: "#" },
-  { id: "3", name: "Mint NFT", href: "#" },
+  { id: "1", name: "Generate Image", href: "#" },
+  { id: "2", name: "Mint NFT", href: "#" },
 ];
 
 const C: NextPage<PageProps> = ({
@@ -30,7 +31,8 @@ const C: NextPage<PageProps> = ({
   const [jobId, setJobId] = useState<string | null>(null);
 
   // store the name of the workflow (indicated by the url)
-  const [workflowName, setWorkflowName] = useState<string | null>(null);
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [workflowInfo, setWorkflowInfo] = useState<any | null>(null);
 
   // store params and details for each step here
   // so that we can pass them to the next step and store them
@@ -48,19 +50,25 @@ const C: NextPage<PageProps> = ({
   useEffect(() => {
     // get the workflow name from the url param 'name'
     const params = new URLSearchParams(window.location.search);
-    const workflowName = params.get("name");
-    if (workflowName) {
-      console.log("workflowName: ", workflowName);
-      setWorkflowName(workflowName);
+    const workflowId = params.get("id");
+    if (workflowId) {
+      console.log("workflowId: ", workflowId);
+      setWorkflowId(workflowId);
+    } else {
+      setWorkflowId("Workflow not found");
     }
   }, []);
 
   useEffect(() => {
     // get info about the workflow from the db
-    // TODO
-    if (workflowName) {
+    if (workflowId) {
+      // todo - get workflow info from db
+      // @ts-ignore
+      const workflowInfo = WORKFLOWS[workflowId];
+      console.log("workflowInfo: ", workflowInfo);
+      setWorkflowInfo(workflowInfo);
     }
-  }, [workflowName]);
+  }, [workflowId]);
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
@@ -130,7 +138,9 @@ const C: NextPage<PageProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto md:px-24 px-6">
-      <h1 className="text-3xl font-bold text-center mt-12">Image Generation</h1>
+      <h1 className="text-3xl font-bold text-center mt-12">
+        {workflowInfo?.name}
+      </h1>
       <div className="text-center mt-2">
         <Link
           href="/workflows/outputs"
@@ -203,14 +213,9 @@ const C: NextPage<PageProps> = ({
 
       <div className="mt-12">
         {currentStepIdx === 0 ? (
-          <Select
-            selectedModal={selectedModal}
-            setSelectedModal={setSelectedModal}
-          />
-        ) : currentStepIdx === 1 ? (
-          <Generate
+          <GenerateImage
             credits={credits}
-            selectedModal={selectedModal}
+            modelName={workflowInfo?.blocks[0].modelName}
             setJobId={setJobId}
             prompt={prompt}
             setPrompt={setPrompt}
@@ -218,7 +223,7 @@ const C: NextPage<PageProps> = ({
             jobStatus={jobStatus}
           />
         ) : (
-          <Mint
+          <MintImage
             provider={provider}
             signer={signer}
             networkName={networkName}

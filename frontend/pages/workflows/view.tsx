@@ -76,7 +76,7 @@ const C: NextPage<PageProps> = ({ uid }) => {
             <div className="absolute bottom-0 right-0 m-4">
               <Link
                 className="primary-button font-bold py-2 px-8 rounded"
-                href={`/workflows/run?name=${workflowId}`}
+                href={`/workflows/run?id=${workflowId}`}
               >
                 <ChevronRightIcon className="h-5 w-5 inline mr-1" />
                 Run
