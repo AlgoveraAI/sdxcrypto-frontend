@@ -59,11 +59,21 @@ exports.webhookHandler = functions.https.onRequest((req, res) => {
 });
 
 // stripe
-const { createStripeCharge, stripeWebhookHandler } = require("./stripe.ts");
+const {
+  createStripeCharge,
+  stripeWebhookHandler,
+  createStripeSubscription,
+} = require("./stripe.ts");
 exports.createStripeCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const charge = await createStripeCharge(req, res);
     res.status(200).send(charge);
+  });
+});
+exports.createStripeSubscription = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const subscription = await createStripeSubscription(req, res);
+    res.status(200).send(subscription);
   });
 });
 exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {

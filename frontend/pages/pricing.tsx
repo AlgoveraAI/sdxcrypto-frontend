@@ -4,11 +4,14 @@ import { PageProps } from "../lib/types";
 import Link from "next/link";
 
 const Pricing: NextPage<PageProps> = ({
+  uid,
   setCreditsModalTrigger,
   creditCost,
   accessPassCost,
   accessCreditsPerMonth,
 }) => {
+  const [paymentType, setPaymentType] = useState<"fiat" | "crypto">("fiat");
+
   const paymentOptions = {
     fiat: [
       {
@@ -19,9 +22,9 @@ const Pricing: NextPage<PageProps> = ({
       },
       {
         name: "Subscription",
-        priceMonthly: `${accessPassCost} USD`,
-        priceType: "",
-        description: `${accessCreditsPerMonth} credits per month + perks`,
+        priceMonthly: `$10 USD`,
+        priceType: "per-month",
+        description: `${accessCreditsPerMonth} credits + perks`,
       },
     ],
     crypto: [
@@ -40,7 +43,21 @@ const Pricing: NextPage<PageProps> = ({
     ],
   };
 
-  const [paymentType, setPaymentType] = useState<"fiat" | "crypto">("fiat");
+  async function fiatSubscription() {
+    const chargeRes = await fetch(
+      "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeSubscription",
+      // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeSubscription",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uid: uid,
+        }),
+      }
+    );
+    const data = await chargeRes.json();
+    console.log("got charge data", data);
+    window.open(data.url, "_blank", "noopener,noreferrer");
+  }
 
   return (
     <div className="bg-background">
@@ -127,6 +144,13 @@ const Pricing: NextPage<PageProps> = ({
                             Purchase
                           </a>
                         </div>
+                      ) : paymentType === "fiat" ? (
+                        <button
+                          className="flex primary-button items-center justify-center rounded-md shadow-md hover:brightness-90 px-5 py-3 text-base font-medium w-full"
+                          onClick={fiatSubscription}
+                        >
+                          Subscribe
+                        </button>
                       ) : (
                         <Link
                           href="/access"

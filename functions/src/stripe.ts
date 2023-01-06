@@ -43,6 +43,54 @@ exports.createStripeCharge = async function (request, response) {
   return session;
 };
 
+exports.createStripeSubscription = async function (request, response) {
+  console.log("creating stripe subscription", request.body);
+  let { uid } = JSON.parse(request.body);
+  // check uid
+  if (!uid) {
+    return response.status(400).send("Missing uid");
+  }
+
+  // unlike a pay-as-you-go charge, subscriptions require a stripe customer
+  // get/create the customer object first
+
+  const customerRef = firestore.collection("stripe_customers").doc(uid);
+  const customerSnap = await customerRef.get();
+  let customerId;
+  if (customerSnap.exists) {
+    // customer exists, get the stripe customer id
+    customerId = customerSnap.data().id;
+    console.log("got existing stripe customer", customerId);
+  } else {
+    // customer doesn't exist, create a new one
+    const stripeCustomer = await stripe.customers.create({
+      metadata: {
+        uid,
+      },
+    });
+    // save the stripe customer id to firestore
+    await customerRef.set({
+      id: stripeCustomer.id,
+    });
+    customerId = stripeCustomer.id;
+    console.log("created new stripe customer", customerId);
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    success_url: "https://app.algovera.ai",
+    customer: customerId,
+    line_items: [
+      {
+        price: "price_1MN6MuBFFZb1IEji0pfycfGT", // todo move to config
+        quantity: 1,
+      },
+    ],
+  });
+
+  return session;
+};
+
 // write function to listed for stripe events
 exports.stripeWebhookHandler = async function (request, response) {
   console.log("stripe webhook");
