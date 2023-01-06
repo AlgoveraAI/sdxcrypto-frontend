@@ -1,8 +1,10 @@
+import "reactjs-popup/dist/index.css";
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
 import Link from "next/link";
+import Popup from "reactjs-popup";
 
 const { WORKFLOWS } = require("../lib/config");
 const iconUrlPrefix =
@@ -29,7 +31,7 @@ const Workflows: NextPage<PageProps> = () => {
           {Object.entries(WORKFLOWS).map(([id, workflow]: [string, any]) => (
             <li
               key={id}
-              className={`col-span-1 flex flex-col w-full divide-y divide-gray-200 rounded-lg bg-background-darker text-center shadow-md`}
+              className={`col-span-1 flex flex-col w-full divide-y divide-gray-200 rounded-lg bg-background-darker text-center shadow-md hover:bg-opacity-70`}
             >
               <Link
                 href={workflow.available ? "/workflows/view?id=" + id : ""}
@@ -48,17 +50,32 @@ const Workflows: NextPage<PageProps> = () => {
                 <div className="flex flex-1 flex-col p-8 hover:">
                   <div>
                     {workflow.blocks.map((block: any, ix: number) => (
-                      <div key={ix} className="relative inline-block w-16 h-16">
-                        <Image
-                          src={
-                            block.light_icon.startsWith("http")
-                              ? block.light_icon
-                              : iconUrlPrefix + block.light_icon + iconUrlSuffix
-                          }
-                          fill
-                          alt={block.name}
-                        />
-                      </div>
+                      <Popup
+                        key={ix}
+                        trigger={
+                          <div className="relative inline-block w-16 h-16">
+                            <Image
+                              src={
+                                block.light_icon.startsWith("http")
+                                  ? block.light_icon
+                                  : iconUrlPrefix +
+                                    block.light_icon +
+                                    iconUrlSuffix
+                              }
+                              fill
+                              alt={block.name}
+                            />
+                          </div>
+                        }
+                        position="right center"
+                        on="hover"
+                        {...{ contentStyle: { background: "black" } }}
+                      >
+                        <div className="text-gray-50 text-sm">
+                          <span className="font-medium">{block.name}: </span>
+                          <span>{block.desc}</span>
+                        </div>
+                      </Popup>
                     ))}
                   </div>
                   <h3 className="mt-6 font-bold text-gray-50">
