@@ -45,8 +45,8 @@ const Pricing: NextPage<PageProps> = ({
 
   async function fiatSubscription() {
     const chargeRes = await fetch(
-      "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeSubscription",
-      // "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeSubscription",
+      // "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeSubscription",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeSubscription",
       {
         method: "POST",
         body: JSON.stringify({
