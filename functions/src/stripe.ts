@@ -1,11 +1,14 @@
 // get env variables
 require("dotenv").config();
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+// const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeSecretKey = process.env.STRIPE_TEST_KEY;
 const stripe = require("stripe")(stripeSecretKey);
+
 // @ts-ignore (block scoping errors are irrelevant)
 const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 // @ts-ignore (block scoping errors are irrelevant)
-const { updateUserCredits } = require("./utils.ts");
+const { updateUserCredits, storeUserSubscription } = require("./utils.ts");
 
 // docs
 // https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-price_data
@@ -19,6 +22,7 @@ exports.createStripeCharge = async function (request, response) {
   }
   credits = parseInt(credits);
   const session = await stripe.checkout.sessions.create({
+    mode: "payment",
     success_url: "https://app.algovera.ai",
     cancel_url: "https://app.algovera.ai",
     line_items: [
@@ -34,7 +38,6 @@ exports.createStripeCharge = async function (request, response) {
         quantity: Math.max(50, credits), // minimum charge is $0.50
       },
     ],
-    mode: "payment",
     metadata: {
       uid,
       credits,
@@ -79,13 +82,18 @@ exports.createStripeSubscription = async function (request, response) {
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     success_url: "https://app.algovera.ai",
+    cancel_url: "https://app.algovera.ai",
     customer: customerId,
     line_items: [
       {
-        price: "price_1MN6MuBFFZb1IEji0pfycfGT", // todo move to config
+        // price: "price_1MN6MuBFFZb1IEji0pfycfGT", // todo move to config
+        price: "price_1MN81iBFFZb1IEjiHIZZqMtq", // test product
         quantity: 1,
       },
     ],
+    metadata: {
+      uid,
+    },
   });
 
   return session;
@@ -93,6 +101,13 @@ exports.createStripeSubscription = async function (request, response) {
 
 // write function to listed for stripe events
 exports.stripeWebhookHandler = async function (request, response) {
+  // to simulate a webhook event, use the stripe cli
+  // https://stripe.com/docs/stripe-cli#webhooks
+  // (more: https://dashboard.stripe.com/test/webhooks/create?endpoint_location=local)
+
+  // stripe listen --forward-to http://localhost:5001/sdxcrypto-algovera/us-central1/stripeWebhookHandler
+  // stripe trigger checkout.session.completed
+
   console.log("stripe webhook");
 
   const sig = request.headers["stripe-signature"];
@@ -102,22 +117,40 @@ exports.stripeWebhookHandler = async function (request, response) {
   let event = stripe.webhooks.constructEvent(
     request.rawBody,
     sig,
-    process.env.STRIPE_SIGNING_SECRET
+    process.env.STRIPE_SIGNING_SECRET_TEST
+    // "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9"
   );
 
   // Handle the event
   switch (event.type) {
     case "checkout.session.completed":
       console.log("checkout session completed", event.data.object);
-      const { uid, credits } = event.data.object.metadata;
-      await updateUserCredits(
-        uid,
-        parseInt(credits),
-        event.data.object.id,
-        event.data.object.payment_intent,
-        firestore,
-        admin
-      );
+      const { mode } = event.data.object;
+      if (mode === "subscription") {
+        // subscription event
+        console.log("got subscription event!");
+        const { uid } = event.data.object.metadata;
+        const currentDateUTC = new Date();
+
+        await storeUserSubscription(
+          uid,
+          event.data.object.subscription,
+
+          firestore
+        );
+      } else {
+        // once off 'payment' for a fixed amount of credits
+        // add to user in firestore
+        const { uid, credits } = event.data.object.metadata;
+        await updateUserCredits(
+          uid,
+          parseInt(credits),
+          event.data.object.id,
+          event.data.object.payment_intent,
+          firestore,
+          admin
+        );
+      }
       break;
     // ... handle other event types
     default:

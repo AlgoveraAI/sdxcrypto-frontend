@@ -10,17 +10,36 @@ const cors = require("cors")({ origin: true });
 const {
   checkGiftedCredits,
   checkAccessCredits,
+  checkSubscription,
 } = require("./credit-handling.ts");
 exports.checkAccessCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkAccessCredits(req, res);
-    res.status(200).send("OK");
+    try {
+      await checkAccessCredits(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await checkGiftedCredits(req, res);
-    res.status(200).send("OK");
+    try {
+      await checkGiftedCredits(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
+  });
+});
+exports.checkSubscription = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      await checkSubscription(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 
@@ -28,8 +47,12 @@ exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
 const { genCommunitySignature } = require("./contracts.ts");
 exports.genCommunitySignature = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const signature = await genCommunitySignature(req, res);
-    res.status(200).send(signature);
+    try {
+      const signature = await genCommunitySignature(req, res);
+      res.status(200).send(signature);
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 
@@ -41,20 +64,32 @@ const {
 } = require("./coinbase.ts");
 exports.createCoinbaseCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const charge = await createCoinbaseCharge(req, res);
-    res.status(200).send(charge);
+    try {
+      const charge = await createCoinbaseCharge(req, res);
+      res.status(200).send(charge);
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 exports.testChargeEvent = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    testChargeEvent(req, res);
-    res.status(200).send("OK");
+    try {
+      testChargeEvent(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 exports.webhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await webhookHandler(req, res);
-    return res.status(200).send("Webhook received");
+    try {
+      await webhookHandler(req, res);
+      return res.status(200).send("Webhook received");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 
@@ -66,20 +101,32 @@ const {
 } = require("./stripe.ts");
 exports.createStripeCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const charge = await createStripeCharge(req, res);
-    res.status(200).send(charge);
+    try {
+      const charge = await createStripeCharge(req, res);
+      res.status(200).send(charge);
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 exports.createStripeSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const subscription = await createStripeSubscription(req, res);
-    res.status(200).send(subscription);
+    try {
+      const subscription = await createStripeSubscription(req, res);
+      res.status(200).send(subscription);
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await stripeWebhookHandler(req, res);
-    return res.status(200).send("Webhook received");
+    try {
+      await stripeWebhookHandler(req, res);
+      return res.status(200).send("Webhook received");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 
@@ -87,14 +134,22 @@ exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
 const { createApiKey, deleteApiKey } = require("./api-keys.ts");
 exports.createApiKey = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const key = await createApiKey(req, res);
-    res.status(200).send(key);
+    try {
+      const key = await createApiKey(req, res);
+      res.status(200).send(key);
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
 
 exports.deleteApiKey = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    await deleteApiKey(req, res);
-    res.status(200).send("OK");
+    try {
+      await deleteApiKey(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
   });
 });
