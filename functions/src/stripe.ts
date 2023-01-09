@@ -1,8 +1,8 @@
 // get env variables
 require("dotenv").config();
 
-// const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripeSecretKey = process.env.STRIPE_TEST_KEY;
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// const stripeSecretKey = process.env.STRIPE_TEST_KEY;
 const stripe = require("stripe")(stripeSecretKey);
 
 // @ts-ignore (block scoping errors are irrelevant)
@@ -98,8 +98,8 @@ exports.createStripeSubscription = async function (request, response) {
     customer: customerId,
     line_items: [
       {
-        // price: "price_1MN6MuBFFZb1IEji0pfycfGT", // todo move to config
-        price: "price_1MN81iBFFZb1IEjiHIZZqMtq", // test product
+        price: "price_1MN6MuBFFZb1IEji0pfycfGT", // todo move to config
+        // price: "price_1MN81iBFFZb1IEjiHIZZqMtq", // test product
         quantity: 1,
       },
     ],
@@ -174,7 +174,8 @@ exports.stripeWebhookHandler = async function (request, response) {
   let event = stripe.webhooks.constructEvent(
     request.rawBody,
     sig,
-    process.env.STRIPE_SIGNING_SECRET_TEST
+    process.env.STRIPE_SIGNING_SECRET
+    // process.env.STRIPE_SIGNING_SECRET_TEST
   );
 
   // Handle the event
