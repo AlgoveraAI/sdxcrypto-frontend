@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { NextPage } from "next";
 import { PageProps } from "../lib/types";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 const Pricing: NextPage<PageProps> = ({
   uid,
@@ -43,7 +44,23 @@ const Pricing: NextPage<PageProps> = ({
     ],
   };
 
+  const errorToast = (msg: string) => {
+    toast(msg, {
+      position: "bottom-left",
+      type: "error",
+      autoClose: 5000,
+      theme: "dark",
+      style: {
+        fontSize: ".9rem",
+      },
+    });
+  };
+
   async function fiatSubscription() {
+    if (!uid) {
+      errorToast("You must be logged in to subscribe");
+      return;
+    }
     const chargeRes = await fetch(
       // "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeSubscription",
       "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeSubscription",
@@ -134,8 +151,20 @@ const Pricing: NextPage<PageProps> = ({
                           <a
                             onClick={() => {
                               if (paymentType === "fiat") {
+                                if (!uid) {
+                                  errorToast(
+                                    "You must be logged in to subscribe"
+                                  );
+                                  return;
+                                }
                                 setCreditsModalTrigger("creditcard");
                               } else {
+                                if (!uid) {
+                                  errorToast(
+                                    "You must be logged in to subscribe"
+                                  );
+                                  return;
+                                }
                                 setCreditsModalTrigger("crypto");
                               }
                             }}

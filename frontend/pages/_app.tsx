@@ -75,90 +75,40 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   useEffect(() => {
-    // on user login
+    // user login
     if (uid) {
       checkIfWeb3User();
+      checkSubscription(); // (stripe)
       pollCredits();
     }
   }, [uid]);
 
   useEffect(() => {
-    // on user login
+    // web3 user login
     if (uid && walletAddress) {
       checkGiftedCredits();
     }
   }, [uid, walletAddress]);
 
   useEffect(() => {
-    // on user login and access pass check
+    // web3 user login or network has changed
+    if (walletAddress && provider) {
+      checkWalletAddress();
+      getAccessContract();
+    }
+  }, [walletAddress, provider, networkName]);
+
+  useEffect(() => {
+    // web3 user login and access contract found
+    checkHasAccess();
+  }, [walletAddress, accessContract]);
+
+  useEffect(() => {
+    // user login who holds an access pass
     if (uid && hasAccess) {
       checkAccessCredits();
     }
   }, [uid, hasAccess]);
-
-  useEffect(() => {
-    // web3 user signed in
-    if (walletAddress && provider) {
-      checkWalletAddress();
-    }
-  }, [walletAddress, provider]);
-
-  useEffect(() => {
-    if (provider) {
-      getAccessContract();
-    }
-  }, [provider, networkName]);
-
-  useEffect(() => {
-    checkHasAccess();
-  }, [walletAddress, accessContract]);
-
-  const getAccessContract = async () => {
-    // get contract address from firebase
-    if (provider && networkName && !accessContract) {
-      console.log("Getting access contract");
-      const docRef = doc(db, "contracts", networkName);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data && data.access) {
-          let { address, abi } = JSON.parse(data.access);
-          console.log("Connecting to access contract:", address);
-          console.log("ABI:", abi);
-          const accessContract = new ethers.Contract(address, abi, provider);
-          setAccessContract(accessContract);
-          console.log(
-            "checking if user has an access pass",
-            walletAddress,
-            accessContract
-          );
-        } else {
-          console.error(`No Access contract deployed on: ${networkName}`);
-        }
-      } else {
-        console.error(`No Access contract deployed on: ${networkName}`);
-      }
-    }
-  };
-
-  const checkHasAccess = async () => {
-    if (walletAddress && accessContract) {
-      let hasAccess = false;
-      const tokenIds = [0]; // todo update if launch more tokens
-      for (let i = 0; i < tokenIds.length; i++) {
-        const tokenId = tokenIds[i];
-        console.log("checking balance", tokenId);
-        const balance = await accessContract.balanceOf(walletAddress, tokenId);
-        console.log("balance", balance);
-        if (balance.gt(0)) {
-          hasAccess = true;
-          break;
-        }
-      }
-      console.log("hasAccess: ", hasAccess);
-      setHasAccess(hasAccess);
-    }
-  };
 
   const checkIfWeb3User = async () => {
     // runs once a user has logged in
@@ -227,6 +177,53 @@ export default function App({ Component, pageProps }: AppProps) {
     console.log("got provider on network", network.name);
     const signer = provider.getSigner();
     setSigner(signer);
+  };
+
+  const getAccessContract = async () => {
+    // get contract address from firebase
+    if (provider && networkName && !accessContract) {
+      console.log("Getting access contract");
+      const docRef = doc(db, "contracts", networkName);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && data.access) {
+          let { address, abi } = JSON.parse(data.access);
+          console.log("Connecting to access contract:", address);
+          console.log("ABI:", abi);
+          const accessContract = new ethers.Contract(address, abi, provider);
+          setAccessContract(accessContract);
+          console.log(
+            "checking if user has an access pass",
+            walletAddress,
+            accessContract
+          );
+        } else {
+          console.error(`No Access contract deployed on: ${networkName}`);
+        }
+      } else {
+        console.error(`No Access contract deployed on: ${networkName}`);
+      }
+    }
+  };
+
+  const checkHasAccess = async () => {
+    if (walletAddress && accessContract) {
+      let hasAccess = false;
+      const tokenIds = [0]; // todo update if launch more tokens
+      for (let i = 0; i < tokenIds.length; i++) {
+        const tokenId = tokenIds[i];
+        console.log("checking balance", tokenId);
+        const balance = await accessContract.balanceOf(walletAddress, tokenId);
+        console.log("balance", balance);
+        if (balance.gt(0)) {
+          hasAccess = true;
+          break;
+        }
+      }
+      console.log("hasAccess: ", hasAccess);
+      setHasAccess(hasAccess);
+    }
   };
 
   const loadRemoteConfig = async () => {
@@ -304,6 +301,26 @@ export default function App({ Component, pageProps }: AppProps) {
     const res = await fetch(
       // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkAccessCredits",
       "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkAccessCredits",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          uid: uid,
+          walletAddress: walletAddress,
+          hasAccess: hasAccess,
+        }),
+      }
+    );
+    if (!res.ok) {
+      console.error("error checking access credits", res);
+    }
+  };
+
+  const checkSubscription = async () => {
+    // call this when a user logs in
+    console.log("checking subscription");
+    const res = await fetch(
+      // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/checkSubscription",
+      "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/checkSubscription",
       {
         method: "POST",
         body: JSON.stringify({

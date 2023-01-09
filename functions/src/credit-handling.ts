@@ -187,35 +187,32 @@ exports.checkAccessCredits = async function (req, res) {
 
 exports.checkSubscription = async function (req, res) {
   const { uid } = JSON.parse(req.body);
+  console.log("checking subscriptions", uid);
   if (!uid) {
     console.log("missing uid");
     throw new Error("Missing uid");
   }
-  // get user doc
-  console.log("getting users doc", uid);
   const userRef = firestore.collection("users").doc(uid);
   const userSnap = await userRef.get();
 
   if (userSnap.exists) {
     const data = userSnap.data();
-    if (data.subscriptionId) {
+    const { stripeSubscription } = data;
+    console.log("stripe subscription:", stripeSubscription);
+    if (stripeSubscription) {
       // user has a subscription (created & stored by stripewebhookhandler)
       // check that the current months credits have been allocated
 
       // monthly credits is stored at time of subscription
       // rather than reading in current config value
       // as the default value may change over time (eg. if we change the price)
-      const {
-        subscriptionStartMonth,
-        subscriptionStartYear,
-        subscriptionMonthlyCredits,
-      } = data.subscription;
+      const { startMonth, startYear, monthlyCredits } = stripeSubscription;
 
       checkMonthlyCreditsAllocated(
         uid,
-        subscriptionStartMonth,
-        subscriptionStartYear,
-        subscriptionMonthlyCredits,
+        startMonth,
+        startYear,
+        monthlyCredits,
         null, // max months (stripe sub is indefinite)
         "subscription_credits", // collection name
         userRef,

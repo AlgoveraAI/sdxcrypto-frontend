@@ -1,10 +1,10 @@
 exports.updateUserCredits = async function (
-  uid: string,
-  credits: number,
-  chargeId: string,
-  orderId: string,
-  firestore: any,
-  admin: any
+  uid,
+  credits,
+  chargeId,
+  orderId,
+  firestore,
+  admin
 ) {
   // prepare a batch update
   let batch = firestore.batch();
@@ -64,54 +64,16 @@ exports.updateUserCredits = async function (
   });
 };
 
-exports.storeUserSubscription = async function (
-  uid: string,
-  subscriptionId: string,
-  firestore: any
-) {
-  // store the subscription id for the user
-  // use this when a user logs in to check if they have
-  // monthly credits due (see functions/src/credit-handling.ts)
-
-  const currentDateUTC = new Date();
-  let currentMonth = currentDateUTC.getUTCMonth();
-  currentMonth++; // getUTCMonth is 0-11, we want 1-12
-  const currentYear = currentDateUTC.getUTCFullYear();
-
-  // get params from remote config
-  const template = await remoteConfig.getTemplate();
-  const subscriptionMonthlyCredits = parseInt(
-    template.parameters.subscription_monthly_credits.defaultValue.value
-  );
-
-  console.log("storing new user subscription");
-  console.log("uid", uid);
-  console.log("subscriptionId", subscriptionId);
-  console.log("currentMonth", currentMonth);
-  console.log("currentYear", currentYear);
-
-  const userRef = firestore.collection("users").doc(uid);
-  await userRef.set(
-    {
-      subscriptionId: subscriptionId,
-      subscriptionStartMonth: currentMonth,
-      subscriptionStartYear: currentYear,
-      subscriptionMonthlyCredits: subscriptionMonthlyCredits,
-    },
-    { merge: true }
-  );
-};
-
 exports.checkMonthlyCreditsAllocated = async function (
-  uid: string,
-  startMonth: number,
-  startYear: number,
-  monthlyCredits: number,
-  maxMonths: number | null,
-  creditsCollectionName: string, // eg. "access_credits" or "subscription_credits"
-  userRef: any,
-  firestore: any,
-  admin: any
+  uid,
+  startMonth,
+  startYear,
+  monthlyCredits,
+  maxMonths,
+  creditsCollectionName, // eg. "access_credits" or "subscription_credits"
+  userRef,
+  firestore,
+  admin
 ) {
   // check every month between fromMonth/fromYear to now
   // and if credits havent been allocated, allocate them

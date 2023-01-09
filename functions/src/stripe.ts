@@ -8,7 +8,7 @@ const stripe = require("stripe")(stripeSecretKey);
 // @ts-ignore (block scoping errors are irrelevant)
 const { admin, firestore, remoteConfig, auth } = require("./firebase.ts");
 // @ts-ignore (block scoping errors are irrelevant)
-const { updateUserCredits, storeUserSubscription } = require("./utils.ts");
+const { updateUserCredits } = require("./utils.ts");
 
 // docs
 // https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-line_items-price_data
@@ -99,6 +99,39 @@ exports.createStripeSubscription = async function (request, response) {
   return session;
 };
 
+const storeUserSubscription = async function (uid, subscriptionId, firestore) {
+  // store the subscription id for the user
+  // use this when a user logs in to check if they have
+  // monthly credits due (see functions/src/credit-handling.ts)
+
+  console.log("storing new user subscription");
+
+  const currentDateUTC = new Date();
+  let currentMonth = currentDateUTC.getUTCMonth();
+  currentMonth++; // getUTCMonth is 0-11, we want 1-12
+  const currentYear = currentDateUTC.getUTCFullYear();
+
+  // get params from remote config
+  const template = await remoteConfig.getTemplate();
+  const subscriptionMonthlyCredits = parseInt(
+    template.parameters.subscription_monthly_credits.defaultValue.value
+  );
+
+  console.log("uid", uid);
+  console.log("subscriptionId", subscriptionId);
+  console.log("currentMonth", currentMonth);
+  console.log("currentYear", currentYear);
+
+  const userRef = firestore.collection("users").doc(uid);
+  const stripeSubscription = {
+    id: subscriptionId,
+    startMonth: currentMonth,
+    startYear: currentYear,
+    monthlyCredits: subscriptionMonthlyCredits,
+  };
+  await userRef.update({ stripeSubscription });
+};
+
 // write function to listed for stripe events
 exports.stripeWebhookHandler = async function (request, response) {
   // to simulate a webhook event, use the stripe cli
@@ -108,17 +141,17 @@ exports.stripeWebhookHandler = async function (request, response) {
   // stripe listen --forward-to http://localhost:5001/sdxcrypto-algovera/us-central1/stripeWebhookHandler
   // stripe trigger checkout.session.completed
 
-  console.log("stripe webhook");
+  // logs
+  // https://console.cloud.google.com/functions/details/us-central1/stripeWebhookHandler?env=gen1&project=sdxcrypto-algovera&tab=logs
 
-  const sig = request.headers["stripe-signature"];
-  console.log("sig", sig);
+  console.log("running stripe webhook handler");
+
   // reconstruct the sig
-
+  const sig = request.headers["stripe-signature"];
   let event = stripe.webhooks.constructEvent(
     request.rawBody,
     sig,
     process.env.STRIPE_SIGNING_SECRET_TEST
-    // "whsec_e846dd36bc4dd3e74a7fba0f6286bc1659a5f48483f1303e6e7e9a944cbedbe9"
   );
 
   // Handle the event
@@ -128,14 +161,11 @@ exports.stripeWebhookHandler = async function (request, response) {
       const { mode } = event.data.object;
       if (mode === "subscription") {
         // subscription event
-        console.log("got subscription event!");
+        console.log("got subscription event");
         const { uid } = event.data.object.metadata;
-        const currentDateUTC = new Date();
-
         await storeUserSubscription(
           uid,
           event.data.object.subscription,
-
           firestore
         );
       } else {
@@ -151,8 +181,8 @@ exports.stripeWebhookHandler = async function (request, response) {
           admin
         );
       }
+      console.log("processed checkout");
       break;
-    // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
