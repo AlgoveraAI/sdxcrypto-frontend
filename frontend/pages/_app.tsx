@@ -69,9 +69,19 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     // on mount
+    // this runs twice in dev because of reactStrictMode in next.config.js
     loadRemoteConfig();
     checkMetamaskConnection();
     setupMetamaskListeners();
+
+    // check url params
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get("status");
+    if (status === "subscriptionSuccess") {
+      toast.success("Subscription successful!", {
+        position: "bottom-left",
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -264,12 +274,12 @@ export default function App({ Component, pageProps }: AppProps) {
     if (window.ethereum) {
       // add listener for window.ethereum metamask network change
       window.ethereum.on("chainChanged", () => {
-        console.log("chainChanged");
+        console.log("network changed - reloading");
         window.location.reload();
       });
       // add listener for metamask account change
       window.ethereum.on("accountsChanged", () => {
-        console.log("accountsChanged");
+        console.log("metamask account changed - reloading");
         window.location.reload();
       });
     }
