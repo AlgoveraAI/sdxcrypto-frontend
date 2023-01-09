@@ -3,6 +3,8 @@ import type { NextPage } from "next";
 import { PageProps } from "../lib/types";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../lib/firebase";
 
 const Pricing: NextPage<PageProps> = ({
   uid,
@@ -61,6 +63,19 @@ const Pricing: NextPage<PageProps> = ({
       errorToast("You must be logged in to subscribe");
       return;
     }
+
+    // check if user is already subscribed
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if (docSnap.data()?.stripeSubscription?.status === "active") {
+        toast.warning("You are already subscribed!", {
+          position: "bottom-left",
+        });
+        return;
+      }
+    }
+
     const chargeRes = await fetch(
       // "http://localhost:5001/sdxcrypto-algovera/us-central1/createStripeSubscription",
       "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/createStripeSubscription",
@@ -68,9 +83,17 @@ const Pricing: NextPage<PageProps> = ({
         method: "POST",
         body: JSON.stringify({
           uid: uid,
+          sourceUrl: window.location.href,
         }),
       }
     );
+    if (!chargeRes.ok) {
+      console.error("error creating stripe subscription", chargeRes);
+      errorToast(
+        "An error occured while creating your subscription. Please try again later."
+      );
+      return;
+    }
     const data = await chargeRes.json();
     console.log("got charge data", data);
     window.open(data.url, "_blank", "noopener,noreferrer");

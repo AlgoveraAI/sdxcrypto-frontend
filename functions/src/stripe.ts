@@ -48,22 +48,33 @@ exports.createStripeCharge = async function (request, response) {
 
 exports.createStripeSubscription = async function (request, response) {
   console.log("creating stripe subscription", request.body);
-  let { uid } = JSON.parse(request.body);
-  // check uid
+  let { uid, sourceUrl } = JSON.parse(request.body);
+  // remove url params from sourceUrl
+  // (eg if the user clicks cancel from a confirmation page)
+  sourceUrl = sourceUrl.split("?")[0];
+
+  // check params
   if (!uid) {
+    console.log("missing uid", uid);
     return response.status(400).send("Missing uid");
+  }
+  if (!sourceUrl) {
+    console.log("missing sourceUrl", sourceUrl);
+    return response.status(400).send("Missing sourceUrl");
   }
 
   // unlike a pay-as-you-go charge, subscriptions require a stripe customer
   // get/create the customer object first
 
-  const customerRef = firestore.collection("stripe_customers").doc(uid);
+  const customerRef = firestore.collection("users").doc(uid);
   const customerSnap = await customerRef.get();
   let customerId;
   if (customerSnap.exists) {
     // customer exists, get the stripe customer id
-    customerId = customerSnap.data().id;
-    console.log("got existing stripe customer", customerId);
+    customerId = customerSnap.data()?.stripeCustome?.id;
+  }
+  if (customerId) {
+    console.log("found existing stripe customer", customerId);
   } else {
     // customer doesn't exist, create a new one
     const stripeCustomer = await stripe.customers.create({
@@ -71,9 +82,10 @@ exports.createStripeSubscription = async function (request, response) {
         uid,
       },
     });
-    // save the stripe customer id to firestore
+    // save the stripe customer id and sub status to firestore
     await customerRef.set({
       id: stripeCustomer.id,
+      status: "active",
     });
     customerId = stripeCustomer.id;
     console.log("created new stripe customer", customerId);
@@ -81,8 +93,8 @@ exports.createStripeSubscription = async function (request, response) {
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    success_url: "https://app.algovera.ai",
-    cancel_url: "https://app.algovera.ai",
+    success_url: sourceUrl + "?status=subscribed",
+    cancel_url: sourceUrl + "?status=subscription_canceled",
     customer: customerId,
     line_items: [
       {
@@ -96,40 +108,51 @@ exports.createStripeSubscription = async function (request, response) {
     },
   });
 
+  console.log("returning session", session);
+
   return session;
 };
 
-const storeUserSubscription = async function (uid, subscriptionId, firestore) {
-  // store the subscription id for the user
-  // use this when a user logs in to check if they have
-  // monthly credits due (see functions/src/credit-handling.ts)
+exports.cancelStripeSubscription = async function (request, response) {
+  console.log("canceling stripe subscription", request.body);
+  let { uid, sourceUrl } = JSON.parse(request.body);
+  // remove url params from sourceUrl
+  // (eg if the user clicks cancel from a confirmation page)
+  sourceUrl = sourceUrl.split("?")[0];
 
-  console.log("storing new user subscription");
+  // check params
+  if (!uid) {
+    console.log("missing uid", uid);
+    return response.status(400).send("Missing uid");
+  }
+  if (!sourceUrl) {
+    console.log("missing sourceUrl", sourceUrl);
+    return response.status(400).send("Missing sourceUrl");
+  }
+  const customerRef = firestore.collection("users").doc(uid);
+  const customerSnap = await customerRef.get();
+  if (!customerSnap.exists) {
+    console.log("no customer found");
+    return response.status(400).send("No customer found");
+  }
 
-  const currentDateUTC = new Date();
-  let currentMonth = currentDateUTC.getUTCMonth();
-  currentMonth++; // getUTCMonth is 0-11, we want 1-12
-  const currentYear = currentDateUTC.getUTCFullYear();
+  const stripeSubscription = customerSnap.data().stripeSubscription;
+  if (!stripeSubscription) {
+    console.log("no subscription found");
+    return response.status(400).send("No subscription found");
+  }
 
-  // get params from remote config
-  const template = await remoteConfig.getTemplate();
-  const subscriptionMonthlyCredits = parseInt(
-    template.parameters.subscription_monthly_credits.defaultValue.value
+  const deleted = await stripe.subscriptions.del(stripeSubscription.id);
+  console.log("deleted subscription", deleted);
+  // update the user's subscription status
+  await customerRef.set(
+    {
+      stripeSubscription: {
+        status: "canceled",
+      },
+    },
+    { merge: true }
   );
-
-  console.log("uid", uid);
-  console.log("subscriptionId", subscriptionId);
-  console.log("currentMonth", currentMonth);
-  console.log("currentYear", currentYear);
-
-  const userRef = firestore.collection("users").doc(uid);
-  const stripeSubscription = {
-    id: subscriptionId,
-    startMonth: currentMonth,
-    startYear: currentYear,
-    monthlyCredits: subscriptionMonthlyCredits,
-  };
-  await userRef.update({ stripeSubscription });
 };
 
 // write function to listed for stripe events
@@ -186,4 +209,38 @@ exports.stripeWebhookHandler = async function (request, response) {
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
+};
+
+const storeUserSubscription = async function (uid, subscriptionId, firestore) {
+  // store the subscription id for the user
+  // use this when a user logs in to check if they have
+  // monthly credits due (see functions/src/credit-handling.ts)
+
+  console.log("storing new user subscription");
+
+  const currentDateUTC = new Date();
+  let currentMonth = currentDateUTC.getUTCMonth();
+  currentMonth++; // getUTCMonth is 0-11, we want 1-12
+  const currentYear = currentDateUTC.getUTCFullYear();
+
+  // get params from remote config
+  const template = await remoteConfig.getTemplate();
+  const subscriptionMonthlyCredits = parseInt(
+    template.parameters.subscription_monthly_credits.defaultValue.value
+  );
+
+  console.log("uid", uid);
+  console.log("subscriptionId", subscriptionId);
+  console.log("currentMonth", currentMonth);
+  console.log("currentYear", currentYear);
+
+  const userRef = firestore.collection("users").doc(uid);
+  const stripeSubscription = {
+    id: subscriptionId,
+    startMonth: currentMonth,
+    startYear: currentYear,
+    monthlyCredits: subscriptionMonthlyCredits,
+    status: "active",
+  };
+  await userRef.update({ stripeSubscription });
 };

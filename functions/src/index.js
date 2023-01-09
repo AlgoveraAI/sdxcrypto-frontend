@@ -18,6 +18,7 @@ exports.checkAccessCredits = functions.https.onRequest((req, res) => {
       await checkAccessCredits(req, res);
       res.status(200).send("OK");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -28,6 +29,7 @@ exports.checkGiftedCredits = functions.https.onRequest((req, res) => {
       await checkGiftedCredits(req, res);
       res.status(200).send("OK");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -38,6 +40,7 @@ exports.checkSubscription = functions.https.onRequest((req, res) => {
       await checkSubscription(req, res);
       res.status(200).send("OK");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -51,6 +54,7 @@ exports.genCommunitySignature = functions.https.onRequest((req, res) => {
       const signature = await genCommunitySignature(req, res);
       res.status(200).send(signature);
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -68,6 +72,7 @@ exports.createCoinbaseCharge = functions.https.onRequest((req, res) => {
       const charge = await createCoinbaseCharge(req, res);
       res.status(200).send(charge);
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -78,6 +83,7 @@ exports.testChargeEvent = functions.https.onRequest((req, res) => {
       testChargeEvent(req, res);
       res.status(200).send("OK");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -88,6 +94,7 @@ exports.webhookHandler = functions.https.onRequest((req, res) => {
       await webhookHandler(req, res);
       return res.status(200).send("Webhook received");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -98,6 +105,7 @@ const {
   createStripeCharge,
   stripeWebhookHandler,
   createStripeSubscription,
+  cancelStripeSubscription,
 } = require("./stripe.ts");
 exports.createStripeCharge = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -105,6 +113,7 @@ exports.createStripeCharge = functions.https.onRequest((req, res) => {
       const charge = await createStripeCharge(req, res);
       res.status(200).send(charge);
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -125,6 +134,18 @@ exports.stripeWebhookHandler = functions.https.onRequest((req, res) => {
       await stripeWebhookHandler(req, res);
       return res.status(200).send("Webhook received");
     } catch (e) {
+      console.log("error", e);
+      res.status(500).send(e.message ? e.message : "Something went wrong");
+    }
+  });
+});
+exports.cancelStripeSubscription = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      await cancelStripeSubscription(req, res);
+      res.status(200).send("OK");
+    } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -138,6 +159,7 @@ exports.createApiKey = functions.https.onRequest((req, res) => {
       const key = await createApiKey(req, res);
       res.status(200).send(key);
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });
@@ -149,6 +171,7 @@ exports.deleteApiKey = functions.https.onRequest((req, res) => {
       await deleteApiKey(req, res);
       res.status(200).send("OK");
     } catch (e) {
+      console.log("error", e);
       res.status(500).send(e.message ? e.message : "Something went wrong");
     }
   });

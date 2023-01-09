@@ -77,8 +77,16 @@ export default function App({ Component, pageProps }: AppProps) {
     // check url params
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get("status");
-    if (status === "subscriptionSuccess") {
+    if (status === "subscribed") {
       toast.success("Subscription successful!", {
+        position: "bottom-left",
+      });
+    } else if (status === "subscription_cancelled") {
+      toast.success("Subscription cancelled!", {
+        position: "bottom-left",
+      });
+    } else if (status === "credits_purchased") {
+      toast.success("Credits purchase successful!", {
         position: "bottom-left",
       });
     }
