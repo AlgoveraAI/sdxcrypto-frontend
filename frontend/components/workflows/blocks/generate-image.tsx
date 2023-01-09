@@ -5,12 +5,11 @@ import Spinner from "../../spinner";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { models } from "./models";
 import Input from "../input";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
-  modelName: string;
+  config: any;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
@@ -22,7 +21,7 @@ type Props = {
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
-  modelName,
+  config,
   setJobId,
   prompt,
   setPrompt,
@@ -153,7 +152,7 @@ export default function Generate({
         body: JSON.stringify({
           uid: user?.sub,
           prompt: prompt,
-          base_model: modelName, // the modelId (key of models)
+          base_model: config.modelName, // the modelId (key of models)
           ...params, // the model params
         }),
       });
@@ -200,7 +199,7 @@ export default function Generate({
     }
   };
 
-  console.log("MODEL NAME", modelName);
+  console.log("MODEL NAME", config.modelName);
 
   return (
     <div className="mb-12">
@@ -292,27 +291,23 @@ export default function Generate({
             </div>
           </div> */}
 
-          {modelName
-            ? models[modelName].inputs.map((input) => (
-                <Input
-                  key={input.id}
-                  id={input.id}
-                  label={input.label}
-                  type={input.type}
-                  params={input.params}
-                  info={input.info}
-                  value={
-                    params[input.id] ? params[input.id] : input.defaultValue
-                  }
-                  setValue={(e) => {
-                    setParams({
-                      ...params,
-                      [input.id]: e,
-                    });
-                  }}
-                />
-              ))
-            : null}
+          {config.params.map((param: any) => (
+            <Input
+              key={param.id}
+              id={param.id}
+              label={param.name}
+              type={param.type}
+              params={param.params}
+              info={param.info}
+              value={params[param.id] ? params[param.id] : param.default}
+              setValue={(e) => {
+                setParams({
+                  ...params,
+                  [param.id]: e,
+                });
+              }}
+            />
+          ))}
         </div>
       </div>
     </div>

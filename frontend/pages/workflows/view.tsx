@@ -4,13 +4,15 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRightIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 
-const { WORKFLOWS, iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
+const { iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
 
 const C: NextPage<PageProps> = ({ uid }) => {
   // workflowId is one of the keys in WORKFLOWS or null
   const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [workflowInfo, setWorkflowInfo] = useState<any | null>(null);
+  const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
 
   useEffect(() => {
     // get the workflow name from the url param 'name'
@@ -26,23 +28,32 @@ const C: NextPage<PageProps> = ({ uid }) => {
 
   useEffect(() => {
     // get info about the workflow from the db
-    if (workflowId) {
-      // todo - get workflow info from db
-      // @ts-ignore
-      const workflowInfo = WORKFLOWS[workflowId];
-      setWorkflowInfo(workflowInfo);
-    }
+    getWorkflowConfig();
   }, [workflowId]);
+
+  const getWorkflowConfig = async () => {
+    if (workflowId) {
+      const docRef = doc(db, "workflow_configs", workflowId);
+      const docSnap = await getDoc(docRef);
+      const workflowConfig = docSnap.data();
+      console.log("got workflow config: ", workflowConfig);
+      if (!workflowConfig) {
+        console.error("workflow config not found");
+        return;
+      }
+      setWorkflowConfig(workflowConfig);
+    }
+  };
 
   return (
     <div className="mt-12 max-w-5xl mx-auto px-12">
-      {workflowInfo ? (
+      {workflowConfig ? (
         <>
-          <h1 className="text-4xl font-bold mb-12">{workflowInfo.name}</h1>
+          <h1 className="text-4xl font-bold mb-12">{workflowConfig.name}</h1>
           <div className="flex bg-white relative min-h-[512px]">
             {/* workflow blocks as centered item */}
             <div className="flex items-center justify-center w-full">
-              {workflowInfo.blocks.map((block: any, ix: number) => (
+              {workflowConfig.blocks.map((block: any, ix: number) => (
                 <>
                   <div key={ix} className="text-black mx-8">
                     <div className="text-center">
@@ -65,7 +76,7 @@ const C: NextPage<PageProps> = ({ uid }) => {
                       </div>
                     </div>
                   </div>
-                  {ix !== workflowInfo.blocks.length - 1 ? (
+                  {ix !== workflowConfig.blocks.length - 1 ? (
                     <ArrowRightIcon className="h-5 w-5 text-black" />
                   ) : null}
                 </>
@@ -85,7 +96,7 @@ const C: NextPage<PageProps> = ({ uid }) => {
           </div>
           <div className="border border-gray-500 rounded-md mt-12 p-5">
             <h1 className="text-2xl font-bold mb-8">Description</h1>
-            <p className="text-md">{workflowInfo.long_desc}</p>
+            <p className="text-md">{workflowConfig.long_desc}</p>
           </div>
         </>
       ) : (

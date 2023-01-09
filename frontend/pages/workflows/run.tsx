@@ -6,13 +6,8 @@ import GenerateImage from "../../components/workflows/blocks/generate-image";
 import MintImage from "../../components/workflows/blocks/mint-image";
 import { PageProps } from "../../lib/types";
 import { useUser } from "@auth0/nextjs-auth0/client";
-
-const { WORKFLOWS, iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
-
-const steps = [
-  { id: "1", name: "Generate Image", href: "#" },
-  { id: "2", name: "Mint NFT", href: "#" },
-];
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 
 const C: NextPage<PageProps> = ({
   uid,
@@ -32,7 +27,8 @@ const C: NextPage<PageProps> = ({
 
   // store the name of the workflow (indicated by the url)
   const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [workflowInfo, setWorkflowInfo] = useState<any | null>(null);
+  const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
+  const [blockConfigs, setBlockConfigs] = useState<any | null>(null);
 
   // store params and details for each step here
   // so that we can pass them to the next step and store them
@@ -61,14 +57,34 @@ const C: NextPage<PageProps> = ({
 
   useEffect(() => {
     // get info about the workflow from the db
-    if (workflowId) {
-      // todo - get workflow info from db
-      // @ts-ignore
-      const workflowInfo = WORKFLOWS[workflowId];
-      console.log("workflowInfo: ", workflowInfo);
-      setWorkflowInfo(workflowInfo);
-    }
+    getWorkflowConfig();
   }, [workflowId]);
+
+  const getWorkflowConfig = async () => {
+    if (workflowId) {
+      const docRef = doc(db, "workflow_configs", workflowId);
+      const docSnap = await getDoc(docRef);
+      const workflowConfig = docSnap.data();
+      console.log("got workflow config: ", workflowConfig);
+      if (!workflowConfig) {
+        console.error("workflow config not found");
+        return;
+      }
+      setWorkflowConfig(workflowConfig);
+
+      const { blocks } = workflowConfig;
+      let blockConfigs = [];
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        const blockRef = doc(db, "block_configs", block);
+        const blockSnap = await getDoc(blockRef);
+        const blockConfig = blockSnap.data();
+        console.log("got block config: ", blockConfig);
+        blockConfigs.push(blockConfig);
+      }
+      setBlockConfigs(blockConfigs);
+    }
+  };
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
@@ -139,7 +155,7 @@ const C: NextPage<PageProps> = ({
   return (
     <div className="max-w-7xl mx-auto md:px-24 px-6">
       <h1 className="text-3xl font-bold text-center mt-12">
-        {workflowInfo?.name}
+        {workflowConfig?.name}
       </h1>
       <div className="text-center mt-2">
         <Link
@@ -149,92 +165,99 @@ const C: NextPage<PageProps> = ({
           View your outputs
         </Link>
       </div>
-      <nav aria-label="Progress">
-        <ol
-          role="list"
-          className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
-        >
-          {steps.map((step, stepIdx) => (
-            <li
-              key={step.name}
-              className="relative md:flex md:flex-1 cursor-pointer"
-              onClick={() => setCurrentStepIdx(stepIdx)}
+      {blockConfigs ? (
+        <>
+          <nav aria-label="Progress">
+            <ol
+              role="list"
+              className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
             >
-              {currentStepIdx === stepIdx ? (
-                <a
-                  className="flex items-center px-6 py-4 text-sm font-medium"
-                  aria-current="step"
-                >
-                  <span className="text-white">{step.id}</span>
-                  <span className="ml-4 text-sm font-medium text-white">
-                    {step.name}
-                  </span>
-                </a>
-              ) : (
-                <a
-                  href={step.href}
-                  className="flex items-center px-6 py-4 text-sm font-medium"
-                  aria-current="step"
-                >
-                  <span className="text-gray-600">{step.id}</span>
-                  <span className="ml-4 text-sm font-medium text-gray-600">
-                    {step.name}
-                  </span>
-                </a>
-              )}
-
-              {stepIdx !== steps.length - 1 ? (
-                <>
-                  {/* Arrow separator for lg screens and up */}
-                  <div
-                    className="absolute top-0 right-0 hidden h-full w-5 md:block"
-                    aria-hidden="true"
+              {
+                // iterate through the steps, but not the first
+                blockConfigs.slice(1).map((block: any, blockIx: number) => (
+                  <li
+                    key={blockIx}
+                    className="relative md:flex md:flex-1 cursor-pointer"
+                    onClick={() => setCurrentStepIdx(blockIx)}
                   >
-                    <svg
-                      className="h-full w-full text-primary"
-                      viewBox="0 0 22 80"
-                      fill="none"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M0 -2L20 40L0 82"
-                        vectorEffect="non-scaling-stroke"
-                        stroke="currentcolor"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                </>
-              ) : null}
-            </li>
-          ))}
-        </ol>
-      </nav>
+                    {currentStepIdx === blockIx ? (
+                      <a
+                        className="flex items-center px-6 py-4 text-sm font-medium"
+                        aria-current="step"
+                      >
+                        <span className="text-white">{blockIx + 1}</span>
+                        <span className="ml-4 text-sm font-medium text-white">
+                          {block.name}
+                        </span>
+                      </a>
+                    ) : (
+                      <div
+                        // href={step.href}
+                        className="flex items-center px-6 py-4 text-sm font-medium"
+                        aria-current="step"
+                      >
+                        <span className="text-gray-600">{blockIx + 1}</span>
+                        <span className="ml-4 text-sm font-medium text-gray-600">
+                          {block.name}
+                        </span>
+                      </div>
+                    )}
 
-      <div className="mt-12">
-        {currentStepIdx === 0 ? (
-          <GenerateImage
-            credits={credits}
-            modelName={workflowInfo?.blocks[0].modelName}
-            setJobId={setJobId}
-            prompt={prompt}
-            setPrompt={setPrompt}
-            images={images}
-            jobStatus={jobStatus}
-          />
-        ) : (
-          <MintImage
-            provider={provider}
-            signer={signer}
-            networkName={networkName}
-            walletAddress={walletAddress}
-            selectedModal={selectedModal}
-            jobId={jobId}
-            prompt={prompt}
-            images={images}
-          />
-        )}
-      </div>
+                    {blockIx !== 1 ? (
+                      <>
+                        {/* Arrow separator for lg screens and up */}
+                        <div
+                          className="absolute top-0 right-0 hidden h-full w-5 md:block"
+                          aria-hidden="true"
+                        >
+                          <svg
+                            className="h-full w-full text-primary"
+                            viewBox="0 0 22 80"
+                            fill="none"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M0 -2L20 40L0 82"
+                              vectorEffect="non-scaling-stroke"
+                              stroke="currentcolor"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                      </>
+                    ) : null}
+                  </li>
+                ))
+              }
+            </ol>
+          </nav>
+
+          <div className="mt-12">
+            {currentStepIdx === 0 ? (
+              <GenerateImage
+                credits={credits}
+                config={blockConfigs[1]}
+                setJobId={setJobId}
+                prompt={prompt}
+                setPrompt={setPrompt}
+                images={images}
+                jobStatus={jobStatus}
+              />
+            ) : (
+              <MintImage
+                provider={provider}
+                signer={signer}
+                networkName={networkName}
+                walletAddress={walletAddress}
+                config={blockConfigs[2]}
+                jobId={jobId}
+                prompt={prompt}
+                images={images}
+              />
+            )}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 };
