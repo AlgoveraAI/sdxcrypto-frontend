@@ -147,12 +147,14 @@ export default function Generate({
       const interval = setInterval(checkTimeTaken, 5000);
       setCheckTimeTakenInteraval(interval);
 
+      console.log("sending", config);
+
       const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
           uid: user?.sub,
           prompt: prompt,
-          base_model: config.modelName, // the modelId (key of models)
+          base_model: config.model_name, // the modelId (key of models)
           ...params, // the model params
         }),
       });
@@ -198,8 +200,6 @@ export default function Generate({
       generateImg();
     }
   };
-
-  console.log("MODEL NAME", config.modelName);
 
   return (
     <div className="mb-12">
