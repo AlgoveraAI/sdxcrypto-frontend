@@ -60,6 +60,17 @@ export default function Generate({
   };
 
   useEffect(() => {
+    // set model params
+    if (config) {
+      let params: any = {};
+      config.params.forEach((param: any) => {
+        params[param.id] = param.default;
+      });
+      setParams(params);
+    }
+  }, [config]);
+
+  useEffect(() => {
     // catch job status errors
     if (jobStatus === "error") {
       errorToast("Error monitoring job");
@@ -304,7 +315,7 @@ export default function Generate({
               type={param.type}
               params={param.params}
               info={param.info}
-              value={params[param.id] ? params[param.id] : param.default}
+              value={params[param.id]}
               setValue={(e) => {
                 setParams({
                   ...params,
