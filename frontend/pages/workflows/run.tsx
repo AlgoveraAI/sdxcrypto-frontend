@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Link from "next/link";
-import Select from "../../components/workflows/blocks/select";
+// import Select from "../../components/workflows/blocks/select";
 import GenerateImage from "../../components/workflows/blocks/generate-image";
 import MintImage from "../../components/workflows/blocks/mint-image";
 import { PageProps } from "../../lib/types";
