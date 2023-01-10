@@ -148,14 +148,19 @@ export default function Generate({
       setCheckTimeTakenInteraval(interval);
 
       console.log("sending", config);
-
+      console.log("params", params);
+      const endpointBody = {
+        uid: user?.sub,
+        prompt: prompt,
+        model: config.model_name,
+        ...params,
+      };
+      console.log("endpoint body", endpointBody);
       const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
-          uid: user?.sub,
-          prompt: prompt,
-          base_model: config.model_name, // the modelId (key of models)
-          ...params, // the model params
+          endpoint: config.endpoint,
+          endpointBody,
         }),
       });
 

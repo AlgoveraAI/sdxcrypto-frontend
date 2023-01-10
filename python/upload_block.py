@@ -15,7 +15,7 @@ block_config = {
     "dark_icon": "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/frontend%2Fassets%2Ficons%2Fstabilityai.jpg?alt=media&token=771ac1a5-591d-47c2-9edd-64bd3c8fc132",
     "light_icon": "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/frontend%2Fassets%2Ficons%2Fstabilityai.jpg?alt=media&token=771ac1a5-591d-47c2-9edd-64bd3c8fc132",
     "desc": "Generate an image with stable diffusion",
-    "endpoint": "txt2img",
+    "endpoint": "openaitxt2img",
     "model_name": "stable",
     "pricing": 2,
     "params": [

@@ -25,13 +25,25 @@ export default async function handler(
       apiBaseUrl = config.api_base_url_dev;
     }
 
-    const url = `${apiBaseUrl}/generate/txt2img`;
+    const body = JSON.parse(req.body);
+
+    // custom logic to prep body for endpoint
+    const { endpointBody } = body;
+    if (endpointBody.model === "dalle") {
+      endpointBody.resolution = `${endpointBody.resolution}x${endpointBody.resolution}`;
+    }
+
+    console.log("endpointBody", endpointBody);
+
+    const url = `${apiBaseUrl}/generate/${body.endpoint}`;
     console.log("calling", url);
-    const headers = { "Content-Type": "application/json" };
+    const headers = {
+      "Content-Type": "application/json",
+    };
     const response = await fetch(url, {
       method: "POST",
       headers: headers,
-      body: req.body,
+      body: JSON.stringify(body.endpointBody),
     });
     // throw new Error("test error");
     if (response.ok) {
