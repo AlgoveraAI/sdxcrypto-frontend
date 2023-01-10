@@ -23,6 +23,7 @@ const moduleExports = {
       "img.icons8.com",
       "commons.wikimedia.org",
       "upload.wikimedia.org",
+      "cdn-icons-png.flaticon.com",
     ],
   },
   env: {

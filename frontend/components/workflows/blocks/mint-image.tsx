@@ -11,18 +11,18 @@ import { BaseProvider } from "@ethersproject/providers";
 import { Signer } from "@ethersproject/abstract-signer";
 
 type Props = {
+  config: any;
   provider: BaseProvider | null;
   signer: Signer | null;
   networkName: string | null;
   walletAddress: string | null;
-  selectedModal: string | null;
   jobId: string | null;
   prompt: string;
   images: string[];
 };
 
 export default function Mint({
-  selectedModal,
+  config,
   jobId,
   prompt,
   images,
@@ -98,10 +98,6 @@ export default function Mint({
       setLoading(true);
       setStatus("Preparing transaction");
       // check we have everything needed to mint
-      if (!selectedModal) {
-        errorToast("No image to mint");
-        return;
-      }
       if (!images.length) {
         errorToast("No image to mint");
         return;
@@ -192,7 +188,7 @@ export default function Mint({
           image: images[selectedIdx],
           attributes: {
             prompt: prompt,
-            model: selectedModal,
+            model: config.modalName,
           },
         };
         // upload metadata to firebase

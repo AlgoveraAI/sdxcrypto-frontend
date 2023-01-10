@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "../../spinner";
-import { models } from "../image-generation/models";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 type ImgResult = {

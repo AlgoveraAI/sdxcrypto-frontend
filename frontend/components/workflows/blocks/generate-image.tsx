@@ -5,12 +5,11 @@ import Spinner from "../../spinner";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { models } from "./models";
 import Input from "../input";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
-  selectedModal: string | null;
+  config: any;
   setJobId: React.Dispatch<React.SetStateAction<string | null>>;
   prompt: string;
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
@@ -22,7 +21,7 @@ type Props = {
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
 export default function Generate({
-  selectedModal,
+  config,
   setJobId,
   prompt,
   setPrompt,
@@ -94,11 +93,6 @@ export default function Generate({
         return;
       }
 
-      if (!selectedModal) {
-        errorToast("Please select a model!");
-        return;
-      }
-
       if (prompt === "") {
         errorToast("Please enter a prompt!");
         return;
@@ -153,12 +147,14 @@ export default function Generate({
       const interval = setInterval(checkTimeTaken, 5000);
       setCheckTimeTakenInteraval(interval);
 
+      console.log("sending", config);
+
       const res = await fetch("/api/txt2img", {
         method: "POST",
         body: JSON.stringify({
           uid: user?.sub,
           prompt: prompt,
-          base_model: selectedModal, // the modelId (key of models)
+          base_model: config.model_name, // the modelId (key of models)
           ...params, // the model params
         }),
       });
@@ -284,7 +280,7 @@ export default function Generate({
         <div className="mt-6 md:mt-12 md:ml-12 grid-col">
           <h2 className="text-2xl font-bold">Settings</h2>
 
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <label className="block font-medium text-gray-500">Model</label>
             <div className="text-white font-bold text-left">
               {
@@ -293,29 +289,25 @@ export default function Generate({
                 selectedModal ? models[selectedModal].name : "Not selected"
               }
             </div>
-          </div>
+          </div> */}
 
-          {selectedModal
-            ? models[selectedModal].inputs.map((input) => (
-                <Input
-                  key={input.id}
-                  id={input.id}
-                  label={input.label}
-                  type={input.type}
-                  params={input.params}
-                  info={input.info}
-                  value={
-                    params[input.id] ? params[input.id] : input.defaultValue
-                  }
-                  setValue={(e) => {
-                    setParams({
-                      ...params,
-                      [input.id]: e,
-                    });
-                  }}
-                />
-              ))
-            : null}
+          {config.params.map((param: any) => (
+            <Input
+              key={param.id}
+              id={param.id}
+              label={param.name}
+              type={param.type}
+              params={param.params}
+              info={param.info}
+              value={params[param.id] ? params[param.id] : param.default}
+              setValue={(e) => {
+                setParams({
+                  ...params,
+                  [param.id]: e,
+                });
+              }}
+            />
+          ))}
         </div>
       </div>
     </div>

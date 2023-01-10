@@ -81,8 +81,8 @@ export default function App({ Component, pageProps }: AppProps) {
       toast.success("Subscription successful!", {
         position: "bottom-left",
       });
-    } else if (status === "subscription_cancelled") {
-      toast.success("Subscription cancelled!", {
+    } else if (status === "subscription_canceled") {
+      toast.success("Subscription canceled!", {
         position: "bottom-left",
       });
     } else if (status === "credits_purchased") {
@@ -414,6 +414,7 @@ export default function App({ Component, pageProps }: AppProps) {
         networkName={networkName}
         walletAddress={walletAddress}
         setHasAccess={setHasAccess}
+        accessContract={accessContract}
       />
       <Analytics />
     </UserProvider>

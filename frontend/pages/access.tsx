@@ -105,16 +105,13 @@ const C: NextPage<PageProps> = ({
   }, [walletAddress, networkName, accessContract?.address]);
 
   const mint = async () => {
-    if (!signer || !provider || !walletAddress || !networkName) {
-      errorToast("Please connect your wallet");
+    console.log("minting to", accessContract);
+    if (!signer || !provider || !walletAddress || !networkName || !uid) {
+      errorToast("Please connect your wallet to mint");
       return;
     }
     if (!accessContract) {
-      if (!uid || !provider) {
-        errorToast("Please connect your wallet to mint");
-      } else {
-        errorToast("Access contract not found on network " + networkName);
-      }
+      errorToast("Access contract not found on network " + networkName);
       return;
     }
     const mintingActive = await accessContract.mintingActive(TOKEN_ID);
