@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import type { NextPage } from "next";
 import Roadmap from "../components/roadmap";
 import { PageProps } from "../lib/types";
@@ -8,6 +8,14 @@ import { db } from "../lib/firebase";
 import { toast } from "react-toastify";
 const { ethers } = require("ethers");
 import { useUser } from "@auth0/nextjs-auth0/client";
+import {
+  UserContext,
+  UserContextType,
+  AppContext,
+  AppContextType,
+  Web3Context,
+  Web3ContextType,
+} from "../lib/contexts";
 
 const accessImg = require("../assets/access.png");
 
@@ -19,28 +27,21 @@ type SignatureInfo = {
   tokenId: number;
 };
 
-const C: NextPage<PageProps> = ({
-  uid,
-  accessPassCost,
-  accessCreditsPerMonth,
-  accessSubscriptionLength,
-  provider,
-  networkName,
-  signer,
-  walletAddress,
-  accessContract,
-  setHasAccess,
-}) => {
+const C: NextPage<PageProps> = () => {
   const [status, setStatus] = useState<string | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [signature, setSignature] = useState<SignatureInfo | null>(null);
 
   const { user, error, isLoading } = useUser();
 
+  const appContext = useContext(AppContext) as AppContextType;
+  const userContext = useContext(UserContext) as UserContextType;
+  const web3Context = useContext(Web3Context) as Web3ContextType;
+
   const features = [
     {
       name: "Credits",
-      description: `${accessCreditsPerMonth} credits per month for ${accessSubscriptionLength} months`,
+      description: `${appContext.accessCreditsPerMonth} credits per month for ${appContext.accessSubscriptionLength} months`,
     },
     {
       name: "Priority support",
@@ -57,15 +58,19 @@ const C: NextPage<PageProps> = ({
   ];
 
   const getSignature = async () => {
-    if (networkName && walletAddress && accessContract?.address) {
+    if (
+      web3Context.networkName &&
+      userContext.walletAddress &&
+      web3Context.accessContract?.address
+    ) {
       const sigDocRef = doc(
         db,
         "access_pass_signatures",
-        networkName,
-        accessContract.address,
+        web3Context.networkName,
+        web3Context.accessContract.address,
         `token_${TOKEN_ID}`,
         "wallets",
-        walletAddress
+        userContext.walletAddress
       );
       const sigDocSnap = await getDoc(sigDocRef);
       if (sigDocSnap.exists()) {
@@ -99,27 +104,48 @@ const C: NextPage<PageProps> = ({
 
   // once we have user account and contract address, look for a signature
   useEffect(() => {
-    if (walletAddress && networkName && accessContract?.address) {
+    if (
+      userContext.walletAddress &&
+      web3Context.networkName &&
+      web3Context.accessContract?.address
+    ) {
       getSignature();
     }
-  }, [walletAddress, networkName, accessContract?.address]);
+  }, [
+    userContext.walletAddress,
+    web3Context.networkName,
+    web3Context.accessContract?.address,
+  ]);
 
   const mint = async () => {
-    console.log("minting to", accessContract);
-    if (!signer || !provider || !walletAddress || !networkName || !uid) {
+    console.log("minting to", web3Context.accessContract);
+    if (
+      !web3Context.signer ||
+      !web3Context.provider ||
+      !userContext.walletAddress ||
+      !web3Context.networkName ||
+      !userContext.uid
+    ) {
       errorToast("Please connect your wallet to mint");
       return;
     }
-    if (!accessContract) {
-      errorToast("Access contract not found on network " + networkName);
+    if (!web3Context.accessContract) {
+      errorToast(
+        "Access contract not found on network " + web3Context.networkName
+      );
       return;
     }
-    const mintingActive = await accessContract.mintingActive(TOKEN_ID);
+    const mintingActive = await web3Context.accessContract.mintingActive(
+      TOKEN_ID
+    );
     if (!mintingActive) {
       errorToast("Access pass minting is not active");
       return;
     }
-    const balance = await accessContract.balanceOf(walletAddress, TOKEN_ID);
+    const balance = await web3Context.accessContract.balanceOf(
+      userContext.walletAddress,
+      TOKEN_ID
+    );
     if (balance > 0) {
       errorToast("You already have an access pass");
       return;
@@ -136,7 +162,7 @@ const C: NextPage<PageProps> = ({
     let sig, mintPrice;
     if (signature === null || signature.sig === "0x") {
       sig = "0x";
-      mintPrice = await accessContract.tokenPrices(TOKEN_ID);
+      mintPrice = await web3Context.accessContract.tokenPrices(TOKEN_ID);
     } else {
       sig = signature.sig;
       mintPrice = signature.price;
@@ -146,24 +172,25 @@ const C: NextPage<PageProps> = ({
     console.log("Signature:", sig);
 
     try {
-      const methodSignature = await accessContract.interface.encodeFunctionData(
-        "mint",
-        [TOKEN_ID, sig] // TODO get real signatures for approved mints
-      );
+      const methodSignature =
+        await web3Context.accessContract.interface.encodeFunctionData(
+          "mint",
+          [TOKEN_ID, sig] // TODO get real signatures for approved mints
+        );
 
       const txnParams = {
-        to: accessContract.address,
+        to: web3Context.accessContract.address,
         value: mintPrice, // all Community art mints are free
         data: methodSignature,
-        from: walletAddress,
+        from: userContext.walletAddress,
       };
-      const gasEstimate = await signer.estimateGas(txnParams);
+      const gasEstimate = await web3Context.signer.estimateGas(txnParams);
       console.log("Gas estimate:", gasEstimate.toString());
 
       // send transaction
       setStatus("Awaiting signature");
-      const txn = await signer.sendTransaction({
-        to: accessContract.address,
+      const txn = await web3Context.signer.sendTransaction({
+        to: web3Context.accessContract.address,
         value: mintPrice, // all Community art mints are free
         data: methodSignature,
         gasLimit: gasEstimate,
@@ -178,17 +205,23 @@ const C: NextPage<PageProps> = ({
 
       // get opensea url
       let openseaUrl = "";
-      if (networkName === "mainnet" || networkName === "homestead") {
+      if (
+        web3Context.networkName === "mainnet" ||
+        web3Context.networkName === "homestead"
+      ) {
         openseaUrl = "https://opensea.io/assets/";
       } else {
         openseaUrl = "https://testnets.opensea.io/assets/";
       }
       setOpenseaAssetUrl(
-        openseaUrl + accessContract.address + "/" + TOKEN_ID.toString()
+        openseaUrl +
+          web3Context.accessContract.address +
+          "/" +
+          TOKEN_ID.toString()
       );
 
       // mark user as access (to trigger checkAccessCredits)
-      setHasAccess(true);
+      appContext.setHasAccess(true);
     } catch (error: any) {
       if (error.message?.includes("user rejected transaction")) {
         console.error("User rejected transaction");
@@ -211,7 +244,8 @@ const C: NextPage<PageProps> = ({
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-400 text-center w-3/4 mx-auto">
                 Tired of buying credits? <br /> Make a one-time purchase for{" "}
-                {accessPassCost} ETH to get monthly credits and other perks.
+                {appContext.accessPassCost} ETH to get monthly credits and other
+                perks.
               </p>
               <div className="mt-8 text-center justify-center">
                 <div

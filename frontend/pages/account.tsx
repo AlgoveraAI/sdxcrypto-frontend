@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, Fragment } from "react";
+import { useEffect, useRef, useState, Fragment, useContext } from "react";
 import type { NextPage } from "next";
 import { PageProps } from "../lib/types";
 import Link from "next/link";
@@ -8,6 +8,12 @@ import { db, auth } from "../lib/firebase";
 import Spinner from "../components/spinner";
 import { Dialog, Transition } from "@headlessui/react";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import {
+  UserContext,
+  UserContextType,
+  AppContext,
+  AppContextType,
+} from "../lib/contexts";
 
 type apiKey = {
   id: string;
@@ -15,12 +21,10 @@ type apiKey = {
   expiresAt: string;
 };
 
-const Account: NextPage<PageProps> = ({
-  uid,
-  credits,
-  hasAccess,
-  walletAddress,
-}) => {
+const Account: NextPage<PageProps> = () => {
+  const appContext = useContext(AppContext) as AppContextType;
+  const userContext = useContext(UserContext) as UserContextType;
+
   const toastId = useRef<any>(null);
   const [apiKeys, setApiKeys] = useState<apiKey[]>([]);
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
@@ -36,7 +40,7 @@ const Account: NextPage<PageProps> = ({
   useEffect(() => {
     getApiKeys();
     checkSubscription();
-  }, [uid]);
+  }, [userContext.uid]);
 
   const closeModal = () => {
     setShowModal(false);
@@ -59,8 +63,8 @@ const Account: NextPage<PageProps> = ({
   };
 
   const checkSubscription = async () => {
-    if (uid) {
-      const docRef = doc(db, "users", uid);
+    if (userContext.uid) {
+      const docRef = doc(db, "users", userContext.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -74,7 +78,7 @@ const Account: NextPage<PageProps> = ({
   const updateSubscription = async () => {
     setSubLoading(true);
     // if active, cancel. if canceled, reactivate
-    if (uid) {
+    if (userContext.uid) {
       if (subscriptionStatus === "active") {
         const res = await fetch(
           // "http://localhost:5001/sdxcrypto-algovera/us-central1/cancelStripeSubscription",
@@ -82,7 +86,7 @@ const Account: NextPage<PageProps> = ({
           {
             method: "POST",
             body: JSON.stringify({
-              uid: uid,
+              uid: userContext.uid,
               sourceUrl: window.location.href,
             }),
           }
@@ -108,7 +112,7 @@ const Account: NextPage<PageProps> = ({
           {
             method: "POST",
             body: JSON.stringify({
-              uid: uid,
+              uid: userContext.uid,
               sourceUrl: window.location.href,
             }),
           }
@@ -129,9 +133,9 @@ const Account: NextPage<PageProps> = ({
   };
 
   const getApiKeys = async () => {
-    if (uid) {
+    if (userContext.uid) {
       // list api keys under user doc in firestore
-      const docRef = doc(db, "users", uid);
+      const docRef = doc(db, "users", userContext.uid);
       getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -153,7 +157,7 @@ const Account: NextPage<PageProps> = ({
       {
         method: "POST",
         body: JSON.stringify({
-          uid: uid,
+          uid: userContext.uid,
         }),
       }
     );
@@ -172,7 +176,7 @@ const Account: NextPage<PageProps> = ({
       {
         method: "POST",
         body: JSON.stringify({
-          uid,
+          uid: userContext.uid,
           id: apiKey.id,
         }),
       }
@@ -192,19 +196,23 @@ const Account: NextPage<PageProps> = ({
         <h2 className="text-3xl font-bold text-center">Account</h2>
       </div>
       <div className="max-w-5xl mx-auto mt-12 p-10 rounded-lg shadow-lg bg-background-darker">
-        {uid ? (
+        {userContext.uid ? (
           <>
             <div className="mt-12">
               <div className="font-bold text-xl mb-2">
-                {uid?.includes("|siwe|") ? "Wallet Address" : "Email"}
+                {userContext.uid?.includes("|siwe|")
+                  ? "Wallet Address"
+                  : "Email"}
               </div>
               <div className="mb-2">
-                {uid?.includes("|siwe|") ? walletAddress : user?.email}
+                {userContext.uid?.includes("|siwe|")
+                  ? userContext.walletAddress
+                  : user?.email}
               </div>
             </div>
             <div className="mt-12">
               <div className="font-bold text-xl mb-2">Credits</div>
-              <div className="mb-2">{credits}</div>
+              <div className="mb-2">{userContext.credits}</div>
               <Link
                 href="/pricing"
                 className="font-medium primary-button cursor-pointer py-1 px-3 rounded-md"
@@ -240,7 +248,7 @@ const Account: NextPage<PageProps> = ({
             <div className="mt-12">
               <div className="font-bold text-xl mb-2">Access Pass</div>
 
-              {hasAccess ? (
+              {userContext.hasAccess ? (
                 <div>
                   <div className="mb-2">Active</div>
                   <Link

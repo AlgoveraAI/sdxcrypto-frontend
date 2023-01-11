@@ -4,15 +4,13 @@ import "react-toastify/dist/ReactToastify.css";
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import type { AppProps } from "next/app";
-// import { useUser } from "../lib/hooks";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
+import { db } from "../lib/firebase";
 import { firebaseApp } from "../lib/firebase";
 import {
   fetchAndActivate,
   getValue,
   getRemoteConfig,
-  RemoteConfigSettings,
 } from "firebase/remote-config";
 import { ToastContainer } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react";
@@ -26,6 +24,7 @@ const { ethers } = require("ethers");
 import { toast } from "react-toastify";
 import FeedbackModal from "../components/feedback-modal";
 import { Contract } from "@ethersproject/contracts";
+import { UserContext, Web3Context, AppContext } from "../lib/contexts";
 
 // suppress console.log when in production on main branch
 const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
@@ -388,44 +387,64 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <UserProvider>
-      <Head>
-        <title>Algovera Flow</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <ToastContainer />
-      <Nav setUID={setUID} setFeedbackModalTrigger={setFeedbackModalTrigger} />
-      <CreditsModal
-        uid={uid}
-        credits={credits}
-        creditsModalTrigger={creditsModalTrigger}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-      />
-      <FeedbackModal
-        uid={uid || null}
-        feedbackModalTrigger={feedbackModalTrigger}
-        setFeedbackModalTrigger={setFeedbackModalTrigger}
-      />
-      <Component
-        uid={uid}
-        credits={credits}
-        hasAccess={hasAccess}
-        creditsModalTrigger={creditsModalTrigger}
-        setCreditsModalTrigger={setCreditsModalTrigger}
-        setFeedbackModalTrigger={setFeedbackModalTrigger}
-        creditCost={creditCost}
-        accessPassCost={accessPassCost}
-        accessCreditsPerMonth={accessCreditsPerMonth}
-        accessSubscriptionLength={accessSubscriptionLength}
-        stripeCreditsPerMonth={stripeCreditsPerMonth}
-        provider={provider}
-        signer={signer}
-        networkName={networkName}
-        walletAddress={walletAddress}
-        setHasAccess={setHasAccess}
-        accessContract={accessContract}
-      />
-      <Analytics />
+      <AppContext.Provider // app config and state
+        value={{
+          creditsModalTrigger,
+          creditCost,
+          accessPassCost,
+          accessCreditsPerMonth,
+          accessSubscriptionLength,
+          stripeCreditsPerMonth,
+          setHasAccess,
+          setCreditsModalTrigger,
+          setFeedbackModalTrigger,
+        }}
+      >
+        <UserContext.Provider // user data
+          value={{
+            uid,
+            credits,
+            hasAccess,
+            walletAddress,
+          }}
+        >
+          <Web3Context.Provider // web3 data and objects
+            value={{
+              accessContract,
+              provider,
+              signer,
+              networkName,
+            }}
+          >
+            <Head>
+              <title>Algovera Flow</title>
+              <meta
+                name="viewport"
+                content="initial-scale=1.0, width=device-width"
+              />
+              <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <ToastContainer />
+            <Nav
+              setUID={setUID}
+              setFeedbackModalTrigger={setFeedbackModalTrigger}
+            />
+            <CreditsModal
+              uid={uid}
+              credits={credits}
+              creditsModalTrigger={creditsModalTrigger}
+              setCreditsModalTrigger={setCreditsModalTrigger}
+            />
+            <FeedbackModal
+              uid={uid || null}
+              feedbackModalTrigger={feedbackModalTrigger}
+              setFeedbackModalTrigger={setFeedbackModalTrigger}
+            />
+            <Component />
+            <Analytics />
+          </Web3Context.Provider>
+        </UserContext.Provider>
+      </AppContext.Provider>
     </UserProvider>
   );
 }

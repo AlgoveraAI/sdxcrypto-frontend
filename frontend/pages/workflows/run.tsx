@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import type { NextPage } from "next";
 import Link from "next/link";
 
@@ -12,15 +12,19 @@ import GenerateImage from "../../components/workflows/blocks/generate-image";
 import MintImage from "../../components/workflows/blocks/mint-image";
 import SummarizeText from "../../components/workflows/blocks/summarize-text";
 
-const C: NextPage<PageProps> = ({
-  uid,
-  credits,
-  provider,
-  networkName,
-  signer,
-  walletAddress,
-  setFeedbackModalTrigger,
-}) => {
+import {
+  UserContext,
+  UserContextType,
+  Web3Context,
+  Web3ContextType,
+  AppContext,
+  AppContextType,
+} from "../../lib/contexts";
+
+const C: NextPage<PageProps> = ({}) => {
+  const userContext = useContext(UserContext) as UserContextType;
+  const web3Context = useContext(Web3Context) as Web3ContextType;
+
   // define which step of the workflow the user is on
   // (e.g. 0 = select, 1 = generate, 2 = mint)
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
@@ -110,7 +114,7 @@ const C: NextPage<PageProps> = ({
           method: "POST",
           body: JSON.stringify({
             jobId,
-            uid,
+            uid: userContext.uid,
             workflow: "txt2img",
           }),
         });
@@ -253,7 +257,7 @@ const C: NextPage<PageProps> = ({
               workflowId === "stable-diffusion-image-gen" ? (
                 currentStepIdx === 0 ? (
                   <GenerateImage
-                    credits={credits}
+                    credits={userContext.credits}
                     config={
                       workflowId === "dalle-image-gen"
                         ? blockConfigs["image_generation_dalle"]
@@ -267,10 +271,10 @@ const C: NextPage<PageProps> = ({
                   />
                 ) : (
                   <MintImage
-                    provider={provider}
-                    signer={signer}
-                    networkName={networkName}
-                    walletAddress={walletAddress}
+                    provider={web3Context.provider}
+                    signer={web3Context.signer}
+                    networkName={web3Context.networkName}
+                    walletAddress={userContext.walletAddress}
                     config={blockConfigs[2]}
                     jobId={jobId}
                     prompt={prompt}
@@ -279,7 +283,7 @@ const C: NextPage<PageProps> = ({
                 )
               ) : workflowId === "text-summarization" ? (
                 <SummarizeText
-                  credits={credits}
+                  credits={userContext.credits}
                   config={blockConfigs["text_summarization"]}
                   setJobId={setJobId}
                   jobStatus={jobStatus}

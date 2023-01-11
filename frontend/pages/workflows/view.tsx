@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { PageProps } from "../../lib/types";
 import type { NextPage } from "next";
 import Image from "next/image";
@@ -13,8 +13,7 @@ import { db } from "../../lib/firebase";
 
 const { iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
 
-const C: NextPage<PageProps> = ({ uid }) => {
-  // workflowId is one of the keys in WORKFLOWS or null
+const C: NextPage<PageProps> = () => {
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
   const [blockConfigs, setBlockConfigs] = useState<any>({});
