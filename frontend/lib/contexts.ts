@@ -2,6 +2,7 @@ import { createContext } from "react";
 import { Contract } from "@ethersproject/contracts";
 import { BaseProvider } from "@ethersproject/providers";
 import { Signer } from "@ethersproject/abstract-signer";
+import { WorkflowConfigsType, BlockConfigsType } from "./types";
 
 export interface AppContextType {
   creditsModalTrigger: string | boolean;
@@ -15,6 +16,8 @@ export interface AppContextType {
   accessSubscriptionLength: number | null;
   stripeCreditsPerMonth: number | null;
   setHasAccess: React.Dispatch<React.SetStateAction<boolean | null>>;
+  workflowConfigs: WorkflowConfigsType;
+  blockConfigs: BlockConfigsType;
 }
 
 export interface UserContextType {

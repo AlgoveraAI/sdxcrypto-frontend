@@ -17,11 +17,13 @@ import {
   UserContextType,
   Web3Context,
   Web3ContextType,
-  AppContext,
-  AppContextType,
 } from "../../lib/contexts";
 
+import { WorkflowConfigType } from "../../lib/types";
+import { AppContext, AppContextType } from "../../lib/contexts";
+
 const C: NextPage<PageProps> = ({}) => {
+  const appContext = useContext(AppContext) as AppContextType;
   const userContext = useContext(UserContext) as UserContextType;
   const web3Context = useContext(Web3Context) as Web3ContextType;
 
@@ -35,7 +37,6 @@ const C: NextPage<PageProps> = ({}) => {
   // store the name of the workflow (indicated by the url)
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
-  const [blockConfigs, setBlockConfigs] = useState<any>({});
 
   // store params and details for each step here
   // so that we can pass them to the next step and store them
@@ -64,34 +65,10 @@ const C: NextPage<PageProps> = ({}) => {
 
   useEffect(() => {
     // get info about the workflow from the db
-    getWorkflowConfig();
-  }, [workflowId]);
-
-  const getWorkflowConfig = async () => {
-    if (workflowId) {
-      const docRef = doc(db, "workflow_configs", workflowId);
-      const docSnap = await getDoc(docRef);
-      const workflowConfig = docSnap.data();
-      console.log("got workflow config: ", workflowConfig);
-      if (!workflowConfig) {
-        console.error("workflow config not found");
-        return;
-      }
-      setWorkflowConfig(workflowConfig);
-
-      const { blocks } = workflowConfig;
-      let blockConfigs: any = {};
-      for (let i = 0; i < blocks.length; i++) {
-        const blockId = blocks[i];
-        const blockRef = doc(db, "block_configs", blockId);
-        const blockSnap = await getDoc(blockRef);
-        const blockConfig = blockSnap.data();
-        console.log("got block config: ", blockConfig);
-        blockConfigs[blockId] = blockConfig;
-      }
-      setBlockConfigs(blockConfigs);
+    if (appContext?.workflowConfigs && workflowId) {
+      setWorkflowConfig(appContext.workflowConfigs[workflowId]);
     }
-  };
+  }, [appContext.workflowConfigs, workflowId]);
 
   const checkJobStatus = async (jobId: string) => {
     // check the status of a job
@@ -180,7 +157,7 @@ const C: NextPage<PageProps> = ({}) => {
           View your outputs
         </Link>
       </div> */}
-        {Object.keys(blockConfigs).length && workflowConfig ? (
+        {Object.keys(appContext.blockConfigs).length && workflowConfig ? (
           <>
             {
               // if the workflow has multiple steps, show the progress bar
@@ -205,7 +182,7 @@ const C: NextPage<PageProps> = ({}) => {
                             >
                               <span className="text-white">{ix + 1}</span>
                               <span className="ml-4 text-sm font-medium text-white">
-                                {blockConfigs[blockId].name}
+                                {appContext.blockConfigs[blockId].name}
                               </span>
                             </a>
                           ) : (
@@ -216,7 +193,7 @@ const C: NextPage<PageProps> = ({}) => {
                             >
                               <span className="text-gray-600">{ix + 1}</span>
                               <span className="ml-4 text-sm font-medium text-gray-600">
-                                {blockConfigs[blockId].name}
+                                {appContext.blockConfigs[blockId].name}
                               </span>
                             </div>
                           )}
@@ -260,8 +237,10 @@ const C: NextPage<PageProps> = ({}) => {
                     credits={userContext.credits}
                     config={
                       workflowId === "dalle-image-gen"
-                        ? blockConfigs["image_generation_dalle"]
-                        : blockConfigs["image_generation_stable_diffusion"]
+                        ? appContext.blockConfigs["image_generation_dalle"]
+                        : appContext.blockConfigs[
+                            "image_generation_stable_diffusion"
+                          ]
                     }
                     setJobId={setJobId}
                     prompt={prompt}
@@ -275,7 +254,7 @@ const C: NextPage<PageProps> = ({}) => {
                     signer={web3Context.signer}
                     networkName={web3Context.networkName}
                     walletAddress={userContext.walletAddress}
-                    config={blockConfigs[2]}
+                    config={appContext.blockConfigs[2]}
                     jobId={jobId}
                     prompt={prompt}
                     images={images}
@@ -284,7 +263,7 @@ const C: NextPage<PageProps> = ({}) => {
               ) : workflowId === "text-summarization" ? (
                 <SummarizeText
                   credits={userContext.credits}
-                  config={blockConfigs["text_summarization"]}
+                  config={appContext.blockConfigs["text_summarization"]}
                   setJobId={setJobId}
                   jobStatus={jobStatus}
                 />

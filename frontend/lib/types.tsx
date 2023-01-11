@@ -56,3 +56,14 @@ export type OptionsProps = {
   value: number;
   onChange: (value: number) => void;
 };
+
+export type WorkflowConfigType = { [field: string]: any };
+export type WorkflowConfigsType = {
+  [key: string]: WorkflowConfigType;
+};
+export type BlockConfigType = {
+  [field: string]: any;
+};
+export type BlockConfigsType = {
+  [key: string]: BlockConfigType;
+};

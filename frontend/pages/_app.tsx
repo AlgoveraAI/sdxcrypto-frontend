@@ -1,10 +1,20 @@
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-
-import Head from "next/head";
 import { useState, useEffect } from "react";
+import Head from "next/head";
 import type { AppProps } from "next/app";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+
+import CreditsModal from "../components/credits-modal";
+import FeedbackModal from "../components/feedback-modal";
+import Nav from "../components/nav";
+import { UserContext, Web3Context, AppContext } from "../lib/contexts";
+import {
+  WorkflowConfigType,
+  WorkflowConfigsType,
+  BlockConfigType,
+  BlockConfigsType,
+} from "../lib/types";
+
 import { db } from "../lib/firebase";
 import { firebaseApp } from "../lib/firebase";
 import {
@@ -12,19 +22,23 @@ import {
   getValue,
   getRemoteConfig,
 } from "firebase/remote-config";
-import { ToastContainer } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react";
-import CreditsModal from "../components/credits-modal";
-import Nav from "../components/nav";
-import React from "react";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 import { BaseProvider } from "@ethersproject/providers";
 import { Signer } from "@ethersproject/abstract-signer";
 const { ethers } = require("ethers");
-import { toast } from "react-toastify";
-import FeedbackModal from "../components/feedback-modal";
+import { ToastContainer, toast } from "react-toastify";
 import { Contract } from "@ethersproject/contracts";
-import { UserContext, Web3Context, AppContext } from "../lib/contexts";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 // suppress console.log when in production on main branch
 const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
@@ -52,7 +66,6 @@ export default function App({ Component, pageProps }: AppProps) {
   };
 
   // user context
-  // (cant use useUser hook here because it's not a page)
   const [uid, setUID] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
@@ -81,6 +94,11 @@ export default function App({ Component, pageProps }: AppProps) {
     number | null
   >(null);
 
+  const [workflowConfigs, setWorkflowConfigs] = useState<WorkflowConfigsType>(
+    {}
+  );
+  const [blockConfigs, setBlockConfigs] = useState<BlockConfigsType>({});
+
   const appContext = {
     creditsModalTrigger,
     creditCost,
@@ -88,6 +106,8 @@ export default function App({ Component, pageProps }: AppProps) {
     accessCreditsPerMonth,
     accessSubscriptionLength,
     stripeCreditsPerMonth,
+    workflowConfigs,
+    blockConfigs,
     setHasAccess,
     setCreditsModalTrigger,
     setFeedbackModalTrigger,
@@ -97,6 +117,7 @@ export default function App({ Component, pageProps }: AppProps) {
     // on mount
     // this runs twice in dev because of reactStrictMode in next.config.js
     loadRemoteConfig();
+    loadWorkflowConfigs();
     checkMetamaskConnection();
     setupMetamaskListeners();
 
@@ -153,6 +174,26 @@ export default function App({ Component, pageProps }: AppProps) {
       checkAccessCredits();
     }
   }, [uid, hasAccess]);
+
+  const loadWorkflowConfigs = async () => {
+    // for workflows and blocks
+    const workflowQuerySnapshot = await getDocs(
+      collection(db, "workflow_configs")
+    );
+    const workflowConfigs: WorkflowConfigsType = {};
+    workflowQuerySnapshot.docs.map((doc) => {
+      workflowConfigs[doc.id] = doc.data();
+    });
+    console.log("workflowConfigs: ");
+    setWorkflowConfigs(workflowConfigs);
+
+    const blockQuerySnapshot = await getDocs(collection(db, "block_configs"));
+    const blockConfigs: BlockConfigsType = {};
+    blockQuerySnapshot.docs.map((doc) => {
+      blockConfigs[doc.id] = doc.data();
+    });
+    setBlockConfigs(blockConfigs);
+  };
 
   const checkIfWeb3User = async () => {
     // runs once a user has logged in

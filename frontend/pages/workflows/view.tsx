@@ -8,15 +8,16 @@ import {
   ArrowRightIcon,
   ArrowLeftCircleIcon,
 } from "@heroicons/react/24/outline";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { WorkflowConfigType } from "../../lib/types";
+import { AppContext, AppContextType } from "../../lib/contexts";
 
 const { iconUrlPrefix, iconUrlSuffix } = require("../../lib/config");
 
 const C: NextPage<PageProps> = () => {
+  const appContext = useContext(AppContext) as AppContextType;
   const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
-  const [blockConfigs, setBlockConfigs] = useState<any>({});
+  const [workflowConfig, setWorkflowConfig] =
+    useState<WorkflowConfigType | null>(null);
 
   useEffect(() => {
     // get the workflow name from the url param 'name'
@@ -32,33 +33,10 @@ const C: NextPage<PageProps> = () => {
 
   useEffect(() => {
     // get info about the workflow from the db
-    getConfigs();
-  }, [workflowId]);
-
-  const getConfigs = async () => {
-    if (workflowId) {
-      const docRef = doc(db, "workflow_configs", workflowId);
-      const docSnap = await getDoc(docRef);
-      const workflowConfig = docSnap.data();
-      console.log("got workflow config: ", workflowConfig);
-      if (!workflowConfig) {
-        console.error("workflow config not found");
-        return;
-      }
-      setWorkflowConfig(workflowConfig);
-      const { blocks } = workflowConfig;
-      let blockConfigs: any = {};
-      for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-        const blockRef = doc(db, "block_configs", block);
-        const blockSnap = await getDoc(blockRef);
-        const blockConfig = blockSnap.data();
-        console.log("got block config: ", blockConfig);
-        blockConfigs[block] = blockConfig;
-      }
-      setBlockConfigs(blockConfigs);
+    if (appContext?.workflowConfigs && workflowId) {
+      setWorkflowConfig(appContext.workflowConfigs[workflowId]);
     }
-  };
+  }, [appContext.workflowConfigs, workflowId]);
 
   return (
     <>
@@ -69,14 +47,14 @@ const C: NextPage<PageProps> = () => {
         <ArrowLeftCircleIcon className="h-6 w-6" />
         <span className="ml-2">View All Workflows</span>
       </Link>
-      <div className="mt-12 max-w-5xl mx-auto px-12">
-        {workflowConfig && Object.keys(blockConfigs).length ? (
+      {workflowId && workflowConfig && appContext ? (
+        <div className="mt-12 max-w-5xl mx-auto px-12">
           <>
             <h1 className="text-4xl font-bold mb-12">{workflowConfig.name}</h1>
             <div className="flex bg-white relative min-h-[512px]">
               {/* workflow blocks as centered item */}
               <div className="flex items-center justify-center w-full">
-                {workflowConfig.blocks.map((block: string, ix: number) => (
+                {workflowConfig.blocks.map((blockId: string, ix: number) => (
                   <>
                     <div key={ix} className="text-black mx-8">
                       <div className="text-center">
@@ -84,23 +62,25 @@ const C: NextPage<PageProps> = () => {
                           <Image
                             className="mx-auto"
                             src={
-                              blockConfigs[block].dark_icon.startsWith("http")
-                                ? blockConfigs[block].dark_icon
+                              appContext.blockConfigs[
+                                blockId
+                              ].dark_icon.startsWith("http")
+                                ? appContext.blockConfigs[blockId].dark_icon
                                 : iconUrlPrefix +
-                                  blockConfigs[block].dark_icon +
+                                  appContext.blockConfigs[blockId].dark_icon +
                                   iconUrlSuffix
                             }
-                            alt={blockConfigs[block].name}
+                            alt={appContext.blockConfigs[blockId].name}
                             fill
                           />
                         </div>
 
                         <div className="mt-4">
                           <h1 className="text-md font-bold">
-                            {blockConfigs[block].name}
+                            {appContext.blockConfigs[blockId].name}
                           </h1>
                           <p className="text-sm max-w-[200px]">
-                            {blockConfigs[block].desc}
+                            {appContext.blockConfigs[blockId].desc}
                           </p>
                         </div>
                       </div>
@@ -128,8 +108,8 @@ const C: NextPage<PageProps> = () => {
               <p className="text-md">{workflowConfig.long_desc}</p>
             </div>
           </>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </>
   );
 };

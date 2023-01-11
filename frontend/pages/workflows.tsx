@@ -1,100 +1,92 @@
 import "reactjs-popup/dist/index.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import type { NextPage } from "next";
 import { PageProps } from "../lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import Popup from "reactjs-popup";
 import Spinner from "../components/spinner";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../lib/firebase";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-
 const { iconUrlPrefix, iconUrlSuffix } = require("../lib/config");
+import {
+  UserContext,
+  Web3Context,
+  AppContext,
+  AppContextType,
+} from "../lib/contexts";
+import {
+  WorkflowConfigType,
+  WorkflowConfigsType,
+  BlockConfigType,
+  BlockConfigsType,
+} from "../lib/types";
 
 const Workflows: NextPage<PageProps> = () => {
-  const [workflowConfigs, setWorkflowConfigs] = useState<any>([]);
-  const [blockConfigs, setBlockConfigs] = useState<any>({});
+  const [sortedWorkflowKeys, setSortedWorkflowKeys] = useState<string[]>([]);
+  const appContext = useContext(AppContext) as AppContextType;
 
   useEffect(() => {
-    getWorkflows();
-  }, []);
-
-  const getWorkflows = async () => {
-    // load in each workflowConfig from the workflow_configs collection
-    const querySnapshot = await getDocs(collection(db, "workflow_configs"));
-    let workflowConfigs = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    console.log("workflowConfigs: ", workflowConfigs);
-
-    // sort by which ones are available first
-    workflowConfigs.sort((a: any, b: any) => {
-      if (a.available && !b.available) {
-        return -1;
-      } else if (!a.available && b.available) {
-        return 1;
-      } else {
+    if (appContext?.workflowConfigs) {
+      // sort by which ones are available first
+      const configs = appContext.workflowConfigs;
+      const sortedWorkflowConfigs = Object.keys(
+        appContext.workflowConfigs
+      ).sort((a, b) => {
+        if (configs[a].available && !configs[b].available) {
+          return -1;
+        } else if (!configs[a].available && configs[b].available) {
+          return 1;
+        }
         return 0;
-      }
-    });
-
-    // if a workflow is in dev and available, dont show it in the prod app
-    // (its still in testing)
-    if (process.env.GIT_BRANCH === "main") {
-      workflowConfigs = workflowConfigs.filter(
-        (workflowConfig: any) =>
-          workflowConfig.available === false || workflowConfig.env !== "dev"
-      );
+      });
+      console.log("sorted workflow configs: ", sortedWorkflowConfigs);
+      setSortedWorkflowKeys(sortedWorkflowConfigs);
     }
+  }, [appContext.workflowConfigs]);
 
-    setWorkflowConfigs(workflowConfigs);
-
-    const blockQuerySnapshot = await getDocs(collection(db, "block_configs"));
-    let blockConfigs: any = {};
-    blockQuerySnapshot.docs.forEach((doc) => {
-      blockConfigs[doc.id] = doc.data();
-    });
-    console.log("blockConfigs: ", blockConfigs);
-    setBlockConfigs(blockConfigs);
-  };
+  const workflowConfigs = appContext.workflowConfigs;
+  const blockConfigs = appContext.blockConfigs;
 
   return (
     <div className="my-24 mx-4">
       <h2 className="mb-4 text-3xl font-bold text-center">AI Workflows</h2>
+
       <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto">
-        {workflowConfigs.length && Object.keys(blockConfigs).length ? (
+        {workflowConfigs &&
+        Object.keys(workflowConfigs).length &&
+        blockConfigs &&
+        Object.keys(blockConfigs).length ? (
           <ul
             role="list"
             className="grid grid-cols-1 gap-12 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 mt-12"
           >
-            {Object.entries(workflowConfigs).map(
-              ([id, workflow]: [string, any]) => (
-                <li
-                  key={id}
-                  className={`col-span-1 flex flex-col w-full divide-y divide-gray-200 rounded-lg bg-background-darker text-center shadow-md hover:bg-opacity-70`}
-                >
-                  <Link
-                    href={
-                      workflow.available
-                        ? "/workflows/view?id=" + workflow.id
-                        : ""
+            {sortedWorkflowKeys.map((id: string) => (
+              <li
+                key={id}
+                className={`col-span-1 flex flex-col w-full divide-y divide-gray-200 rounded-lg bg-background-darker text-center shadow-md hover:bg-opacity-70`}
+              >
+                <Link
+                  href={
+                    workflowConfigs[id].available
+                      ? "/workflows/view?id=" + id
+                      : ""
+                  }
+                  className={`${
+                    workflowConfigs[id].available
+                      ? "cursor-pointer hover:brightness-110"
+                      : "cursor-default"
+                  } `}
+                  onClick={(e) => {
+                    // prevent scrolling to top of page on click
+                    if (!workflowConfigs[id].available) {
+                      e.preventDefault();
                     }
-                    className={`${
-                      workflow.available
-                        ? "cursor-pointer hover:brightness-110"
-                        : "cursor-default"
-                    } `}
-                    onClick={(e) => {
-                      // prevent scrolling to top of page on click
-                      if (!workflow.available) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    <div className="flex flex-1 flex-col p-8">
-                      <div className="justify-center text-center">
-                        {workflow.blocks.map((blockId: string, ix: number) => {
+                  }}
+                >
+                  <div className="flex flex-1 flex-col p-8">
+                    <div className="justify-center text-center">
+                      {workflowConfigs[id].blocks.map(
+                        (blockId: string, ix: number) => {
                           console.log(
                             "getting workflow block",
                             blockId,
@@ -132,39 +124,43 @@ const Workflows: NextPage<PageProps> = () => {
                                   <span>{blockConfigs[blockId].desc}</span>
                                 </div>
                               </Popup>
-                              {ix !== workflow.blocks.length - 1 ? (
+                              {ix !== workflowConfigs[id].blocks.length - 1 ? (
                                 <div className="inline-block mx-2 relative">
                                   <ChevronRightIcon className="h-4 w-4 text-gray-400 mb-1" />
                                 </div>
                               ) : null}
                             </div>
                           );
-                        })}
-                      </div>
-                      <h3 className="mt-6 font-bold text-gray-50">
-                        {workflow.name}
-                      </h3>
-                      <dl className="mt-1 flex flex-grow flex-col justify-between">
-                        <dd className="text-sm text-gray-500">
-                          {workflow.short_desc}
-                        </dd>
-                        <dt className="sr-only">
-                          {workflow.available ? "Live" : "Coming Soon"}
-                        </dt>
-                        <dd className="mt-3">
-                          <span
-                            className={`rounded-full text-gray-50 px-2 py-1 text-xs font-medium
-                ${workflow.available ? "bg-green-600" : "bg-gray-500"}`}
-                          >
-                            {workflow.available ? "Live" : "Coming Soon"}
-                          </span>
-                        </dd>
-                      </dl>
+                        }
+                      )}
                     </div>
-                  </Link>
-                </li>
-              )
-            )}
+                    <h3 className="mt-6 font-bold text-gray-50">
+                      {workflowConfigs[id].name}
+                    </h3>
+                    <dl className="mt-1 flex flex-grow flex-col justify-between">
+                      <dd className="text-sm text-gray-500">
+                        {workflowConfigs[id].short_desc}
+                      </dd>
+                      <dt className="sr-only">
+                        {workflowConfigs[id].available ? "Live" : "Coming Soon"}
+                      </dt>
+                      <dd className="mt-3">
+                        <span
+                          className={`rounded-full text-gray-50 px-2 py-1 text-xs font-medium
+                ${
+                  workflowConfigs[id].available ? "bg-green-600" : "bg-gray-500"
+                }`}
+                        >
+                          {workflowConfigs[id].available
+                            ? "Live"
+                            : "Coming Soon"}
+                        </span>
+                      </dd>
+                    </dl>
+                  </div>
+                </Link>
+              </li>
+            ))}
           </ul>
         ) : (
           <div className="mt-12 text-gray-400">
