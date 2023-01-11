@@ -8,18 +8,7 @@ import Popup from "reactjs-popup";
 import Spinner from "../components/spinner";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 const { iconUrlPrefix, iconUrlSuffix } = require("../lib/config");
-import {
-  UserContext,
-  Web3Context,
-  AppContext,
-  AppContextType,
-} from "../lib/contexts";
-import {
-  WorkflowConfigType,
-  WorkflowConfigsType,
-  BlockConfigType,
-  BlockConfigsType,
-} from "../lib/types";
+import { AppContext, AppContextType } from "../lib/contexts";
 
 const Workflows: NextPage<PageProps> = () => {
   const [sortedWorkflowKeys, setSortedWorkflowKeys] = useState<string[]>([]);
@@ -126,7 +115,7 @@ const Workflows: NextPage<PageProps> = () => {
                               </Popup>
                               {ix !== workflowConfigs[id].blocks.length - 1 ? (
                                 <div className="inline-block mx-2 relative">
-                                  <ChevronRightIcon className="h-4 w-4 text-gray-400 mb-1" />
+                                  <ChevronRightIcon className="h-4 w-4 text-gray-400 mb-2" />
                                 </div>
                               ) : null}
                             </div>

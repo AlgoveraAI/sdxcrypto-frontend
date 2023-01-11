@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronRightIcon,
-  ArrowRightIcon,
   ArrowLeftCircleIcon,
 } from "@heroicons/react/24/outline";
 import { WorkflowConfigType } from "../../lib/types";
@@ -86,7 +85,7 @@ const C: NextPage<PageProps> = () => {
                       </div>
                     </div>
                     {ix !== workflowConfig.blocks.length - 1 ? (
-                      <ArrowRightIcon className="h-5 w-5 text-black" />
+                      <ChevronRightIcon className="h-5 w-5 text-black" />
                     ) : null}
                   </>
                 ))}
