@@ -7,6 +7,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
+import BgCircles from "../../components/bg-circles";
 
 import GenerateImage from "../../components/workflows/blocks/generate-image";
 import MintImage from "../../components/workflows/blocks/mint-image";
@@ -138,18 +139,21 @@ const C: NextPage<PageProps> = ({}) => {
 
   return (
     <>
-      <Link
-        href={`/workflows/view?id=${workflowId}`}
-        className="flex mt-4 ml-4 text-gray-500 hover:text-gray-700"
-      >
-        <ArrowLeftCircleIcon className="h-6 w-6" />
-        <span className="ml-2">View Workflow</span>
-      </Link>
-      <div className="max-w-7xl mx-auto md:px-24 px-6">
-        <h1 className="text-3xl font-bold text-center mt-12">
-          {workflowConfig?.name}
-        </h1>
-        {/* <div className="text-center mt-2">
+      <BgCircles />
+
+      <div className="relative">
+        <Link
+          href={`/workflows/view?id=${workflowId}`}
+          className="flex mt-4 ml-4 text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeftCircleIcon className="h-6 w-6" />
+          <span className="ml-2">View Workflow</span>
+        </Link>
+        <div className="max-w-7xl mx-auto md:px-24 px-6">
+          <h1 className="text-3xl font-bold text-center mt-12">
+            {workflowConfig?.name}
+          </h1>
+          {/* <div className="text-center mt-2">
         <Link
           href="/workflows/outputs"
           className="mx-auto text-center text-sm underline text-gray-400"
@@ -157,122 +161,123 @@ const C: NextPage<PageProps> = ({}) => {
           View your outputs
         </Link>
       </div> */}
-        {Object.keys(appContext.blockConfigs).length && workflowConfig ? (
-          <>
-            {
-              // if the workflow has multiple steps, show the progress bar
-              workflowConfig.steps ? (
-                <nav aria-label="Progress">
-                  <ol
-                    role="list"
-                    className="bg-background-darker mt-12 divide-y rounded-md md:flex md:divide-y-0"
-                  >
-                    {
-                      // iterate through the steps, but not the first
-                      workflowConfig.steps.map((blockId: any, ix: number) => (
-                        <li
-                          key={ix}
-                          className="relative md:flex md:flex-1 cursor-pointer"
-                          onClick={() => setCurrentStepIdx(ix)}
-                        >
-                          {currentStepIdx === ix ? (
-                            <a
-                              className="flex items-center px-6 py-4 text-sm font-medium"
-                              aria-current="step"
-                            >
-                              <span className="text-white">{ix + 1}</span>
-                              <span className="ml-4 text-sm font-medium text-white">
-                                {appContext.blockConfigs[blockId].name}
-                              </span>
-                            </a>
-                          ) : (
-                            <div
-                              // href={step.href}
-                              className="flex items-center px-6 py-4 text-sm font-medium"
-                              aria-current="step"
-                            >
-                              <span className="text-gray-600">{ix + 1}</span>
-                              <span className="ml-4 text-sm font-medium text-gray-600">
-                                {appContext.blockConfigs[blockId].name}
-                              </span>
-                            </div>
-                          )}
-
-                          {ix !== 1 ? (
-                            <>
-                              {/* Arrow separator for lg screens and up */}
-                              <div
-                                className="absolute top-0 right-0 hidden h-full w-5 md:block"
-                                aria-hidden="true"
+          {Object.keys(appContext.blockConfigs).length && workflowConfig ? (
+            <>
+              {
+                // if the workflow has multiple steps, show the progress bar
+                workflowConfig.steps ? (
+                  <nav aria-label="Progress">
+                    <ol
+                      role="list"
+                      className="bg-background-darker mt-12 divide-y rounded-md md:flex md:divide-y-0"
+                    >
+                      {
+                        // iterate through the steps, but not the first
+                        workflowConfig.steps.map((blockId: any, ix: number) => (
+                          <li
+                            key={ix}
+                            className="relative md:flex md:flex-1 cursor-pointer"
+                            onClick={() => setCurrentStepIdx(ix)}
+                          >
+                            {currentStepIdx === ix ? (
+                              <a
+                                className="flex items-center px-6 py-4 text-sm font-medium"
+                                aria-current="step"
                               >
-                                <svg
-                                  className="h-full w-full text-primary"
-                                  viewBox="0 0 22 80"
-                                  fill="none"
-                                  preserveAspectRatio="none"
-                                >
-                                  <path
-                                    d="M0 -2L20 40L0 82"
-                                    vectorEffect="non-scaling-stroke"
-                                    stroke="currentcolor"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <span className="text-white">{ix + 1}</span>
+                                <span className="ml-4 text-sm font-medium text-white">
+                                  {appContext.blockConfigs[blockId].name}
+                                </span>
+                              </a>
+                            ) : (
+                              <div
+                                // href={step.href}
+                                className="flex items-center px-6 py-4 text-sm font-medium"
+                                aria-current="step"
+                              >
+                                <span className="text-gray-600">{ix + 1}</span>
+                                <span className="ml-4 text-sm font-medium text-gray-600">
+                                  {appContext.blockConfigs[blockId].name}
+                                </span>
                               </div>
-                            </>
-                          ) : null}
-                        </li>
-                      ))
-                    }
-                  </ol>
-                </nav>
-              ) : null
-            }
+                            )}
 
-            <div className="mt-12">
-              {workflowId === "dalle-image-gen" ||
-              workflowId === "stable-diffusion-image-gen" ? (
-                currentStepIdx === 0 ? (
-                  <GenerateImage
+                            {ix !== 1 ? (
+                              <>
+                                {/* Arrow separator for lg screens and up */}
+                                <div
+                                  className="absolute top-0 right-0 hidden h-full w-5 md:block"
+                                  aria-hidden="true"
+                                >
+                                  <svg
+                                    className="h-full w-full text-primary"
+                                    viewBox="0 0 22 80"
+                                    fill="none"
+                                    preserveAspectRatio="none"
+                                  >
+                                    <path
+                                      d="M0 -2L20 40L0 82"
+                                      vectorEffect="non-scaling-stroke"
+                                      stroke="currentcolor"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </div>
+                              </>
+                            ) : null}
+                          </li>
+                        ))
+                      }
+                    </ol>
+                  </nav>
+                ) : null
+              }
+
+              <div className="mt-12">
+                {workflowId === "dalle-image-gen" ||
+                workflowId === "stable-diffusion-image-gen" ? (
+                  currentStepIdx === 0 ? (
+                    <GenerateImage
+                      credits={userContext.credits}
+                      config={
+                        workflowId === "dalle-image-gen"
+                          ? appContext.blockConfigs["image_generation_dalle"]
+                          : appContext.blockConfigs[
+                              "image_generation_stable_diffusion"
+                            ]
+                      }
+                      setJobId={setJobId}
+                      prompt={prompt}
+                      setPrompt={setPrompt}
+                      images={images}
+                      jobStatus={jobStatus}
+                    />
+                  ) : (
+                    <MintImage
+                      provider={web3Context.provider}
+                      signer={web3Context.signer}
+                      networkName={web3Context.networkName}
+                      walletAddress={userContext.walletAddress}
+                      config={appContext.blockConfigs[2]}
+                      jobId={jobId}
+                      prompt={prompt}
+                      images={images}
+                    />
+                  )
+                ) : workflowId === "text-summarization" ? (
+                  <SummarizeText
                     credits={userContext.credits}
-                    config={
-                      workflowId === "dalle-image-gen"
-                        ? appContext.blockConfigs["image_generation_dalle"]
-                        : appContext.blockConfigs[
-                            "image_generation_stable_diffusion"
-                          ]
-                    }
+                    config={appContext.blockConfigs["text_summarization"]}
                     setJobId={setJobId}
-                    prompt={prompt}
-                    setPrompt={setPrompt}
-                    images={images}
                     jobStatus={jobStatus}
                   />
-                ) : (
-                  <MintImage
-                    provider={web3Context.provider}
-                    signer={web3Context.signer}
-                    networkName={web3Context.networkName}
-                    walletAddress={userContext.walletAddress}
-                    config={appContext.blockConfigs[2]}
-                    jobId={jobId}
-                    prompt={prompt}
-                    images={images}
-                  />
-                )
-              ) : workflowId === "text-summarization" ? (
-                <SummarizeText
-                  credits={userContext.credits}
-                  config={appContext.blockConfigs["text_summarization"]}
-                  setJobId={setJobId}
-                  jobStatus={jobStatus}
-                />
-              ) : workflowId === "notion-question-answering" ? (
-                <div></div>
-              ) : null}
-            </div>
-          </>
-        ) : null}
+                ) : workflowId === "notion-question-answering" ? (
+                  <div></div>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
     </>
   );
