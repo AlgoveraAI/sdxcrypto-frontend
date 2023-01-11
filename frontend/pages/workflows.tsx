@@ -23,10 +23,31 @@ const Workflows: NextPage<PageProps> = () => {
   const getWorkflows = async () => {
     // load in each workflowConfig from the workflow_configs collection
     const querySnapshot = await getDocs(collection(db, "workflow_configs"));
-    const workflowConfigs = querySnapshot.docs.map((doc) => {
+    let workflowConfigs = querySnapshot.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
     console.log("workflowConfigs: ", workflowConfigs);
+
+    // sort by which ones are available first
+    workflowConfigs.sort((a: any, b: any) => {
+      if (a.available && !b.available) {
+        return -1;
+      } else if (!a.available && b.available) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
+    // if a workflow is in dev and available, dont show it in the prod app
+    // (its still in testing)
+    if (process.env.GIT_BRANCH === "main") {
+      workflowConfigs = workflowConfigs.filter(
+        (workflowConfig: any) =>
+          workflowConfig.available === false || workflowConfig.env !== "dev"
+      );
+    }
+
     setWorkflowConfigs(workflowConfigs);
 
     const blockQuerySnapshot = await getDocs(collection(db, "block_configs"));
