@@ -37,13 +37,38 @@ if (branch === "main" && process.env.NODE_ENV === "production") {
 declare var window: any; // to avoid typescript error on window.ethereum
 
 export default function App({ Component, pageProps }: AppProps) {
-  // app controls
+  // web3 context
+  const [provider, setProvider] = useState<BaseProvider | null>(null);
+  const [networkName, setNetworkName] = useState<string | null>(null);
+  const [signer, setSigner] = useState<Signer | null>(null);
+  const [accessContract, setAccessContract] = useState<Contract | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  const web3Context = {
+    accessContract,
+    provider,
+    signer,
+    networkName,
+  };
+
+  // user context
+  // (cant use useUser hook here because it's not a page)
+  const [uid, setUID] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
+
+  const userContext = {
+    uid,
+    walletAddress,
+    credits,
+    hasAccess,
+  };
+
+  // app context
   const [creditsModalTrigger, setCreditsModalTrigger] = useState<
     boolean | string
   >(false);
   const [feedbackModalTrigger, setFeedbackModalTrigger] = useState(false);
-
-  // config variables
   const [creditCost, setCreditCost] = useState<number | null>(null);
   const [accessPassCost, setAccessPassCost] = useState<number | null>(null);
   const [accessCreditsPerMonth, setAccessCreditsPerMonth] = useState<
@@ -56,18 +81,17 @@ export default function App({ Component, pageProps }: AppProps) {
     number | null
   >(null);
 
-  // user variables
-  // (cant use useUser hook here because it's not a page)
-  const [uid, setUID] = useState<string | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [credits, setCredits] = useState<number | null>(null);
-
-  // web3 stuff
-  const [provider, setProvider] = useState<BaseProvider | null>(null);
-  const [networkName, setNetworkName] = useState<string | null>(null);
-  const [signer, setSigner] = useState<Signer | null>(null);
-  const [accessContract, setAccessContract] = useState<Contract | null>(null);
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const appContext = {
+    creditsModalTrigger,
+    creditCost,
+    accessPassCost,
+    accessCreditsPerMonth,
+    accessSubscriptionLength,
+    stripeCreditsPerMonth,
+    setHasAccess,
+    setCreditsModalTrigger,
+    setFeedbackModalTrigger,
+  };
 
   useEffect(() => {
     // on mount
@@ -387,35 +411,9 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <UserProvider>
-      <AppContext.Provider // app config and state
-        value={{
-          creditsModalTrigger,
-          creditCost,
-          accessPassCost,
-          accessCreditsPerMonth,
-          accessSubscriptionLength,
-          stripeCreditsPerMonth,
-          setHasAccess,
-          setCreditsModalTrigger,
-          setFeedbackModalTrigger,
-        }}
-      >
-        <UserContext.Provider // user data
-          value={{
-            uid,
-            credits,
-            hasAccess,
-            walletAddress,
-          }}
-        >
-          <Web3Context.Provider // web3 data and objects
-            value={{
-              accessContract,
-              provider,
-              signer,
-              networkName,
-            }}
-          >
+      <AppContext.Provider value={appContext}>
+        <UserContext.Provider value={userContext}>
+          <Web3Context.Provider value={web3Context}>
             <Head>
               <title>Algovera Flow</title>
               <meta

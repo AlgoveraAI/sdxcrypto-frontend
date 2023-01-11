@@ -8,8 +8,6 @@ import { db, auth } from "../lib/firebase";
 import {
   UserContext,
   UserContextType,
-  Web3Context,
-  Web3ContextType,
   AppContext,
   AppContextType,
 } from "../lib/contexts";
@@ -52,6 +50,7 @@ const Pricing: NextPage<PageProps> = ({}) => {
   const userContext = useContext(UserContext) as UserContextType;
 
   useEffect(() => {
+    // update page details with info from remote config
     if (appContext.creditCost) {
       // only display once appContext is populated
       paymentOptions.fiat.payg.price = `${appContext.creditCost} USD`;
