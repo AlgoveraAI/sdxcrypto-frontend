@@ -9,18 +9,18 @@ creds = credentials.Certificate("firebase-credentials.json")
 app = initialize_app(creds, name="sdxcrypto-algovera")
 db = firestore.client(app=app)
 
-workflow_id = "stable-diffusion-image-gen"
+workflow_id = "text-summarization"
 workflow_config = {
     "author": "Algovera",
     "available": True,
     "blocks": [
-        "ui_prompt",
-        "image_generation_stable_diffusion",
-        "mint_image",
+        "text_input",
+        "text_summarization",
     ],
-    "name": "Mint Stable Diffusion Images",
-    "short_desc": "Generate images and optionally mint them as NFTs",
-    "long_desc": "Generate images using the latest version of Stable Diffusion. Once you've generated an image you're happy with, you can mint it as an NFT on Ethereum.",
+    "name": "Text Summarization",
+    "short_desc": "Summarize text into a few sentences",
+    "long_desc": "Summarize text into a few sentences using GPT-3. You can provide URLs, raw text, or upload a file (e.g. from Google Docs or Notion).",
+    "env": "dev",
 }
 
 doc_ref = db.collection("workflow_configs").document(workflow_id)
