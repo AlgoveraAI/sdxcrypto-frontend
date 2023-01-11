@@ -1,11 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Spinner from "../../spinner";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import Input from "../input";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import Popup from "reactjs-popup";
 
@@ -129,7 +127,7 @@ export default function SummarizeText({
         });
       } else {
         console.error("Error caught in api route", data);
-        errorToast("Error generating image");
+        errorToast("Error summarizing text");
         clearInterval(interval);
         setCheckTimeTakenInteraval(null);
       }
@@ -139,8 +137,8 @@ export default function SummarizeText({
         toast.dismiss(warningToastId);
       }
     } catch (e) {
-      console.error("Erorr generating image", e);
-      errorToast("Error generating image");
+      console.error("Erorr summarizing text", e);
+      errorToast("Error summarizing text");
     }
   };
 
