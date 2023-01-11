@@ -43,7 +43,7 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
   }, [user]);
 
   return (
-    <Popover className="relative bg-black/[0.3]">
+    <Popover className="relative border-bottom border-gray-500">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between border-gray-100 py-6 md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -185,14 +185,14 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
               {user?.sub ? (
                 <Link
                   href="/api/auth/logout"
-                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
                 >
                   Sign Out
                 </Link>
               ) : (
                 <Link
                   href="/api/auth/login"
-                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                  className="text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
                 >
                   Sign In
                 </Link>
@@ -202,7 +202,7 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
                 user?.sub ? (
                   <Link
                     href="/account"
-                    className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                    className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
                   >
                     Account
                   </Link>
@@ -210,19 +210,19 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
               }
               <Link
                 href="/workflows"
-                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
               >
                 AI Workflows
               </Link>
               <Link
                 href="/pricing"
-                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
               >
                 Pricing
               </Link>
               <a
                 onClick={() => setFeedbackModalTrigger(true)}
-                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
+                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-background-darker py-5"
               >
                 Feedback
               </a>

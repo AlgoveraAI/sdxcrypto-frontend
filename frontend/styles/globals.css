@@ -25,7 +25,7 @@ a {
   }
   body {
     color: white;
-    background-color: #0f172a;
+    background-color: #14141F;
   }
 }
 
@@ -64,4 +64,8 @@ table {
 
 .primary-button:hover {
   filter: brightness(90%);
+}
+
+.border-bottom {
+  border-bottom: 1px solid;
 }

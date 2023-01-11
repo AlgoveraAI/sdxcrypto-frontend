@@ -244,7 +244,7 @@ export default function Mint({
               id="name"
               defaultValue=""
               data-lpignore="true"
-              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none text-sm"
+              className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-background-darker border-none text-sm"
               placeholder="AI Art #1"
             />
           </div>
@@ -260,7 +260,7 @@ export default function Mint({
               id="description"
               defaultValue=""
               data-lpignore="true"
-              className="block p-2 w-full shadow-sm outline-none sm:text-sm bg-black/[0.3] border-none text-sm"
+              className="block p-2 w-full shadow-sm outline-none sm:text-sm bg-background-darker border-none text-sm"
               placeholder="An AI generated artwork"
             />
           </div>

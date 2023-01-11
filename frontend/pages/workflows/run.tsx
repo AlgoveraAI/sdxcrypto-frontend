@@ -165,7 +165,7 @@ const C: NextPage<PageProps> = ({}) => {
                 <nav aria-label="Progress">
                   <ol
                     role="list"
-                    className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
+                    className="bg-background-darker mt-12 divide-y rounded-md md:flex md:divide-y-0"
                   >
                     {
                       // iterate through the steps, but not the first

@@ -87,7 +87,7 @@ export default function Feedback({
                     <div className="mt-4">
                       <textarea
                         id="feedback"
-                        className="w-full h-50 sm:h-40 p-2 rounded-lg bg-black/[0.3] outline-none"
+                        className="w-full h-50 sm:h-40 p-2 rounded-lg bg-background-darker outline-none"
                         placeholder="Enter your feedback or suggestions..."
                       />
 

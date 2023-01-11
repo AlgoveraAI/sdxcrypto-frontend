@@ -37,7 +37,7 @@ const Workflows: NextPage<PageProps> = () => {
   const blockConfigs = appContext.blockConfigs;
 
   return (
-    <div className="my-24 mx-4">
+    <div className="my-24 mx-12">
       <h2 className="mb-4 text-3xl font-bold text-center">AI Workflows</h2>
 
       <div className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto">
@@ -47,7 +47,7 @@ const Workflows: NextPage<PageProps> = () => {
         Object.keys(blockConfigs).length ? (
           <ul
             role="list"
-            className="grid grid-cols-1 gap-12 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 mt-12"
+            className="grid grid-cols-1 gap-12 md-grid-cols-2 lg:grid-cols-3 mt-12"
           >
             {sortedWorkflowKeys.map((id: string) => (
               <li
