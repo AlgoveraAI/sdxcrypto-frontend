@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Link from "next/link";
-// import Select from "../../components/workflows/blocks/select";
-import GenerateImage from "../../components/workflows/blocks/generate-image";
-import MintImage from "../../components/workflows/blocks/mint-image";
+
 import { PageProps } from "../../lib/types";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
+
+import GenerateImage from "../../components/workflows/blocks/generate-image";
+import MintImage from "../../components/workflows/blocks/mint-image";
+import SummarizeText from "../../components/workflows/blocks/summarize-text";
 
 const C: NextPage<PageProps> = ({
   uid,
@@ -29,7 +31,7 @@ const C: NextPage<PageProps> = ({
   // store the name of the workflow (indicated by the url)
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
-  const [blockConfigs, setBlockConfigs] = useState<any | null>(null);
+  const [blockConfigs, setBlockConfigs] = useState<any>({});
 
   // store params and details for each step here
   // so that we can pass them to the next step and store them
@@ -74,14 +76,14 @@ const C: NextPage<PageProps> = ({
       setWorkflowConfig(workflowConfig);
 
       const { blocks } = workflowConfig;
-      let blockConfigs = [];
+      let blockConfigs: any = {};
       for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-        const blockRef = doc(db, "block_configs", block);
+        const blockId = blocks[i];
+        const blockRef = doc(db, "block_configs", blockId);
         const blockSnap = await getDoc(blockRef);
         const blockConfig = blockSnap.data();
         console.log("got block config: ", blockConfig);
-        blockConfigs.push(blockConfig);
+        blockConfigs[blockId] = blockConfig;
       }
       setBlockConfigs(blockConfigs);
     }
@@ -174,96 +176,117 @@ const C: NextPage<PageProps> = ({
           View your outputs
         </Link>
       </div> */}
-        {blockConfigs ? (
+        {Object.keys(blockConfigs).length && workflowConfig ? (
           <>
-            <nav aria-label="Progress">
-              <ol
-                role="list"
-                className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
-              >
-                {
-                  // iterate through the steps, but not the first
-                  blockConfigs.slice(1).map((block: any, blockIx: number) => (
-                    <li
-                      key={blockIx}
-                      className="relative md:flex md:flex-1 cursor-pointer"
-                      onClick={() => setCurrentStepIdx(blockIx)}
-                    >
-                      {currentStepIdx === blockIx ? (
-                        <a
-                          className="flex items-center px-6 py-4 text-sm font-medium"
-                          aria-current="step"
+            {
+              // if the workflow has multiple steps, show the progress bar
+              workflowConfig.steps ? (
+                <nav aria-label="Progress">
+                  <ol
+                    role="list"
+                    className="bg-black/[0.3] mt-12 divide-y rounded-md md:flex md:divide-y-0"
+                  >
+                    {
+                      // iterate through the steps, but not the first
+                      workflowConfig.steps.map((blockId: any, ix: number) => (
+                        <li
+                          key={ix}
+                          className="relative md:flex md:flex-1 cursor-pointer"
+                          onClick={() => setCurrentStepIdx(ix)}
                         >
-                          <span className="text-white">{blockIx + 1}</span>
-                          <span className="ml-4 text-sm font-medium text-white">
-                            {block.name}
-                          </span>
-                        </a>
-                      ) : (
-                        <div
-                          // href={step.href}
-                          className="flex items-center px-6 py-4 text-sm font-medium"
-                          aria-current="step"
-                        >
-                          <span className="text-gray-600">{blockIx + 1}</span>
-                          <span className="ml-4 text-sm font-medium text-gray-600">
-                            {block.name}
-                          </span>
-                        </div>
-                      )}
-
-                      {blockIx !== 1 ? (
-                        <>
-                          {/* Arrow separator for lg screens and up */}
-                          <div
-                            className="absolute top-0 right-0 hidden h-full w-5 md:block"
-                            aria-hidden="true"
-                          >
-                            <svg
-                              className="h-full w-full text-primary"
-                              viewBox="0 0 22 80"
-                              fill="none"
-                              preserveAspectRatio="none"
+                          {currentStepIdx === ix ? (
+                            <a
+                              className="flex items-center px-6 py-4 text-sm font-medium"
+                              aria-current="step"
                             >
-                              <path
-                                d="M0 -2L20 40L0 82"
-                                vectorEffect="non-scaling-stroke"
-                                stroke="currentcolor"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
-                        </>
-                      ) : null}
-                    </li>
-                  ))
-                }
-              </ol>
-            </nav>
+                              <span className="text-white">{ix + 1}</span>
+                              <span className="ml-4 text-sm font-medium text-white">
+                                {blockConfigs[blockId].name}
+                              </span>
+                            </a>
+                          ) : (
+                            <div
+                              // href={step.href}
+                              className="flex items-center px-6 py-4 text-sm font-medium"
+                              aria-current="step"
+                            >
+                              <span className="text-gray-600">{ix + 1}</span>
+                              <span className="ml-4 text-sm font-medium text-gray-600">
+                                {blockConfigs[blockId].name}
+                              </span>
+                            </div>
+                          )}
+
+                          {ix !== 1 ? (
+                            <>
+                              {/* Arrow separator for lg screens and up */}
+                              <div
+                                className="absolute top-0 right-0 hidden h-full w-5 md:block"
+                                aria-hidden="true"
+                              >
+                                <svg
+                                  className="h-full w-full text-primary"
+                                  viewBox="0 0 22 80"
+                                  fill="none"
+                                  preserveAspectRatio="none"
+                                >
+                                  <path
+                                    d="M0 -2L20 40L0 82"
+                                    vectorEffect="non-scaling-stroke"
+                                    stroke="currentcolor"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </div>
+                            </>
+                          ) : null}
+                        </li>
+                      ))
+                    }
+                  </ol>
+                </nav>
+              ) : null
+            }
 
             <div className="mt-12">
-              {currentStepIdx === 0 ? (
-                <GenerateImage
+              {workflowId === "dalle-image-gen" ||
+              workflowId === "stable-diffusion-image-gen" ? (
+                currentStepIdx === 0 ? (
+                  <GenerateImage
+                    credits={credits}
+                    config={
+                      workflowId === "dalle-image-gen"
+                        ? blockConfigs["image_generation_dalle"]
+                        : blockConfigs["image_generation_stable_diffusion"]
+                    }
+                    setJobId={setJobId}
+                    prompt={prompt}
+                    setPrompt={setPrompt}
+                    images={images}
+                    jobStatus={jobStatus}
+                  />
+                ) : (
+                  <MintImage
+                    provider={provider}
+                    signer={signer}
+                    networkName={networkName}
+                    walletAddress={walletAddress}
+                    config={blockConfigs[2]}
+                    jobId={jobId}
+                    prompt={prompt}
+                    images={images}
+                  />
+                )
+              ) : workflowId === "text-summarization" ? (
+                <SummarizeText
                   credits={credits}
-                  config={blockConfigs[1]}
+                  config={blockConfigs["text_summarization"]}
                   setJobId={setJobId}
-                  prompt={prompt}
-                  setPrompt={setPrompt}
-                  images={images}
                   jobStatus={jobStatus}
                 />
-              ) : (
-                <MintImage
-                  provider={provider}
-                  signer={signer}
-                  networkName={networkName}
-                  walletAddress={walletAddress}
-                  config={blockConfigs[2]}
-                  jobId={jobId}
-                  prompt={prompt}
-                  images={images}
-                />
-              )}
+              ) : workflowId === "notion-question-answering" ? (
+                <div></div>
+              ) : null}
             </div>
           </>
         ) : null}
