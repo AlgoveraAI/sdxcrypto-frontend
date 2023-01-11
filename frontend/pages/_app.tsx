@@ -53,6 +53,9 @@ export default function App({ Component, pageProps }: AppProps) {
   const [accessSubscriptionLength, setAccessSubscriptionLength] = useState<
     number | null
   >(null);
+  const [stripeCreditsPerMonth, setStripeCreditsPerMonth] = useState<
+    number | null
+  >(null);
 
   // user variables
   // (cant use useUser hook here because it's not a page)
@@ -271,6 +274,12 @@ export default function App({ Component, pageProps }: AppProps) {
           "access_subscription_length"
         ).asNumber();
         setAccessSubscriptionLength(accessSubscriptionLength);
+        // get stripe credits per month
+        const stripeCreditsPerMonth = getValue(
+          remoteConfig,
+          "subscription_monthly_credits"
+        ).asNumber();
+        setStripeCreditsPerMonth(stripeCreditsPerMonth);
       })
       .catch((err) => {
         console.error(err);
@@ -398,7 +407,6 @@ export default function App({ Component, pageProps }: AppProps) {
         setFeedbackModalTrigger={setFeedbackModalTrigger}
       />
       <Component
-        // {...pageProps}
         uid={uid}
         credits={credits}
         hasAccess={hasAccess}
@@ -409,6 +417,7 @@ export default function App({ Component, pageProps }: AppProps) {
         accessPassCost={accessPassCost}
         accessCreditsPerMonth={accessCreditsPerMonth}
         accessSubscriptionLength={accessSubscriptionLength}
+        stripeCreditsPerMonth={stripeCreditsPerMonth}
         provider={provider}
         signer={signer}
         networkName={networkName}

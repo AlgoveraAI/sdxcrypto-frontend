@@ -3,7 +3,11 @@ import { PageProps } from "../../lib/types";
 import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRightIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronRightIcon,
+  ArrowRightIcon,
+  ArrowLeftCircleIcon,
+} from "@heroicons/react/24/outline";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
@@ -58,72 +62,76 @@ const C: NextPage<PageProps> = ({ uid }) => {
   };
 
   return (
-    <div className="mt-12 max-w-5xl mx-auto px-12">
-      {workflowConfig && Object.keys(blockConfigs).length ? (
-        <>
-          <h1 className="text-4xl font-bold mb-12">{workflowConfig.name}</h1>
-          <div className="flex bg-white relative min-h-[512px]">
-            {/* workflow blocks as centered item */}
-            <div className="flex items-center justify-center w-full">
-              {workflowConfig.blocks.map((block: string, ix: number) => (
-                <>
-                  <div key={ix} className="text-black mx-8">
-                    <div className="text-center">
-                      <div className="relative h-16 w-16 mx-auto">
-                        <Image
-                          className="mx-auto"
-                          src={
-                            blockConfigs[block].dark_icon.startsWith("http")
-                              ? blockConfigs[block].dark_icon
-                              : iconUrlPrefix +
-                                blockConfigs[block].dark_icon +
-                                iconUrlSuffix
-                          }
-                          alt={blockConfigs[block].name}
-                          fill
-                        />
-                      </div>
+    <>
+      <Link
+        href="/workflows"
+        className="flex mt-4 ml-4 text-gray-500 hover:text-gray-700"
+      >
+        <ArrowLeftCircleIcon className="h-6 w-6" />
+        <span className="ml-2">View All Workflows</span>
+      </Link>
+      <div className="mt-12 max-w-5xl mx-auto px-12">
+        {workflowConfig && Object.keys(blockConfigs).length ? (
+          <>
+            <h1 className="text-4xl font-bold mb-12">{workflowConfig.name}</h1>
+            <div className="flex bg-white relative min-h-[512px]">
+              {/* workflow blocks as centered item */}
+              <div className="flex items-center justify-center w-full">
+                {workflowConfig.blocks.map((block: string, ix: number) => (
+                  <>
+                    <div key={ix} className="text-black mx-8">
+                      <div className="text-center">
+                        <div className="relative h-16 w-16 mx-auto">
+                          <Image
+                            className="mx-auto"
+                            src={
+                              blockConfigs[block].dark_icon.startsWith("http")
+                                ? blockConfigs[block].dark_icon
+                                : iconUrlPrefix +
+                                  blockConfigs[block].dark_icon +
+                                  iconUrlSuffix
+                            }
+                            alt={blockConfigs[block].name}
+                            fill
+                          />
+                        </div>
 
-                      <div className="mt-4">
-                        <h1 className="text-md font-bold">
-                          {blockConfigs[block].name}
-                        </h1>
-                        <p className="text-sm max-w-[200px]">
-                          {blockConfigs[block].desc}
-                        </p>
+                        <div className="mt-4">
+                          <h1 className="text-md font-bold">
+                            {blockConfigs[block].name}
+                          </h1>
+                          <p className="text-sm max-w-[200px]">
+                            {blockConfigs[block].desc}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {ix !== workflowConfig.blocks.length - 1 ? (
-                    <ArrowRightIcon className="h-5 w-5 text-black" />
-                  ) : null}
-                </>
-              ))}
-            </div>
+                    {ix !== workflowConfig.blocks.length - 1 ? (
+                      <ArrowRightIcon className="h-5 w-5 text-black" />
+                    ) : null}
+                  </>
+                ))}
+              </div>
 
-            {/* run button in bottom right */}
-            <div className="absolute bottom-0 right-0 m-4">
-              <Link
-                className="primary-button font-bold py-2 px-8 rounded"
-                href={`/workflows/run?id=${workflowId}`}
-              >
-                <ChevronRightIcon className="h-5 w-5 inline mr-1" />
-                Run
-              </Link>
+              {/* run button in bottom right */}
+              <div className="absolute bottom-0 right-0 m-4">
+                <Link
+                  className="primary-button font-bold py-2 px-8 rounded"
+                  href={`/workflows/run?id=${workflowId}`}
+                >
+                  <ChevronRightIcon className="h-5 w-5 inline mr-1" />
+                  Run
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="border border-gray-500 rounded-md mt-12 p-5">
-            <h1 className="text-2xl font-bold mb-8">Description</h1>
-            <p className="text-md">{workflowConfig.long_desc}</p>
-          </div>
-        </>
-      ) : (
-        <>
-          {/* workflowInfo still loading or not found */}
-          <p className="text-xl">Loading workflow info...</p>
-        </>
-      )}
-    </div>
+            <div className="border border-gray-500 rounded-md mt-12 p-5">
+              <h1 className="text-2xl font-bold mb-8">Description</h1>
+              <p className="text-md">{workflowConfig.long_desc}</p>
+            </div>
+          </>
+        ) : null}
+      </div>
+    </>
   );
 };
 

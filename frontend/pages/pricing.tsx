@@ -12,6 +12,7 @@ const Pricing: NextPage<PageProps> = ({
   creditCost,
   accessPassCost,
   accessCreditsPerMonth,
+  stripeCreditsPerMonth,
 }) => {
   const [paymentType, setPaymentType] = useState<"fiat" | "crypto">("fiat");
 
@@ -27,7 +28,7 @@ const Pricing: NextPage<PageProps> = ({
         name: "Subscription",
         priceMonthly: `$10 USD`,
         priceType: "per-month",
-        description: `${accessCreditsPerMonth} credits + perks`,
+        description: `${stripeCreditsPerMonth} credits + perks`,
       },
     ],
     crypto: [
@@ -38,7 +39,7 @@ const Pricing: NextPage<PageProps> = ({
         description: "Pay as you go",
       },
       {
-        name: "Subscription",
+        name: "Access Pass NFT",
         priceMonthly: `${accessPassCost} ETH`,
         priceType: "",
         description: `${accessCreditsPerMonth} credits per month + perks`,

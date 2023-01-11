@@ -17,6 +17,7 @@ export type PageProps = {
   accessPassCost: number | null;
   accessCreditsPerMonth: number | null;
   accessSubscriptionLength: number | null;
+  stripeCreditsPerMonth: number | null;
   setHasAccess: React.Dispatch<React.SetStateAction<boolean>>;
   provider: BaseProvider | null;
   signer: Signer | null;

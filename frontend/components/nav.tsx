@@ -78,14 +78,6 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
               AI Workflows
             </Link>
             <Link
-              href="/access"
-              className={`text-base font-medium text-gray-50  ${
-                currentPage === "/access" ? "" : ""
-              }`}
-            >
-              Access Pass
-            </Link>
-            <Link
               href="/pricing"
               className={`text-base font-medium text-gray-50  ${
                 currentPage === "/pricing" ? "" : ""
@@ -221,12 +213,6 @@ export default function Nav({ setUID, setFeedbackModalTrigger }: NavProps) {
                 className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
               >
                 AI Workflows
-              </Link>
-              <Link
-                href="/access"
-                className="block text-center font-medium cursor-pointer text-gray-50 hover:text-gray-400 bg-black/[0.3] py-5"
-              >
-                Access Pass
               </Link>
               <Link
                 href="/pricing"
