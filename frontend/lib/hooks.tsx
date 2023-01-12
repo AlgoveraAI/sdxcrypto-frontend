@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import Spinner from "../components/spinner";
-
+import { JobContextType } from "../lib/contexts";
 // create a hook that monitors a jobId and returns the status
 // and raises warnings if it takes too long using toast
 
-export const useJobStatus = (started: boolean, jobId: string | null) => {
-  const [jobStatus, setStatus] = useState("pending");
-  const [error, setError] = useState(null);
+export const useJobStatus = (jobContext: JobContextType) => {
   const toastId = useRef<any>(null);
 
   const [checkTimeTakenInterval, setCheckTimeTakenInterval] =
@@ -41,7 +39,7 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
   };
 
   useEffect(() => {
-    if (started) {
+    if (jobContext.status === "started") {
       // create a toast notification
       toastId.current = toast("Starting job", {
         position: "bottom-left",
@@ -60,10 +58,10 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
       }, 5000); // check every 5 seconds
       setCheckTimeTakenInterval(interval);
     }
-  }, [started]);
+  }, [jobContext.status]);
 
   useEffect(() => {
-    if (jobId) {
+    if (jobContext.id && jobContext.status === "started") {
       // once a job id is available, clear the starting toast
       // and create a new one to indicate the job is running
       toast.dismiss(toastId.current);
@@ -80,12 +78,12 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
         const res = await fetch("/api/checkJobStatus", {
           method: "POST",
           body: JSON.stringify({
-            job_uuid: jobId,
+            job_uuid: jobContext.id,
           }),
         });
         const data = await res.json();
         if (res.status === 200 && data.job_status) {
-          setStatus(data.job_status);
+          jobContext.setStatus(data.job_status);
           if (data.job_status === "done") {
             // stop the intervals
             clearInterval(checkTimeTakenInterval);
@@ -93,19 +91,14 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
             // clear toasts
             toast.dismiss();
           }
-
-          if (data.job_status === "error") {
-            setError(data.error);
-          }
         } else {
           // log the error and set job status to error
           // to clear the interval
-          setStatus("error");
-          setError(data.error);
+          jobContext.setStatus("error");
         }
       }, 1000);
     }
-  }, [jobId]);
+  }, [jobContext.id]);
 
-  return { jobStatus, error };
+  return;
 };

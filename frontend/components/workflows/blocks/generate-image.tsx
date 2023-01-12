@@ -25,12 +25,11 @@ export default function Generate({ config }: { config: BlockConfigType }) {
   const [loading, setLoading] = useState(false);
   const [imgHovered, setImgHovered] = useState(false);
   const toastId = useRef<any>(null);
-  const [jobStarted, setJobStarted] = useState(false);
 
   // model params (object with string keys and number values)
   const [params, setParams] = useState<{ [key: string]: number }>({});
 
-  const { jobStatus } = useJobStatus(jobStarted, jobContext.id);
+  useJobStatus(jobContext);
 
   useEffect(() => {
     // on mount
@@ -40,10 +39,10 @@ export default function Generate({ config }: { config: BlockConfigType }) {
 
   useEffect(() => {
     // once job is done, load the image
-    if (jobStatus === "done") {
+    if (jobContext.status === "done") {
       loadImages();
     }
-  }, [jobStatus]);
+  }, [jobContext.status]);
 
   useEffect(() => {
     // set model params
@@ -132,7 +131,7 @@ export default function Generate({ config }: { config: BlockConfigType }) {
       }
 
       // trigger the useJobStatus hook to start polling and show a toast
-      setJobStarted(true);
+      jobContext.setStatus("started");
 
       // store prompt in jobContext so it can be used elsewhere
       jobContext.setData({

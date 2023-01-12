@@ -15,18 +15,16 @@ import {
   JobContextType,
 } from "../../../lib/contexts";
 import { BlockConfigType } from "../../../lib/types";
-
-const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
+import { useJobStatus } from "../../../lib/hooks";
 
 export default function SummarizeText({ config }: { config: BlockConfigType }) {
   const appContext = useContext(AppContext) as AppContextType;
   const userContext = useContext(UserContext) as UserContextType;
   const jobContext = useContext(JobContext) as JobContextType;
+  const [jobStarted, setJobStarted] = useState(false);
 
   // app vars
   const [loading, setLoading] = useState(false);
-  const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
-    useState<any>(null);
   const toastId = useRef<any>(null);
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
@@ -34,15 +32,7 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
   // model params (object with string keys and number values)
   const [params, setParams] = useState<{ [key: string]: number }>({});
 
-  // user
-  const { user, error, isLoading } = useUser();
-
-  useEffect(() => {
-    // catch job status errors
-    if (jobContext?.status === "error") {
-      errorToast("Error monitoring job");
-    }
-  }, [jobContext?.status]);
+  const { jobStatus } = useJobStatus(jobStarted, jobContext.id);
 
   const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
@@ -62,41 +52,14 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
     }
   };
 
-  const summarizeText = async () => {
+  const startJob = async () => {
     try {
       setLoading(true);
-
-      const startTime = Date.now();
-      let warningToastId: any = null;
-
-      const checkTimeTaken = () => {
-        // once the time passes the threshold
-        // show a warning toast
-        // once it's been shown, stop checking and dont show again
-        console.log("checking time taken");
-        if (!warningToastId) {
-          const timeTaken = Date.now() - startTime;
-          console.log(timeTaken);
-          if (timeTaken > EXPECTED_TIME) {
-            warningToastId = toast.warning(
-              "Sorry, your render is taking longer than expected. Our servers are busy!",
-              {
-                position: "bottom-left",
-                theme: "dark",
-                autoClose: false,
-              }
-            );
-          }
-        }
-      };
-
-      const interval = setInterval(checkTimeTaken, 5000);
-      setCheckTimeTakenInteraval(interval);
 
       console.log("sending", config);
       console.log("params", params);
       const endpointBody = {
-        uid: user?.sub,
+        uid: userContext.uid,
         doc: inputText,
         model_name: config.model_name,
         ...params,
@@ -115,27 +78,10 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
       // check the response
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
-        jobContext.id = data.jobId;
-
-        toast.dismiss(toastId.current);
-        toastId.current = toast("Summarizing text", {
-          position: "bottom-left",
-          autoClose: false,
-          closeOnClick: true,
-          theme: "dark",
-          hideProgressBar: false,
-          icon: <Spinner />,
-        });
+        jobContext.setId(data.jobId);
       } else {
         console.error("Error caught in api route", data);
         errorToast("Error summarizing text");
-        clearInterval(interval);
-        setCheckTimeTakenInteraval(null);
-      }
-
-      // clear warning toast
-      if (warningToastId) {
-        toast.dismiss(warningToastId);
       }
     } catch (e) {
       console.error("Erorr summarizing text", e);
@@ -147,7 +93,7 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      summarizeText();
+      startJob();
     }
   };
 
@@ -180,7 +126,7 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
           </div>
           <button
             className="mt-2 text-center primary-button w-full md:w-fit px-6 py-2 rounded-md font-medium"
-            onClick={summarizeText}
+            onClick={startJob}
           >
             Summarize
           </button>
