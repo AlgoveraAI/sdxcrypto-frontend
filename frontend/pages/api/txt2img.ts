@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-const config = require("../../config.json");
 
 // TODO protect API route:
 // https://github.com/auth0/nextjs-auth0/blob/main/EXAMPLES.md#protect-an-api-route
@@ -12,18 +11,7 @@ export default async function handler(
   try {
     console.log("got txt2img request", req.body);
 
-    // check git branch
-    const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
-
-    // get the backend for this env
-    let apiBaseUrl;
-    if (branch === "main") {
-      console.log("using prod backend");
-      apiBaseUrl = config.api_base_url;
-    } else {
-      console.log("using dev backend", branch);
-      apiBaseUrl = config.api_base_url_dev;
-    }
+    const apiBaseUrl = process.env.API_BASE_URL;
 
     const body = JSON.parse(req.body);
 

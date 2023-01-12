@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Spinner from "../../spinner";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
@@ -6,43 +6,35 @@ import { db, auth } from "../../../lib/firebase";
 const { ethers } = require("ethers");
 import { Contract } from "@ethersproject/contracts";
 import { toast } from "react-toastify";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { BaseProvider } from "@ethersproject/providers";
-import { Signer } from "@ethersproject/abstract-signer";
+import {
+  AppContext,
+  AppContextType,
+  UserContext,
+  UserContextType,
+  Web3Context,
+  Web3ContextType,
+  JobContext,
+  JobContextType,
+} from "../../../lib/contexts";
+import { BlockConfigType } from "../../../lib/types";
 
-type Props = {
-  config: any;
-  provider: BaseProvider | null;
-  signer: Signer | null;
-  networkName: string | null;
-  walletAddress: string | null;
-  jobId: string | null;
-  prompt: string;
-  images: string[];
-};
+export default function Mint({ config }: { config: BlockConfigType }) {
+  const appContext = useContext(AppContext) as AppContextType;
+  const userContext = useContext(UserContext) as UserContextType;
+  const jobContext = useContext(JobContext) as JobContextType;
+  const web3Context = useContext(Web3Context) as Web3ContextType;
 
-export default function Mint({
-  config,
-  jobId,
-  prompt,
-  images,
-  provider,
-  networkName,
-  signer,
-  walletAddress,
-}: Props) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [contract, setContract] = useState<Contract | null>(null);
   const [openseaAssetUrl, setOpenseaAssetUrl] = useState<string | null>(null);
   const [etherscanTxnUrl, setEtherscanTxnUrl] = useState<string | null>(null);
-  const { user, error, isLoading } = useUser();
 
   const getContract = async () => {
     // get contract address from firebase
-    if (provider && networkName) {
-      const docRef = doc(db, "contracts", networkName);
+    if (web3Context.provider && web3Context.networkName) {
+      const docRef = doc(db, "contracts", web3Context.networkName);
       if (docRef) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -53,17 +45,23 @@ export default function Mint({
             let { address, abi } = JSON.parse(data.community);
             console.log("Connecting to contract:", address);
             console.log("ABI:", abi);
-            const contract = new ethers.Contract(address, abi, provider);
+            const contract = new ethers.Contract(
+              address,
+              abi,
+              web3Context.provider
+            );
             setContract(contract);
           } else {
             console.error(
-              "No Community contract on the connected network: " + networkName
+              "No Community contract on the connected network: " +
+                web3Context.networkName
             );
           }
         }
       } else {
         console.error(
-          "No Community contract on the connected network: " + networkName
+          "No Community contract on the connected network: " +
+            web3Context.networkName
         );
       }
     } else {
@@ -87,7 +85,7 @@ export default function Mint({
 
   useEffect(() => {
     getContract();
-  }, [provider, networkName]);
+  }, [web3Context.provider, web3Context.networkName]);
 
   const mint = async () => {
     try {
@@ -98,15 +96,15 @@ export default function Mint({
       setLoading(true);
       setStatus("Preparing transaction");
       // check we have everything needed to mint
-      if (!images.length) {
+      if (!jobContext.data.images.length) {
         errorToast("No image to mint");
         return;
       }
       if (
-        networkName === null ||
-        provider === null ||
-        signer === null ||
-        walletAddress === null
+        web3Context.networkName === null ||
+        web3Context.provider === null ||
+        web3Context.signer === null ||
+        userContext.walletAddress === null
       ) {
         errorToast("Connect to Metamask to mint");
         return;
@@ -131,14 +129,14 @@ export default function Mint({
       }
       // generate a signature
       console.log("Generating signature");
-      const balance = await contract.balanceOf(walletAddress);
+      const balance = await contract.balanceOf(userContext.walletAddress);
       const resp = await fetch(
         // "http://127.0.0.1:5001/sdxcrypto-algovera/us-central1/genCommunitySignature",
         "https://us-central1-sdxcrypto-algovera.cloudfunctions.net/genCommunitySignature",
         {
           method: "POST",
           body: JSON.stringify({
-            allowlistAddress: walletAddress,
+            allowlistAddress: userContext.walletAddress,
             contractAddress: contract.address,
             balance: balance,
           }),
@@ -161,14 +159,14 @@ export default function Mint({
         to: contract.address,
         value: 0, // all Community art mints are free
         data: methodSignature,
-        from: walletAddress,
+        from: userContext.walletAddress,
       };
-      const gasEstimate = await signer.estimateGas(txnParams);
+      const gasEstimate = await web3Context.signer.estimateGas(txnParams);
       console.log("Gas estimate:", gasEstimate.toString());
       // send transaction
       try {
         setStatus("Awaiting signature");
-        const txn = await signer.sendTransaction({
+        const txn = await web3Context.signer.sendTransaction({
           to: contract.address,
           value: 0, // all Community art mints are free
           data: methodSignature,
@@ -185,7 +183,7 @@ export default function Mint({
         const metadata = {
           name: name.value,
           description: description.value,
-          image: images[selectedIdx],
+          image: jobContext.data.images[selectedIdx],
           attributes: {
             prompt: prompt,
             model: config.modalName,
@@ -208,7 +206,10 @@ export default function Mint({
         }
         // get opensea url
         let openseaUrl = "";
-        if (networkName === "mainnet" || networkName === "homestead") {
+        if (
+          web3Context.networkName === "mainnet" ||
+          web3Context.networkName === "homestead"
+        ) {
           openseaUrl = "https://opensea.io/assets/";
         } else {
           openseaUrl = "https://testnets.opensea.io/assets/";
@@ -266,10 +267,10 @@ export default function Mint({
           </div>
         </div>
       </div>
-      {jobId && images.length ? (
+      {jobContext.id && jobContext.data.images.length ? (
         <Image
           className="mt-6 max-w-full h-auto mx-auto"
-          src={images[selectedIdx]}
+          src={jobContext.data.images[selectedIdx]}
           alt="Generated Image"
           width={512}
           height={512}

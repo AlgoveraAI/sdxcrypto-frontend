@@ -1,63 +1,45 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import Spinner from "../../spinner";
+import { useState, useEffect, useRef, useContext } from "react";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import Input from "../input";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
+import { BlockConfigType } from "../../../lib/types";
+import {
+  AppContext,
+  AppContextType,
+  UserContext,
+  UserContextType,
+  JobContext,
+  JobContextType,
+} from "../../../lib/contexts";
+import { useJobStatus } from "../../../lib/hooks";
 
-type Props = {
-  config: any;
-  setJobId: React.Dispatch<React.SetStateAction<string | null>>;
-  prompt: string;
-  setPrompt: React.Dispatch<React.SetStateAction<string>>;
-  images: string[];
-  jobStatus: string;
-  credits: number | null;
-};
+export default function Generate({ config }: { config: BlockConfigType }) {
+  const appContext = useContext(AppContext) as AppContextType;
+  const userContext = useContext(UserContext) as UserContextType;
+  const jobContext = useContext(JobContext) as JobContextType;
 
-const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
-
-export default function Generate({
-  config,
-  setJobId,
-  prompt,
-  setPrompt,
-  images,
-  jobStatus,
-  credits,
-}: Props) {
   // app vars
   const [loading, setLoading] = useState(false);
-  const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
-    useState<any>(null);
-  const toastId = useRef<any>(null);
   const [imgHovered, setImgHovered] = useState(false);
+  const toastId = useRef<any>(null);
+  const [jobStarted, setJobStarted] = useState(false);
 
   // model params (object with string keys and number values)
   const [params, setParams] = useState<{ [key: string]: number }>({});
 
-  // user
-  const { user, error, isLoading } = useUser();
+  const { jobStatus } = useJobStatus(jobStarted, jobContext.id);
+  console.log("jobStatus", jobStatus);
 
-  const imgLoaded = () => {
-    setLoading(false);
-    toast.dismiss(toastId.current);
-    // clear interval
-    if (checkTimeTakenInterval) {
-      clearInterval(checkTimeTakenInterval);
-      setCheckTimeTakenInteraval(null);
-    }
-  };
-
-  const downloadImage = (img: string) => {
-    // open image in new tab
-    // so the raw img can be downloaded in full-res
-    // (as downloading the next/image will get a compressed .webp)
-    window.open(img, "_blank");
-  };
+  useEffect(() => {
+    // on mount
+    jobContext.data = {
+      prompt: "",
+    };
+    jobContext.output = []; // will be list of image URLs
+  }, []);
 
   useEffect(() => {
     // set model params
@@ -70,12 +52,17 @@ export default function Generate({
     }
   }, [config]);
 
-  useEffect(() => {
-    // catch job status errors
-    if (jobStatus === "error") {
-      errorToast("Error monitoring job");
-    }
-  }, [jobStatus]);
+  const imgLoaded = () => {
+    setLoading(false);
+    toast.dismiss(toastId.current);
+  };
+
+  const downloadImage = (img: string) => {
+    // open image in new tab
+    // so the raw img can be downloaded in full-res
+    // (as downloading the next/image will get a compressed .webp)
+    window.open(img, "_blank");
+  };
 
   const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
@@ -95,21 +82,16 @@ export default function Generate({
     }
   };
 
-  const generateImg = async () => {
+  const startJob = async () => {
     try {
       setLoading(true);
 
-      if (!user) {
+      if (!userContext.uid) {
         errorToast("Please sign in to generate images!");
         return;
       }
 
-      if (prompt === "") {
-        errorToast("Please enter a prompt!");
-        return;
-      }
-
-      if (credits === null || credits < 1) {
+      if (userContext.credits === null || userContext.credits < 1) {
         errorToast("You don't have enough credits!");
         return;
       }
@@ -122,46 +104,27 @@ export default function Generate({
         return;
       }
 
-      toastId.current = toast("Starting job", {
-        position: "bottom-left",
-        autoClose: false,
-        closeOnClick: true,
-        theme: "dark",
-        hideProgressBar: false,
-        icon: <Spinner />,
+      // get value of input with id "prompt"
+      const prompt = (document.getElementById("prompt") as HTMLInputElement)
+        .value;
+
+      if (!prompt) {
+        errorToast("Please enter a prompt!");
+        return;
+      }
+
+      // trigger the useJobStatus hook to start polling and show a toast
+      setJobStarted(true);
+
+      // store prompt in jobContext so it can be used elsewhere
+      jobContext.setData({
+        prompt,
       });
-
-      const startTime = Date.now();
-      let warningToastId: any = null;
-
-      const checkTimeTaken = () => {
-        // once the time passes the threshold
-        // show a warning toast
-        // once it's been shown, stop checking and dont show again
-        console.log("checking time taken");
-        if (!warningToastId) {
-          const timeTaken = Date.now() - startTime;
-          console.log(timeTaken);
-          if (timeTaken > EXPECTED_TIME) {
-            warningToastId = toast.warning(
-              "Sorry, your render is taking longer than expected. Our servers are busy!",
-              {
-                position: "bottom-left",
-                theme: "dark",
-                autoClose: false,
-              }
-            );
-          }
-        }
-      };
-
-      const interval = setInterval(checkTimeTaken, 5000);
-      setCheckTimeTakenInteraval(interval);
 
       console.log("sending", config);
       console.log("params", params);
       const endpointBody = {
-        uid: user?.sub,
+        uid: userContext.uid,
         prompt: prompt,
         model: config.model_name,
         ...params,
@@ -180,28 +143,12 @@ export default function Generate({
       // check the response
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
-        setJobId(data.jobId);
-
-        // update toast from 'Starting job' to 'Generating image'
-        toast.dismiss(toastId.current);
-        toastId.current = toast("Generating image", {
-          position: "bottom-left",
-          autoClose: false,
-          closeOnClick: true,
-          theme: "dark",
-          hideProgressBar: false,
-          icon: <Spinner />,
-        });
+        // this jobId will be sent to the useStatus hook
+        // which will poll the job status endpoint and manage toasts
+        jobContext.setId(data.jobId);
       } else {
         console.error("Error caught in api route", data);
         errorToast("Error generating image");
-        clearInterval(interval);
-        setCheckTimeTakenInteraval(null);
-      }
-
-      // clear warning toast
-      if (warningToastId) {
-        toast.dismiss(warningToastId);
       }
     } catch (e) {
       console.error("Erorr generating image", e);
@@ -213,9 +160,13 @@ export default function Generate({
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      generateImg();
+      startJob();
     }
   };
+
+  console.log("jobContext", jobContext);
+  console.log("userContext", userContext);
+  console.log("jobId:", jobContext.id);
 
   return (
     <div className="mb-12">
@@ -225,10 +176,6 @@ export default function Generate({
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <input
               id="prompt"
-              value={prompt}
-              onChange={(e) => {
-                setPrompt(e.target.value);
-              }}
               onKeyPress={handleInputEnter}
               data-lpignore="true"
               className="block p-2 w-full shadow-sm text-sm outline-none bg-background-darker border-none"
@@ -236,7 +183,7 @@ export default function Generate({
             />
           </div>
           <button
-            onClick={generateImg}
+            onClick={startJob}
             type="button"
             className="primary-button relative -ml-px mt-6 w-full md:w-auto md:mt-0 md:inline-flex items-center space-x-2 border border-none px-6 py-2 text-sm font-medium"
           >
@@ -244,7 +191,7 @@ export default function Generate({
             <span>Generate</span>
           </button>
         </div>
-        {credits === 0 ? (
+        {userContext.credits === 0 ? (
           <div className="mt-2 text-sm text-red-600 italic">
             {"You're out of credits, "}
             <Link className="underline" href="/pricing">
@@ -260,7 +207,7 @@ export default function Generate({
         // 2 column flex that goes to rows on small screens
       }
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {images.length ? (
+        {jobContext.output?.length ? (
           <div
             className="relative mt-6 md:mt-12 max-w-2/3 grid-col shadow"
             onMouseEnter={() => {
@@ -272,7 +219,7 @@ export default function Generate({
           >
             <Image
               className="h-auto"
-              src={images[0]}
+              src={jobContext.output[0]}
               alt="Generated Image"
               fill
               onLoadedData={imgLoaded}
@@ -282,7 +229,11 @@ export default function Generate({
               className={`absolute top-0 right-0 m-4 text-white cursor-pointer w-8 h-8 hover:brightness-50
                ${imgHovered ? "opacity-100" : "opacity-0"}`}
               onClick={() => {
-                downloadImage(images[0]);
+                if (jobContext.output?.length) {
+                  downloadImage(jobContext.output[0]);
+                } else {
+                  errorToast("No image to download");
+                }
               }}
             />
           </div>

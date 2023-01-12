@@ -34,7 +34,21 @@ export interface Web3ContextType {
   networkName: string | null;
 }
 
+// each variable in the job context may need to be updated
+// by child components, so they are all defined as state
+export interface JobContextType {
+  id: string | null;
+  setId: React.Dispatch<React.SetStateAction<string | null>>;
+  status: string | null;
+  setStatus: React.Dispatch<React.SetStateAction<string | null>>;
+  output: any | null; // could be list, string, etc.
+  setOutput: React.Dispatch<React.SetStateAction<any | null>>;
+  data: any | null; // for any misc block or workflow specific data
+  setData: React.Dispatch<React.SetStateAction<any | null>>;
+}
+
 // contexts will be defined in the App component
 export const AppContext = createContext<AppContextType | null>(null);
 export const UserContext = createContext<UserContextType | null>(null);
 export const Web3Context = createContext<Web3ContextType | null>(null);
+export const JobContext = createContext<JobContextType | null>(null);

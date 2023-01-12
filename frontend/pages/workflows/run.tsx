@@ -3,9 +3,6 @@ import type { NextPage } from "next";
 import Link from "next/link";
 
 import { PageProps } from "../../lib/types";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import BgCircles from "../../components/bg-circles";
 
@@ -14,43 +11,30 @@ import MintImage from "../../components/workflows/blocks/mint-image";
 import SummarizeText from "../../components/workflows/blocks/summarize-text";
 
 import {
-  UserContext,
-  UserContextType,
-  Web3Context,
-  Web3ContextType,
+  AppContext,
+  AppContextType,
+  JobContext,
+  JobContextType,
 } from "../../lib/contexts";
-
-import { WorkflowConfigType } from "../../lib/types";
-import { AppContext, AppContextType } from "../../lib/contexts";
 
 const C: NextPage<PageProps> = ({}) => {
   const appContext = useContext(AppContext) as AppContextType;
-  const userContext = useContext(UserContext) as UserContextType;
-  const web3Context = useContext(Web3Context) as Web3ContextType;
+  // set up the job context
+  // these values will be defined once a job is started
+  const jobContext = {
+    id: null,
+    status: null,
+    data: {},
+    output: null,
+  };
 
   // define which step of the workflow the user is on
   // (e.g. 0 = select, 1 = generate, 2 = mint)
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
-  // store the job id
-  const [jobId, setJobId] = useState<string | null>(null);
-
   // store the name of the workflow (indicated by the url)
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [workflowConfig, setWorkflowConfig] = useState<any | null>(null);
-
-  // store params and details for each step here
-  // so that we can pass them to the next step and store them
-  const [selectedModal, setSelectedModal] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState("");
-  const [images, setImages] = useState<string[]>([
-    // TEST img for if API is down
-    // "https://firebasestorage.googleapis.com/v0/b/sdxcrypto-algovera.appspot.com/o/0xfdad2c16a5c3551856337ca415455562683e78f6c487c8046c89e350e4435828%2Fimages%2Fd9516feba65540eb9fcb8b10d0fa28f0%2Fd9516feba65540eb9fcb8b10d0fa28f0.jpg?alt=media&token=6fcb1c0d-67fa-42a5-b04f-8313ff7c8245",
-  ]);
-
-  const [jobStatus, setJobStatus] = useState("");
-  const [jobStatusInterval, setJobStatusInterval] = useState<NodeJS.Timeout>();
-  const { user, error, isLoading } = useUser();
 
   useEffect(() => {
     // get the workflow name from the url param 'name'
@@ -71,74 +55,19 @@ const C: NextPage<PageProps> = ({}) => {
     }
   }, [appContext.workflowConfigs, workflowId]);
 
-  const checkJobStatus = async (jobId: string) => {
-    // check the status of a job
-    const res = await fetch("/api/checkJobStatus", {
-      method: "POST",
-      body: JSON.stringify({
-        job_uuid: jobId,
-      }),
-    });
-    // parse the json
-    const data = await res.json();
-    console.log("job status:", data);
-    if (res.status === 200 && data.job_status) {
-      // set job status
-      setJobStatus(data.job_status);
-      if (data.job_status === "done") {
-        // make call to firebase storage to get all images under job
-        console.log("getting images for jobId", jobId);
-        const response = await fetch("/api/getJobResult", {
-          method: "POST",
-          body: JSON.stringify({
-            jobId,
-            uid: userContext.uid,
-            workflow: "txt2img",
-          }),
-        });
-        const { urls } = await response.json();
-        setImages(urls);
-      }
-    } else {
-      // log the error and set job status to error
-      // to clear the interval
-      console.error("error getting job status", res);
-      setJobStatus("error");
-    }
-  };
+  // useEffect(() => {
+  //   // if job is done, clear interval
+  //   if (jobStatus === "done" || jobStatus === "error") {
+  //     console.log("clearing jobStatus interval:", jobStatus);
+  //     clearInterval(jobStatusInterval);
+  //   }
+  // }, [jobStatus]);
 
-  useEffect(() => {
-    if (jobId && user?.sub) {
-      // check job status on interval
-      console.log("setting jobStatus interval");
-      // reset state here in case it's already done or error
-      // so that the clear interval effect triggers
-      setJobStatus("pending");
-      // checkJobStatus(jobId);
-      const interval = setInterval(() => {
-        checkJobStatus(jobId);
-      }, 1000);
-      setJobStatusInterval(interval);
-    }
-  }, [jobId, user?.sub]);
-
-  useEffect(() => {
-    // if job is done, clear interval
-    if (jobStatus === "done" || jobStatus === "error") {
-      console.log("clearing jobStatus interval:", jobStatus);
-      clearInterval(jobStatusInterval);
-    }
-  }, [jobStatus]);
-
-  useEffect(() => {
-    // switch to step 2 (Generate) when a model is selected
-    if (selectedModal) {
-      setCurrentStepIdx(1);
-    }
-  }, [selectedModal]);
+  console.log("jobContext: ", jobContext);
+  console.log("appContext: ", appContext);
 
   return (
-    <>
+    <JobContext.Provider value={jobContext}>
       <BgCircles />
 
       <div className="relative">
@@ -238,7 +167,6 @@ const C: NextPage<PageProps> = ({}) => {
                 workflowId === "stable-diffusion-image-gen" ? (
                   currentStepIdx === 0 ? (
                     <GenerateImage
-                      credits={userContext.credits}
                       config={
                         workflowId === "dalle-image-gen"
                           ? appContext.blockConfigs["image_generation_dalle"]
@@ -246,30 +174,13 @@ const C: NextPage<PageProps> = ({}) => {
                               "image_generation_stable_diffusion"
                             ]
                       }
-                      setJobId={setJobId}
-                      prompt={prompt}
-                      setPrompt={setPrompt}
-                      images={images}
-                      jobStatus={jobStatus}
                     />
                   ) : (
-                    <MintImage
-                      provider={web3Context.provider}
-                      signer={web3Context.signer}
-                      networkName={web3Context.networkName}
-                      walletAddress={userContext.walletAddress}
-                      config={appContext.blockConfigs[2]}
-                      jobId={jobId}
-                      prompt={prompt}
-                      images={images}
-                    />
+                    <MintImage config={appContext.blockConfigs[2]} />
                   )
                 ) : workflowId === "text-summarization" ? (
                   <SummarizeText
-                    credits={userContext.credits}
                     config={appContext.blockConfigs["text_summarization"]}
-                    setJobId={setJobId}
-                    jobStatus={jobStatus}
                   />
                 ) : workflowId === "notion-question-answering" ? (
                   <div></div>
@@ -279,7 +190,7 @@ const C: NextPage<PageProps> = ({}) => {
           ) : null}
         </div>
       </div>
-    </>
+    </JobContext.Provider>
   );
 };
 

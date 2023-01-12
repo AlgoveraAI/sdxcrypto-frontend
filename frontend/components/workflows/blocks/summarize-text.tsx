@@ -1,27 +1,28 @@
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import Spinner from "../../spinner";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import Popup from "reactjs-popup";
-
-type Props = {
-  config: any;
-  setJobId: React.Dispatch<React.SetStateAction<string | null>>;
-  jobStatus: string;
-  credits: number | null;
-};
+import {
+  AppContext,
+  AppContextType,
+  UserContext,
+  UserContextType,
+  JobContext,
+  JobContextType,
+} from "../../../lib/contexts";
+import { BlockConfigType } from "../../../lib/types";
 
 const EXPECTED_TIME = 30000; // in ms, after this the user will be notified that the job is taking longer than expected
 
-export default function SummarizeText({
-  config,
-  setJobId,
-  jobStatus,
-  credits,
-}: Props) {
+export default function SummarizeText({ config }: { config: BlockConfigType }) {
+  const appContext = useContext(AppContext) as AppContextType;
+  const userContext = useContext(UserContext) as UserContextType;
+  const jobContext = useContext(JobContext) as JobContextType;
+
   // app vars
   const [loading, setLoading] = useState(false);
   const [checkTimeTakenInterval, setCheckTimeTakenInteraval] =
@@ -38,10 +39,10 @@ export default function SummarizeText({
 
   useEffect(() => {
     // catch job status errors
-    if (jobStatus === "error") {
+    if (jobContext?.status === "error") {
       errorToast("Error monitoring job");
     }
-  }, [jobStatus]);
+  }, [jobContext?.status]);
 
   const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
@@ -97,7 +98,7 @@ export default function SummarizeText({
       const endpointBody = {
         uid: user?.sub,
         doc: inputText,
-        model: config.model_name,
+        model_name: config.model_name,
         ...params,
       };
       console.log("endpoint body", endpointBody);
@@ -114,7 +115,7 @@ export default function SummarizeText({
       // check the response
       if (res.status === 200) {
         console.log("job result:", data, data.jobId);
-        setJobId(data.jobId);
+        jobContext.id = data.jobId;
 
         toast.dismiss(toastId.current);
         toastId.current = toast("Summarizing text", {
@@ -201,7 +202,7 @@ export default function SummarizeText({
         </div>
       </div>
 
-      {credits === 0 ? (
+      {userContext.credits === 0 ? (
         <div className="mt-2 text-sm text-red-600 italic">
           {"You're out of credits, "}
           <Link className="underline" href="/pricing">
