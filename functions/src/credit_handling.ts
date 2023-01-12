@@ -45,19 +45,14 @@ exports.checkGiftedCredits = async function (req, res) {
     }
 
     if (credits > 0) {
-      // update user credits
-      let newCredits; // new total credits
-      if (userSnap.exists) {
-        // user already has credits, increment
-        const userData = userSnap.data();
-        newCredits = userData.credits + credits;
-      } else {
-        // user doesnt have a db entry yet, set credits
-        newCredits = credits;
-      }
+      // update user credits from gift
+
       // add credits to the users doc (uid is the doc id)
-      console.log("updating user credits", newCredits);
-      await userRef.set({ credits: newCredits }, { merge: true });
+      console.log("incrementing user credits", credits);
+      await userRef.set(
+        { credits: admin.firestore.FieldValue.increment(credits) },
+        { merge: true }
+      );
       await walletCreditsRef.set(
         { credits: 0, nextGiftId: nextGiftId + 1 },
         { merge: true }

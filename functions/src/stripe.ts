@@ -66,12 +66,12 @@ exports.createStripeSubscription = async function (request, response) {
   // unlike a pay-as-you-go charge, subscriptions require a stripe customer
   // get/create the customer object first
 
-  const customerRef = firestore.collection("users").doc(uid);
-  const customerSnap = await customerRef.get();
+  const userRef = firestore.collection("users").doc(uid);
+  const userSnap = await userRef.get();
   let customerId;
-  if (customerSnap.exists) {
+  if (userSnap.exists) {
     // customer exists, get the stripe customer id
-    customerId = customerSnap.data()?.stripeCustome?.id;
+    customerId = userSnap.data()?.stripeSubscription?.id;
   }
   if (customerId) {
     console.log("found existing stripe customer", customerId);
@@ -82,11 +82,19 @@ exports.createStripeSubscription = async function (request, response) {
         uid,
       },
     });
-    // save the stripe customer id and sub status to firestore
-    await customerRef.set({
-      id: stripeCustomer.id,
-      status: "active",
-    });
+    // save the stripe customer id to firestore for re-use
+    // sub will be updated as 'active' once the payment is successful
+    // (in the stripe webhook handler)
+    await userRef.update(
+      {
+        stripeSubscription: {
+          id: stripeCustomer.id,
+        },
+      },
+      {
+        merge: true,
+      }
+    );
     customerId = stripeCustomer.id;
     console.log("created new stripe customer", customerId);
   }
@@ -243,5 +251,10 @@ const storeUserSubscription = async function (uid, subscriptionId, firestore) {
     monthlyCredits: subscriptionMonthlyCredits,
     status: "active",
   };
-  await userRef.update({ stripeSubscription });
+  await userRef.update(
+    { stripeSubscription },
+    {
+      merge: true,
+    }
+  );
 };

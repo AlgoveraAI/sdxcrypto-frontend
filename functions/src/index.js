@@ -11,7 +11,7 @@ const {
   checkGiftedCredits,
   checkAccessCredits,
   checkSubscription,
-} = require("./credit-handling.ts");
+} = require("./credit_handling.ts");
 exports.checkAccessCredits = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     try {
@@ -152,7 +152,7 @@ exports.cancelStripeSubscription = functions.https.onRequest((req, res) => {
 });
 
 // api key mgmt
-const { createApiKey, deleteApiKey } = require("./api-keys.ts");
+const { createApiKey, deleteApiKey } = require("./api_keys.ts");
 exports.createApiKey = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     try {

@@ -9,16 +9,16 @@ creds = credentials.Certificate("firebase-credentials.json")
 app = initialize_app(creds, name="sdxcrypto-algovera")
 db = firestore.client(app=app)
 
-block_id = "text_input"
+block_id = "image_upload"
 block_config = {
-    "name": "Text Input",
+    "name": "Image Upload",
     "dark_icon": "https://cdn-icons-png.flaticon.com/512/4056/4056922.png",
     "light_icon": "https://cdn-icons-png.flaticon.com/512/4056/4056922.png",
-    "desc": "Text input",
+    "desc": "Upload an image",
     "endpoint": "",
     "pricing": 0,
     "params": [
-        {"id": "text", "name": "Text", "type": "text", "default": ""},
+        {"id": "img", "name": "Image", "type": "file", "default": ""},
     ],
 }
 

@@ -9,17 +9,19 @@ creds = credentials.Certificate("firebase-credentials.json")
 app = initialize_app(creds, name="sdxcrypto-algovera")
 db = firestore.client(app=app)
 
-workflow_id = "text-summarization"
+workflow_id = "image-to-image"
 workflow_config = {
     "author": "Algovera",
-    "available": True,
+    "available": False,
     "blocks": [
+        "image_upload",
         "text_input",
-        "text_summarization",
+        "image_generation_stable_diffusion",
+        "mint_image",
     ],
-    "name": "Text Summarization",
-    "short_desc": "Summarize text into a few sentences",
-    "long_desc": "Summarize text into a few sentences using GPT-3. You can provide URLs, raw text, or upload a file (e.g. from Google Docs or Notion).",
+    "name": "Image to Image",
+    "short_desc": "Generate an image from another image and a prompt",
+    "long_desc": "Generate an image from another image and a prompt using Stable Diffusion.",
     "env": "dev",
 }
 
