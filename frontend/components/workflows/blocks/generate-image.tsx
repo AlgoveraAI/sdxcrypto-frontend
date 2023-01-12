@@ -31,15 +31,19 @@ export default function Generate({ config }: { config: BlockConfigType }) {
   const [params, setParams] = useState<{ [key: string]: number }>({});
 
   const { jobStatus } = useJobStatus(jobStarted, jobContext.id);
-  console.log("jobStatus", jobStatus);
 
   useEffect(() => {
     // on mount
-    jobContext.data = {
-      prompt: "",
-    };
-    jobContext.output = []; // will be list of image URLs
+    jobContext.setData({ prompt: "" });
+    jobContext.setOutput([]);
   }, []);
+
+  useEffect(() => {
+    // once job is done, load the image
+    if (jobStatus === "done") {
+      loadImages();
+    }
+  }, [jobStatus]);
 
   useEffect(() => {
     // set model params
@@ -51,6 +55,20 @@ export default function Generate({ config }: { config: BlockConfigType }) {
       setParams(params);
     }
   }, [config]);
+
+  const loadImages = async () => {
+    console.log("getting images for jobId", jobContext.id);
+    const response = await fetch("/api/getJobResult", {
+      method: "POST",
+      body: JSON.stringify({
+        jobId: jobContext.id,
+        uid: userContext.uid,
+        workflow: "txt2img",
+      }),
+    });
+    const { urls } = await response.json();
+    jobContext.setOutput(urls);
+  };
 
   const imgLoaded = () => {
     setLoading(false);
@@ -163,10 +181,6 @@ export default function Generate({ config }: { config: BlockConfigType }) {
       startJob();
     }
   };
-
-  console.log("jobContext", jobContext);
-  console.log("userContext", userContext);
-  console.log("jobId:", jobContext.id);
 
   return (
     <div className="mb-12">

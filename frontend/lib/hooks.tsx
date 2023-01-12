@@ -10,6 +10,9 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
   const [error, setError] = useState(null);
   const toastId = useRef<any>(null);
 
+  const [checkTimeTakenInterval, setCheckTimeTakenInterval] =
+    useState<any>(null);
+
   let warningToastId: any | null = null;
   let startTime: number;
   const maxTime = 30 * 1000; // 30 seconds
@@ -31,6 +34,8 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
             autoClose: false,
           }
         );
+        // now that it's over the threshold, stop checking
+        clearInterval(checkTimeTakenInterval);
       }
     }
   };
@@ -52,8 +57,8 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
       startTime = Date.now();
       const interval = setInterval(() => {
         checkTimeTaken(startTime);
-      }, 5000);
-      return () => clearInterval(interval);
+      }, 5000); // check every 5 seconds
+      setCheckTimeTakenInterval(interval);
     }
   }, [started]);
 
@@ -62,7 +67,7 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
       // once a job id is available, clear the starting toast
       // and create a new one to indicate the job is running
       toast.dismiss(toastId.current);
-      toastId.current = toast(`Running job ${jobId}`, {
+      toastId.current = toast(`Running job`, {
         position: "bottom-left",
         autoClose: false,
         closeOnClick: true,
@@ -71,7 +76,7 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
         icon: <Spinner />,
       });
 
-      const interval = setInterval(async () => {
+      const monitorJobInterval = setInterval(async () => {
         const res = await fetch("/api/checkJobStatus", {
           method: "POST",
           body: JSON.stringify({
@@ -79,16 +84,14 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
           }),
         });
         const data = await res.json();
-        console.log("job status:", data);
         if (res.status === 200 && data.job_status) {
           setStatus(data.job_status);
           if (data.job_status === "done") {
-            // stop the interval
-            clearInterval(interval);
-            // clear the warning toast
-            if (warningToastId) {
-              toast.dismiss(warningToastId);
-            }
+            // stop the intervals
+            clearInterval(checkTimeTakenInterval);
+            clearInterval(monitorJobInterval);
+            // clear toasts
+            toast.dismiss();
           }
 
           if (data.job_status === "error") {
@@ -101,12 +104,8 @@ export const useJobStatus = (started: boolean, jobId: string | null) => {
           setError(data.error);
         }
       }, 1000);
-
-      return () => clearInterval(interval);
     }
   }, [jobId]);
-
-  console.log("jobStatus hook", started, jobId, jobStatus, error);
 
   return { jobStatus, error };
 };

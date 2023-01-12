@@ -19,13 +19,23 @@ import {
 
 const C: NextPage<PageProps> = ({}) => {
   const appContext = useContext(AppContext) as AppContextType;
+
   // set up the job context
-  // these values will be defined once a job is started
+  // these values are used between different components
+  // that need to access the same state (e.g. job id, job status, etc.)
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [jobStatus, setJobStatus] = useState<string | null>(null);
+  const [jobData, setJobData] = useState<any | null>(null);
+  const [jobOutput, setJobOutput] = useState<any | null>(null);
   const jobContext = {
-    id: null,
-    status: null,
-    data: {},
-    output: null,
+    id: jobId,
+    setId: setJobId,
+    status: jobStatus,
+    setStatus: setJobStatus,
+    data: jobData,
+    setData: setJobData,
+    output: jobOutput,
+    setOutput: setJobOutput,
   };
 
   // define which step of the workflow the user is on
@@ -54,17 +64,6 @@ const C: NextPage<PageProps> = ({}) => {
       setWorkflowConfig(appContext.workflowConfigs[workflowId]);
     }
   }, [appContext.workflowConfigs, workflowId]);
-
-  // useEffect(() => {
-  //   // if job is done, clear interval
-  //   if (jobStatus === "done" || jobStatus === "error") {
-  //     console.log("clearing jobStatus interval:", jobStatus);
-  //     clearInterval(jobStatusInterval);
-  //   }
-  // }, [jobStatus]);
-
-  console.log("jobContext: ", jobContext);
-  console.log("appContext: ", appContext);
 
   return (
     <JobContext.Provider value={jobContext}>
