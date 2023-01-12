@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { useState, useEffect, useRef, useContext } from "react";
-import Spinner from "../../spinner";
 import { toast } from "react-toastify";
 import "reactjs-popup/dist/index.css";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
-import Popup from "reactjs-popup";
 import {
-  AppContext,
-  AppContextType,
   UserContext,
   UserContextType,
   JobContext,
@@ -16,12 +11,12 @@ import {
 } from "../../../lib/contexts";
 import { BlockConfigType } from "../../../lib/types";
 import { useJobStatus } from "../../../lib/hooks";
+import { db } from "../../../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function SummarizeText({ config }: { config: BlockConfigType }) {
-  const appContext = useContext(AppContext) as AppContextType;
   const userContext = useContext(UserContext) as UserContextType;
   const jobContext = useContext(JobContext) as JobContextType;
-  const [jobStarted, setJobStarted] = useState(false);
 
   // app vars
   const [loading, setLoading] = useState(false);
@@ -32,7 +27,33 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
   // model params (object with string keys and number values)
   const [params, setParams] = useState<{ [key: string]: number }>({});
 
-  const { jobStatus } = useJobStatus(jobStarted, jobContext.id);
+  useJobStatus(jobContext);
+
+  useEffect(() => {
+    // once job is done, load the summary
+    if (jobContext.status === "done") {
+      loadSummary();
+    }
+  }, [jobContext.status]);
+
+  const loadSummary = async () => {
+    // get summary from jobId doc in jobs collection
+    if (jobContext.id) {
+      const docRef = doc(db, "jobs", jobContext.id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data) {
+          console.log("job data", data);
+          setOutputText(data.summary);
+        }
+      } else {
+        console.error("No such document!");
+      }
+    } else {
+      console.error("No job id");
+    }
+  };
 
   const errorToast = (msg: string, dismissCurrent: boolean = true) => {
     toast.error(msg, {
@@ -55,6 +76,7 @@ export default function SummarizeText({ config }: { config: BlockConfigType }) {
   const startJob = async () => {
     try {
       setLoading(true);
+      jobContext.setStatus("started");
 
       console.log("sending", config);
       console.log("params", params);
