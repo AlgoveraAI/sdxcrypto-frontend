@@ -56,6 +56,7 @@ const Pricing: NextPage<PageProps> = ({}) => {
       paymentOptions.fiat.payg.price = `${appContext.creditCost} USD`;
       paymentOptions.fiat.sub.description = `${appContext.stripeCreditsPerMonth} credits + perks`;
       paymentOptions.crypto.payg.price = `${appContext.creditCost} USDC`;
+      paymentOptions.crypto.sub.price = `${appContext.accessPassCost} ETH`;
       paymentOptions.crypto.sub.description = `${appContext.accessCreditsPerMonth} credits per month + perks`;
       console.log("paymentOptions: ", paymentOptions);
       setLoaded(true);
