@@ -96,7 +96,7 @@ export default function Mint({ config }: { config: BlockConfigType }) {
       setLoading(true);
       setStatus("Preparing transaction");
       // check we have everything needed to mint
-      if (!jobContext.data.images.length) {
+      if (!jobContext.output.length) {
         errorToast("No image to mint");
         return;
       }
@@ -183,9 +183,8 @@ export default function Mint({ config }: { config: BlockConfigType }) {
         const metadata = {
           name: name.value,
           description: description.value,
-          image: jobContext.data.images[selectedIdx],
+          image: jobContext.output[selectedIdx],
           attributes: {
-            prompt: prompt,
             model: config.modalName,
           },
         };
@@ -259,7 +258,7 @@ export default function Mint({ config }: { config: BlockConfigType }) {
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <input
               id="description"
-              defaultValue=""
+              defaultValue={jobContext.data.prompt}
               data-lpignore="true"
               className="block p-2 w-full shadow-sm outline-none sm:text-sm bg-background-darker border-none text-sm"
               placeholder="An AI generated artwork"
@@ -267,10 +266,10 @@ export default function Mint({ config }: { config: BlockConfigType }) {
           </div>
         </div>
       </div>
-      {jobContext.id && jobContext.data.images.length ? (
+      {jobContext.id && jobContext.output.length ? (
         <Image
           className="mt-6 max-w-full h-auto mx-auto"
-          src={jobContext.data.images[selectedIdx]}
+          src={jobContext.output[selectedIdx]}
           alt="Generated Image"
           width={512}
           height={512}
