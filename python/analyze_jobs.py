@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 import datetime as dt
 
-load_dotenv(os.getcwd() + "/python/.env")
+load_dotenv()
+
 
 def analyze():
     # get all the jobs with outputs on firebase
@@ -27,6 +28,8 @@ def analyze():
     )
 
     print(f"Number of unique base models: {len(unique_base_models)}")
+
+    print(f"Number of unique users: {len(set([job['uid'] for job in jobs]))}")
 
     # print the number of each times each base model was used
     print("Number of times each base model was used:")

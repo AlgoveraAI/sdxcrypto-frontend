@@ -190,7 +190,7 @@ export default function CreditsModal({
                             setDesiredNumCredits(parseInt(e.target.value))
                           }
                           data-lpignore="true"
-                          className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-black/[0.3] border-none"
+                          className="block p-2 w-full shadow-sm sm:text-sm outline-none bg-background-darker border-none"
                           placeholder="Amount (min 50)"
                         />
                       </div>

@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-const config = require("../../config.json");
 import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 import { db, auth, firebaseApp } from "../../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -15,15 +14,8 @@ export default async function handler(
     // check git branch
     const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
 
-    // get the backend for this env
-    let apiBaseUrl;
-    if (branch === "main") {
-      console.log("using prod backend");
-      apiBaseUrl = config.api_base_url;
-    } else {
-      console.log("using dev backend");
-      apiBaseUrl = config.api_base_url_dev;
-    }
+    const apiBaseUrl = process.env.API_BASE_URL;
+
     const { uid, modality } = JSON.parse(req.body);
 
     const storage = getStorage(firebaseApp);

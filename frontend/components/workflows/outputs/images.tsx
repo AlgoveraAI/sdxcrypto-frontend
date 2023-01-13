@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "../../spinner";
-import { models } from "../image-generation/models";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 type ImgResult = {
@@ -67,9 +66,10 @@ export default function Images({ uid }: { uid: string | null }) {
                   <div>
                     <div className="text-lg font-medium">Model</div>
                     <div className="text-gray-400">
-                      {models[result.settings.base_model]
+                      {/* TODO */}
+                      {/* {models[result.settings.base_model]
                         ? models[result.settings.base_model].name
-                        : result.settings.base_model}
+                        : result.settings.base_model} */}
                     </div>
                   </div>
                   <div className="mt-4">

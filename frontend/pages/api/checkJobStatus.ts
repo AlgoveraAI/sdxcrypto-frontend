@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-const config = require("../../config.json");
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,18 +9,8 @@ export default async function handler(
     console.log("checking status", req.body);
 
     const headers = { "Content-Type": "application/json" };
-    // check git branch
-    const branch = process.env.VERCEL_GIT_COMMIT_REF || process.env.GIT_BRANCH;
+    const apiBaseUrl = process.env.API_BASE_URL;
 
-    // get the backend for this env
-    let apiBaseUrl;
-    if (branch === "main") {
-      console.log("using prod backend");
-      apiBaseUrl = config.api_base_url;
-    } else {
-      console.log("using dev backend");
-      apiBaseUrl = config.api_base_url_dev;
-    }
     const url = `${apiBaseUrl}/generate/status`;
     const paramUrl = new URL(url);
     const reqBody = JSON.parse(req.body);

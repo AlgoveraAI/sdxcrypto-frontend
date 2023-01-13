@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    console.log("got txt2img request", req.body);
+    console.log("got summarize request", req.body);
 
     const apiBaseUrl = process.env.API_BASE_URL;
 
@@ -17,10 +17,6 @@ export default async function handler(
 
     // custom logic to prep body for endpoint
     const { endpointBody } = body;
-    if (endpointBody.model === "dalle") {
-      endpointBody.resolution = `${endpointBody.resolution}x${endpointBody.resolution}`;
-    }
-
     console.log("endpointBody", endpointBody);
 
     const url = `${apiBaseUrl}/generate/${body.endpoint}`;
@@ -38,7 +34,7 @@ export default async function handler(
       // const job_uuid = response.headers.get("job_uuid");
       const data = await response.json();
       const job_uuid = data.job_uuid;
-      console.log("got txt2img response", job_uuid);
+      console.log("got response", job_uuid);
       if (!job_uuid) {
         console.log("Invalid job_uuid", job_uuid);
       }
@@ -46,7 +42,7 @@ export default async function handler(
         jobId: job_uuid,
       });
     } else {
-      console.log("txt2img response not ok");
+      console.log("response not ok");
       console.log(response.status);
       console.log(response.statusText);
       try {

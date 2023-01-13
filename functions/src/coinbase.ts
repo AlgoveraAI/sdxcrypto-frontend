@@ -13,11 +13,16 @@ Client.init(cbApiKey);
 exports.createCoinbaseCharge = async function (request, response) {
   console.log("creating charge", request.body);
   const data = JSON.parse(request.body);
-  const { uid, credits } = data;
+  let { uid, credits, sourceUrl } = data;
+  // remove url params from sourceUrl
+  // (eg if the user clicks cancel from a confirmation page)
+  sourceUrl = sourceUrl.split("?")[0];
+
   const amount = String(credits * 0.01);
   const chargeData = {
     name: "Algovera AI Credits",
     description: `Purchase request: ${credits} AI credits`,
+    redirect_url: sourceUrl + "?status=credits_purchased",
     local_price: {
       amount: amount,
       currency: "USD",
